@@ -13,7 +13,7 @@ import type {
   PermissionState,
 } from "./types.js";
 import {
-  compileWildcardPatterns,
+  compileWildcardPatternEntries,
   findCompiledWildcardMatch,
   findCompiledWildcardMatchForNames,
   type CompiledWildcardPattern,
@@ -367,14 +367,26 @@ type ResolvedPermissions = {
   bashFilter: BashFilter;
 };
 
-function compilePermissionPatterns(
-  permissions: Record<string, PermissionState> | undefined,
+function compilePermissionPatternsFromSources(
+  ...sources: Array<Record<string, PermissionState> | undefined>
 ): CompiledPermissionPatterns {
-  if (!permissions || Object.keys(permissions).length === 0) {
+  const entries: Array<readonly [string, PermissionState]> = [];
+
+  for (const source of sources) {
+    if (!source) {
+      continue;
+    }
+
+    for (const entry of Object.entries(source)) {
+      entries.push(entry);
+    }
+  }
+
+  if (entries.length === 0) {
     return [];
   }
 
-  return compileWildcardPatterns(permissions);
+  return compileWildcardPatternEntries(entries);
 }
 
 function findCompiledPermissionMatch(patterns: CompiledPermissionPatterns, name: string) {
@@ -542,10 +554,10 @@ export class PermissionManager {
       globalConfig,
       agentConfig,
       merged,
-      compiledSpecial: compilePermissionPatterns(merged.special),
-      compiledSkills: compilePermissionPatterns(merged.skills),
-      compiledMcp: compilePermissionPatterns(merged.mcp),
-      bashFilter: new BashFilter(merged.bash || {}, bashDefault),
+      compiledSpecial: compilePermissionPatternsFromSources(globalConfig.special, agentConfig.special),
+      compiledSkills: compilePermissionPatternsFromSources(globalConfig.skills, agentConfig.skills),
+      compiledMcp: compilePermissionPatternsFromSources(globalConfig.mcp, agentConfig.mcp),
+      bashFilter: new BashFilter(compilePermissionPatternsFromSources(globalConfig.bash, agentConfig.bash), bashDefault),
     };
 
     this.resolvedPermissionsCache.set(cacheKey, { stamp, value });
@@ -609,19 +621,6 @@ export class PermissionManager {
     if (normalizedToolName === "bash") {
       const record = toRecord(input);
       const command = typeof record.command === "string" ? record.command : "";
-
-      const agentBashToolOverride = agentConfig.tools?.bash;
-      const hasAgentBashPatterns = Object.keys(agentConfig.bash || {}).length > 0;
-
-      if (agentBashToolOverride && !hasAgentBashPatterns) {
-        return {
-          toolName,
-          state: agentBashToolOverride,
-          command,
-          source: "bash",
-        };
-      }
-
       const result = bashFilter.check(command);
 
       return {
@@ -637,15 +636,6 @@ export class PermissionManager {
       const mcpTargets = [...createMcpPermissionTargets(input, this.getConfiguredMcpServerNames()), "mcp"];
       const fallbackTarget = mcpTargets[0] || "mcp";
       const toolLevelMcpState = merged.tools?.mcp;
-
-      if (toolLevelMcpState === "deny") {
-        return {
-          toolName,
-          state: "deny",
-          target: fallbackTarget,
-          source: "tool",
-        };
-      }
 
       const mcpMatch = findCompiledPermissionMatchForNames(compiledMcp, mcpTargets);
       if (mcpMatch) {

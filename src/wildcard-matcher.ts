@@ -2,8 +2,6 @@ export type CompiledWildcardPattern<TState> = {
   pattern: string;
   state: TState;
   regex: RegExp;
-  wildcardCount: number;
-  literalLength: number;
 };
 
 export type WildcardPatternMatch<TState> = {
@@ -26,39 +24,27 @@ export function compileWildcardPattern<TState>(pattern: string, state: TState): 
     pattern,
     state,
     regex: new RegExp(`^${escaped}$`),
-    wildcardCount: (pattern.match(/\*/g) || []).length,
-    literalLength: pattern.replace(/\*/g, "").length,
   };
 }
 
-function compareCompiledPatterns<TState>(
-  left: CompiledWildcardPattern<TState>,
-  right: CompiledWildcardPattern<TState>,
-): number {
-  if (left.wildcardCount !== right.wildcardCount) {
-    return left.wildcardCount - right.wildcardCount;
-  }
-
-  if (left.literalLength !== right.literalLength) {
-    return right.literalLength - left.literalLength;
-  }
-
-  return right.pattern.length - left.pattern.length;
+export function compileWildcardPatternEntries<TState>(
+  entries: Iterable<readonly [string, TState]>,
+): CompiledWildcardPattern<TState>[] {
+  return Array.from(entries, ([pattern, state]) => compileWildcardPattern(pattern, state));
 }
 
 export function compileWildcardPatterns<TState>(
   patterns: Record<string, TState>,
 ): CompiledWildcardPattern<TState>[] {
-  return Object.entries(patterns)
-    .map(([pattern, state]) => compileWildcardPattern(pattern, state))
-    .sort(compareCompiledPatterns);
+  return compileWildcardPatternEntries(Object.entries(patterns));
 }
 
 export function findCompiledWildcardMatch<TState>(
   patterns: readonly CompiledWildcardPattern<TState>[],
   name: string,
 ): WildcardPatternMatch<TState> | null {
-  for (const pattern of patterns) {
+  for (let index = patterns.length - 1; index >= 0; index -= 1) {
+    const pattern = patterns[index];
     if (pattern.regex.test(name)) {
       return {
         state: pattern.state,

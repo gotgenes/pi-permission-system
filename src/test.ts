@@ -47,13 +47,13 @@ function runTest(name: string, testFn: () => void): void {
   console.log(`[PASS] ${name}`);
 }
 
-runTest("BashFilter wildcard and specificity matching", () => {
+runTest("BashFilter uses opencode-style last-match hierarchy", () => {
   const filter = new BashFilter(
     {
-      "git status": "allow",
-      "git status *": "ask",
-      "git *": "deny",
       "*": "ask",
+      "git *": "deny",
+      "git status *": "ask",
+      "git status": "allow",
     },
     "deny",
   );
@@ -98,7 +98,7 @@ runTest("PermissionManager built-in permission checking", () => {
   }
 });
 
-runTest("Agent-specific bash override", () => {
+runTest("Bash patterns stay higher priority than tool-level bash fallback", () => {
   const { manager, cleanup } = createManager(
     {
       defaultPolicy: {
@@ -108,28 +108,31 @@ runTest("Agent-specific bash override", () => {
         skills: "ask",
         special: "ask",
       },
-      tools: {
-        bash: "allow",
-      },
       bash: {
-        "echo *": "allow",
+        "rm -rf *": "deny",
       },
     },
     {
       reviewer: `---
 name: reviewer
 permission:
-  bash: deny
+  tools:
+    bash: allow
 ---
 `,
     },
   );
 
   try {
-    const result = manager.checkPermission("bash", { command: "echo hello" }, "reviewer");
-    assert.equal(result.state, "deny");
-    assert.equal(result.source, "bash");
-    assert.equal(result.matchedPattern, undefined);
+    const denied = manager.checkPermission("bash", { command: "rm -rf build" }, "reviewer");
+    assert.equal(denied.state, "deny");
+    assert.equal(denied.source, "bash");
+    assert.equal(denied.matchedPattern, "rm -rf *");
+
+    const fallback = manager.checkPermission("bash", { command: "echo hello" }, "reviewer");
+    assert.equal(fallback.state, "allow");
+    assert.equal(fallback.source, "bash");
+    assert.equal(fallback.matchedPattern, undefined);
   } finally {
     cleanup();
   }
@@ -145,9 +148,9 @@ runTest("MCP wildcard matching", () => {
       special: "ask",
     },
     mcp: {
+      "*": "deny",
       "subagent_*": "ask",
       "subagent_query-*": "allow",
-      "*": "deny",
     },
   });
 
@@ -179,9 +182,9 @@ runTest("Skill permission matching", () => {
       special: "ask",
     },
     skills: {
-      "requesting-code-review": "allow",
-      "web-*": "deny",
       "*": "ask",
+      "web-*": "deny",
+      "requesting-code-review": "allow",
     },
   });
 
@@ -214,8 +217,8 @@ runTest("MCP proxy tool infers server-prefixed aliases from configured server na
         special: "ask",
       },
       mcp: {
-        exa_get_code_context_exa: "allow",
         "exa_*": "deny",
+        exa_get_code_context_exa: "allow",
       },
     },
     {},
@@ -246,8 +249,8 @@ runTest("MCP describe mode normalizes qualified tool names without duplicating s
         special: "ask",
       },
       mcp: {
-        exa_web_search_exa: "allow",
         "exa_*": "deny",
+        exa_web_search_exa: "allow",
       },
     },
     {},
@@ -360,6 +363,49 @@ permission:
     assert.equal(result.source, "mcp");
     assert.equal(result.matchedPattern, "exa_web_search_exa");
     assert.equal(result.target, "exa_web_search_exa");
+  } finally {
+    cleanup();
+  }
+});
+
+runTest("specific MCP rules still win when tools.mcp is deny", () => {
+  const { manager, cleanup } = createManager(
+    {
+      defaultPolicy: {
+        tools: "ask",
+        bash: "ask",
+        mcp: "ask",
+        skills: "ask",
+        special: "ask",
+      },
+    },
+    {
+      reviewer: `---
+name: reviewer
+permission:
+  tools:
+    mcp: deny
+  mcp:
+    exa_web_search_exa: allow
+---
+`,
+    },
+    {
+      mcpServerNames: ["exa"],
+    },
+  );
+
+  try {
+    const allowed = manager.checkPermission("mcp", { tool: "web_search_exa" }, "reviewer");
+    assert.equal(allowed.state, "allow");
+    assert.equal(allowed.source, "mcp");
+    assert.equal(allowed.matchedPattern, "exa_web_search_exa");
+    assert.equal(allowed.target, "exa_web_search_exa");
+
+    const fallback = manager.checkPermission("mcp", { tool: "other_exa" }, "reviewer");
+    assert.equal(fallback.state, "deny");
+    assert.equal(fallback.source, "tool");
+    assert.equal(fallback.target, "exa_other_exa");
   } finally {
     cleanup();
   }

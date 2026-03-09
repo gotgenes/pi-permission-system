@@ -7,6 +7,12 @@ import {
 
 type CompiledPattern = CompiledWildcardPattern<PermissionState>;
 
+type BashPermissionSource = BashPermissions | readonly CompiledPattern[];
+
+function isCompiledPatternList(value: BashPermissionSource): value is readonly CompiledPattern[] {
+  return Array.isArray(value);
+}
+
 export interface BashPermissionCheck {
   state: PermissionState;
   matchedPattern?: string;
@@ -17,10 +23,12 @@ export class BashFilter {
   private readonly compiledPatterns: CompiledPattern[];
 
   constructor(
-    private readonly permissions: BashPermissions,
+    permissions: BashPermissionSource,
     private readonly defaultState: PermissionState,
   ) {
-    this.compiledPatterns = compileWildcardPatterns(permissions);
+    this.compiledPatterns = isCompiledPatternList(permissions)
+      ? [...permissions]
+      : compileWildcardPatterns(permissions);
   }
 
   check(command: string): BashPermissionCheck {
