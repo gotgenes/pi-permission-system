@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-03-23
+
+### Added
+- Yolo mode for auto-approval when enabled — bypasses permission prompts for streamlined workflows
+- Permission forwarding system for subagent-to-primary IPC communication
+- Configuration modal UI with Zellij integration (`config-modal.ts`, `zellij-modal.ts`)
+- `permission-forwarding.ts` module for subagent permission request routing
+- `yolo-mode.ts` module for automatic permission approval when yolo mode is active
+
+### Changed
+- Updated `@mariozechner/pi-coding-agent` and `@mariozechner/pi-tui` peer dependencies to ^0.62.0
+- Refactored `index.ts` to export new permission resolution utilities
+- Expanded `extension-config.ts` with config normalization for new features
+- Added `types-shims.d.ts` for Zellij modal type definitions
+
+### Tests
+- Added comprehensive tests for config modal functionality
+- Added tests for permission forwarding behavior
+
 ## [0.2.2] - 2026-03-13
 
 ### Changed
