@@ -28,9 +28,13 @@
     "pi-package",
     "pi",
     "pi-extension",
+    "pi-coding-agent",
+    "coding-agent",
     "permissions",
     "policy",
-    "coding-agent"
+    "access-control",
+    "authorization",
+    "security"
   ],
   "author": "MasuRii",
   "license": "MIT",
