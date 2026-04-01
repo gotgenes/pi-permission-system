@@ -5,7 +5,8 @@
 
 Permission enforcement extension for the Pi coding agent that provides centralized, deterministic permission gates for tool, bash, MCP, skill, and special operations.
 
-![Permission Prompt Example](https://raw.githubusercontent.com/MasuRii/pi-permission-system/main/asset/pi-permission-system.png)
+<img width="1360" height="752" alt="image" src="https://github.com/user-attachments/assets/3e85190a-17fa-4d94-ac8e-efa54337df5d" />
+
 
 ## Features
 
