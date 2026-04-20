@@ -580,13 +580,18 @@ export class PermissionManager {
     };
   }
 
-  private resolvePermissions(agentName?: string): ResolvedPermissions {
-    const cacheKey = agentName || "__global__";
+  getPolicyCacheStamp(agentName?: string): string {
     const agentStamp = agentName ? getFileStamp(join(this.agentsDir, `${agentName}.md`)) : "missing";
     const projectStamp = this.projectGlobalConfigPath ? getFileStamp(this.projectGlobalConfigPath) : "none";
     const projectAgentStamp =
       this.projectAgentsDir && agentName ? getFileStamp(join(this.projectAgentsDir, `${agentName}.md`)) : "none";
-    const stamp = `${getFileStamp(this.globalConfigPath)}|${projectStamp}|${agentStamp}|${projectAgentStamp}`;
+
+    return `${getFileStamp(this.globalConfigPath)}|${projectStamp}|${agentStamp}|${projectAgentStamp}`;
+  }
+
+  private resolvePermissions(agentName?: string): ResolvedPermissions {
+    const cacheKey = agentName || "__global__";
+    const stamp = this.getPolicyCacheStamp(agentName);
     const cached = this.resolvedPermissionsCache.get(cacheKey);
     if (cached?.stamp === stamp) {
       return cached.value;
