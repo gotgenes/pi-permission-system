@@ -9,7 +9,8 @@ import {
   loadPermissionSystemConfig,
   savePermissionSystemConfig,
   type PermissionSystemExtensionConfig,
-} from "./extension-config.js";
+} from "../src/extension-config.js";
+import { runAsyncTest, runTest } from "./test-harness.js";
 
 mock.module("@mariozechner/pi-coding-agent", () => ({
   getSettingsListTheme: () => ({}),
@@ -38,7 +39,7 @@ mock.module("@mariozechner/pi-tui", () => ({
   visibleWidth: (text: string) => text.length,
 }));
 
-const { registerPermissionSystemCommand } = await import("./config-modal.js");
+const { registerPermissionSystemCommand } = await import("../src/config-modal.js");
 
 type Notification = { message: string; level: "info" | "warning" | "error" };
 
@@ -49,16 +50,6 @@ type CommandContextStub = {
     custom<T>(renderer: (...args: unknown[]) => unknown, options?: unknown): Promise<T>;
   };
 };
-
-function runTest(name: string, testFn: () => void): void {
-  testFn();
-  console.log(`[PASS] ${name}`);
-}
-
-async function runAsyncTest(name: string, testFn: () => Promise<void>): Promise<void> {
-  await testFn();
-  console.log(`[PASS] ${name}`);
-}
 
 function createCommandContext(
   hasUI: boolean,

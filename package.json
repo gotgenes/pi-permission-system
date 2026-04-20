@@ -1,6 +1,6 @@
 {
   "name": "pi-permission-system",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Permission enforcement extension for the Pi coding agent.",
   "type": "module",
   "main": "./index.ts",
@@ -10,10 +10,10 @@
   "files": [
     "index.ts",
     "src",
+    "tests",
     "config.json",
     "config/config.example.json",
     "schemas/permissions.schema.json",
-    "asset",
     "README.md",
     "CHANGELOG.md",
     "LICENSE"
@@ -21,7 +21,7 @@
   "scripts": {
     "build": "npx --yes -p typescript@5.7.3 tsc -p tsconfig.json --noCheck",
     "lint": "npm run build",
-    "test": "bun ./src/test.ts && bun ./src/config-modal-test.ts",
+    "test": "bun ./tests/permission-system.test.ts && bun ./tests/config-modal.test.ts",
     "check": "npm run lint && npm run test"
   },
   "keywords": [
@@ -58,8 +58,8 @@
     ]
   },
   "peerDependencies": {
-    "@mariozechner/pi-coding-agent": "^0.64.0",
-    "@mariozechner/pi-tui": "^0.64.0",
+    "@mariozechner/pi-coding-agent": "^0.67.68",
+    "@mariozechner/pi-tui": "^0.67.68",
     "@sinclair/typebox": "^0.34.49"
   }
 }

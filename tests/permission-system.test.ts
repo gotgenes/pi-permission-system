@@ -3,20 +3,21 @@ import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { BashFilter } from "./bash-filter.js";
-import { DEFAULT_EXTENSION_CONFIG, loadPermissionSystemConfig, savePermissionSystemConfig } from "./extension-config.js";
-import { createPermissionSystemLogger } from "./logging.js";
+import { BashFilter } from "../src/bash-filter.js";
+import { DEFAULT_EXTENSION_CONFIG, loadPermissionSystemConfig, savePermissionSystemConfig } from "../src/extension-config.js";
+import { createPermissionSystemLogger } from "../src/logging.js";
 import {
   createPermissionForwardingLocation,
   isForwardedPermissionRequestForSession,
   resolvePermissionForwardingTargetSessionId,
-} from "./permission-forwarding.js";
-import { PermissionManager } from "./permission-manager.js";
-import { checkRequestedToolRegistration, getToolNameFromValue } from "./tool-registry.js";
-import { getPermissionSystemStatus } from "./status.js";
-import { sanitizeAvailableToolsSection } from "./system-prompt-sanitizer.js";
-import type { AgentPermissions, GlobalPermissionConfig } from "./types.js";
-import { canResolveAskPermissionRequest, shouldAutoApprovePermissionState } from "./yolo-mode.js";
+} from "../src/permission-forwarding.js";
+import { PermissionManager } from "../src/permission-manager.js";
+import { checkRequestedToolRegistration, getToolNameFromValue } from "../src/tool-registry.js";
+import { getPermissionSystemStatus } from "../src/status.js";
+import { sanitizeAvailableToolsSection } from "../src/system-prompt-sanitizer.js";
+import type { AgentPermissions, GlobalPermissionConfig } from "../src/types.js";
+import { canResolveAskPermissionRequest, shouldAutoApprovePermissionState } from "../src/yolo-mode.js";
+import { runTest } from "./test-harness.js";
 
 type CreateManagerOptions = {
   mcpServerNames?: readonly string[];
@@ -50,11 +51,6 @@ function createManager(
       rmSync(baseDir, { recursive: true, force: true });
     },
   };
-}
-
-function runTest(name: string, testFn: () => void): void {
-  testFn();
-  console.log(`[PASS] ${name}`);
 }
 
 runTest("Permission-system extension config defaults debug off, review log on, and yolo mode off", () => {
