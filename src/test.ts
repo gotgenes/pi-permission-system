@@ -1022,4 +1022,42 @@ runTest("Permission forwarding rejects unresolved sentinel session ids", () => {
   assert.equal(targetSessionId, null);
 });
 
+// ---------------------------------------------------------------------------
+// PI_CODING_AGENT_DIR support
+// ---------------------------------------------------------------------------
+
+runTest("PermissionManager reads config from PI_CODING_AGENT_DIR when set", () => {
+  const baseDir = mkdtempSync(join(tmpdir(), "pi-permission-system-envdir-"));
+  const agentsDir = join(baseDir, "agents");
+  mkdirSync(agentsDir, { recursive: true });
+
+  const config: GlobalPermissionConfig = {
+    defaultPolicy: { tools: "deny", bash: "deny", mcp: "deny", skills: "deny", special: "deny" },
+    tools: { read: "allow" },
+    bash: {},
+    mcp: {},
+    skills: {},
+    special: {},
+  };
+  writeFileSync(join(baseDir, "pi-permissions.jsonc"), JSON.stringify(config), "utf8");
+
+  const original = process.env.PI_CODING_AGENT_DIR;
+  process.env.PI_CODING_AGENT_DIR = baseDir;
+  try {
+    const manager = new PermissionManager();
+    const result = manager.checkPermission("read", {});
+    assert.equal(result.state, "allow");
+
+    const result2 = manager.checkPermission("write", {});
+    assert.equal(result2.state, "deny");
+  } finally {
+    if (original !== undefined) {
+      process.env.PI_CODING_AGENT_DIR = original;
+    } else {
+      delete process.env.PI_CODING_AGENT_DIR;
+    }
+    rmSync(baseDir, { recursive: true, force: true });
+  }
+});
+
 console.log("All permission system tests passed.");

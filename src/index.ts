@@ -1,4 +1,4 @@
-import { isToolCallEventType, type ExtensionAPI, type ExtensionCommandContext, type ExtensionContext } from "@mariozechner/pi-coding-agent";
+import { getAgentDir, isToolCallEventType, type ExtensionAPI, type ExtensionCommandContext, type ExtensionContext } from "@mariozechner/pi-coding-agent";
 import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmdirSync, unlinkSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join, normalize, resolve, sep } from "node:path";
@@ -32,7 +32,7 @@ import type { PermissionCheckResult, PermissionState } from "./types.js";
 import { PERMISSION_SYSTEM_STATUS_KEY, syncPermissionSystemStatus } from "./status.js";
 import { canResolveAskPermissionRequest, shouldAutoApprovePermissionState } from "./yolo-mode.js";
 
-const PI_AGENT_DIR = join(homedir(), ".pi", "agent");
+const PI_AGENT_DIR = getAgentDir();
 const SESSIONS_DIR = join(PI_AGENT_DIR, "sessions");
 const SUBAGENT_SESSIONS_DIR = join(PI_AGENT_DIR, "subagent-sessions");
 const PERMISSION_FORWARDING_DIR = join(SESSIONS_DIR, "permission-forwarding");

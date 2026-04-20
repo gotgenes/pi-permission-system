@@ -1,6 +1,7 @@
 import { readFileSync, statSync } from "node:fs";
-import { homedir } from "node:os";
 import { join } from "node:path";
+
+import { getAgentDir } from "@mariozechner/pi-coding-agent";
 
 import { BashFilter } from "./bash-filter.js";
 import { extractFrontmatter, getNonEmptyString, isPermissionState, parseSimpleYamlMap, toRecord } from "./common.js";
@@ -19,10 +20,10 @@ import {
   type CompiledWildcardPattern,
 } from "./wildcard-matcher.js";
 
-const GLOBAL_CONFIG_PATH = join(homedir(), ".pi", "agent", "pi-permissions.jsonc");
-const AGENTS_DIR = join(homedir(), ".pi", "agent", "agents");
-const LEGACY_GLOBAL_SETTINGS_PATH = join(homedir(), ".pi", "agent", "settings.json");
-const GLOBAL_MCP_CONFIG_PATH = join(homedir(), ".pi", "agent", "mcp.json");
+function defaultGlobalConfigPath(): string { return join(getAgentDir(), "pi-permissions.jsonc"); }
+function defaultAgentsDir(): string { return join(getAgentDir(), "agents"); }
+function defaultLegacyGlobalSettingsPath(): string { return join(getAgentDir(), "settings.json"); }
+function defaultGlobalMcpConfigPath(): string { return join(getAgentDir(), "mcp.json"); }
 
 const BUILT_IN_TOOL_PERMISSION_NAMES = new Set(["bash", "read", "write", "edit", "grep", "find", "ls"]);
 const SPECIAL_PERMISSION_KEYS = new Set(["doom_loop", "external_directory"]);
@@ -441,10 +442,10 @@ export class PermissionManager {
       mcpServerNames?: readonly string[];
     } = {},
   ) {
-    this.globalConfigPath = options.globalConfigPath || GLOBAL_CONFIG_PATH;
-    this.agentsDir = options.agentsDir || AGENTS_DIR;
-    this.legacyGlobalSettingsPath = options.legacyGlobalSettingsPath || LEGACY_GLOBAL_SETTINGS_PATH;
-    this.globalMcpConfigPath = options.globalMcpConfigPath || GLOBAL_MCP_CONFIG_PATH;
+    this.globalConfigPath = options.globalConfigPath || defaultGlobalConfigPath();
+    this.agentsDir = options.agentsDir || defaultAgentsDir();
+    this.legacyGlobalSettingsPath = options.legacyGlobalSettingsPath || defaultLegacyGlobalSettingsPath();
+    this.globalMcpConfigPath = options.globalMcpConfigPath || defaultGlobalMcpConfigPath();
     this.configuredMcpServerNamesOverride = options.mcpServerNames
       ? [...new Set(options.mcpServerNames.map((name) => name.trim()).filter((name) => name.length > 0))]
       : null;
