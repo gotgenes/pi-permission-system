@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.2] - 2026-04-20
+
+### Added
+- Added project-level permission layering from the active session workspace via `<cwd>/.pi/agent/pi-permissions.jsonc`
+- Added project-level per-agent overrides via `<cwd>/.pi/agent/agents/<agent>.md` (thanks to @Talia-12 for PR #7)
+- Added reload-aware permission manager refresh paths so policy caches are rebuilt when Pi reload events occur
+- Added a dedicated `tests/` directory with modular test entrypoints and a shared test harness
+
+### Changed
+- Global path resolution now follows Pi's `getAgentDir()` helper, so global config, agents, sessions, and logs respect `PI_CODING_AGENT_DIR` (thanks to @jvortmann for PR #6)
+- Updated `@mariozechner/pi-coding-agent` and `@mariozechner/pi-tui` peer dependencies to `^0.67.68`
+- Updated TypeScript project configuration and npm scripts to run tests from `tests/` instead of `src/`
+- Updated README documentation for project-level policy files, yolo mode config, test layout, and `PI_CODING_AGENT_DIR`
+
+### Removed
+- Removed the legacy packaged `asset/` directory because the README now uses externally hosted images instead of repository-bundled screenshots
+
+### Fixed
+- `/skill:<name>` permission handling now falls back to the current merged skill policy when no active agent context is available in the main session (thanks to @NSBeidou and @hidromagnetismo for reporting the issue)
+- Skill denial messaging now reflects whether the block came from an agent-specific rule or the merged policy without agent context
+
+### Tests
+- Added coverage for project-level precedence across global, project, system-agent, and project-agent layers
+- Added coverage for resolving config from `PI_CODING_AGENT_DIR`
+
 ## [0.4.1] - 2026-04-01
 
 ### Changed

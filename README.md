@@ -1,6 +1,6 @@
 # 🔐 pi-permission-system
 
-[![Version](https://img.shields.io/badge/version-0.4.1-blue.svg)](package.json)
+[![Version](https://img.shields.io/badge/version-0.4.2-blue.svg)](package.json)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Permission enforcement extension for the Pi coding agent that provides centralized, deterministic permission gates for tool, bash, MCP, skill, and special operations.
@@ -26,10 +26,10 @@ Permission enforcement extension for the Pi coding agent that provides centraliz
 
 Place this folder in one of the following locations:
 
-| Scope   | Path                                          |
-|---------|-----------------------------------------------|
-| Global  | `~/.pi/agent/extensions/pi-permission-system` |
-| Project | `.pi/extensions/pi-permission-system`         |
+| Scope   | Path |
+|---------|------|
+| Global default | `~/.pi/agent/extensions/pi-permission-system` (respects `PI_CODING_AGENT_DIR`) |
+| Project | `.pi/extensions/pi-permission-system` |
 
 Pi auto-discovers extensions in these paths.
 
@@ -39,7 +39,7 @@ Pi auto-discovers extensions in these paths.
 
 ### Quick Start
 
-1. Create the global policy file at `~/.pi/agent/pi-permissions.jsonc`:
+1. Create the global policy file at the Pi agent runtime root (default: `~/.pi/agent/pi-permissions.jsonc`, respects `PI_CODING_AGENT_DIR`):
 
 ```jsonc
 {
@@ -84,20 +84,20 @@ The extension integrates via Pi's lifecycle hooks:
 - The `Available tools:` system prompt section is rewritten to match the filtered active tool set
 - Extension-provided tools like `task`, `mcp`, and third-party tools are handled by exact registered name instead of private built-in hardcodes
 - When a subagent hits an `ask` permission without direct UI access, the request can be forwarded to the main interactive session for confirmation
-- When a subagent triggers an `ask` permission without UI access, the request can be forwarded to the main session and answered there
 
 ## Configuration
 
 ### Extension Config File
 
-**Location:** `~/.pi/agent/extensions/pi-permission-system/config.json`
+**Location:** global Pi extension config (default: `~/.pi/agent/extensions/pi-permission-system/config.json`, respects `PI_CODING_AGENT_DIR`)
 
 The extension creates this file automatically when it is missing. It controls only extension-local logging behavior:
 
 ```json
 {
   "debugLog": false,
-  "permissionReviewLog": true
+  "permissionReviewLog": true,
+  "yoloMode": false
 }
 ```
 
@@ -105,12 +105,13 @@ The extension creates this file automatically when it is missing. It controls on
 |-----|---------|-------------|
 | `debugLog` | `false` | Enables verbose diagnostic logging to `logs/pi-permission-system-debug.jsonl` |
 | `permissionReviewLog` | `true` | Enables the permission request/denial review log at `logs/pi-permission-system-permission-review.jsonl` |
+| `yoloMode` | `false` | Auto-approves `ask` results instead of prompting when yolo mode is enabled |
 
 Both logs write to files only under the extension directory. No debug output is printed to the terminal.
 
 ### Global Policy File
 
-**Location:** `~/.pi/agent/pi-permissions.jsonc`
+**Location:** global Pi policy file (default: `~/.pi/agent/pi-permissions.jsonc`, respects `PI_CODING_AGENT_DIR`)
 
 The policy file is a JSON object with these sections:
 
@@ -125,9 +126,9 @@ The policy file is a JSON object with these sections:
 
 > **Note:** Trailing commas are **not** supported. If parsing fails, the extension falls back to `ask` for all categories.
 
-### Per-Agent Overrides
+### Global Per-Agent Overrides
 
-Override global permissions for specific agents via YAML frontmatter in `~/.pi/agent/agents/<agent>.md`:
+Override global permissions for specific agents via YAML frontmatter in the global Pi agents directory (default: `~/.pi/agent/agents/<agent>.md`, respects `PI_CODING_AGENT_DIR`):
 
 ```yaml
 ---
@@ -148,11 +149,28 @@ permission:
 ---
 ```
 
-**Precedence:** Agent frontmatter overrides global config (shallow-merged per section).
-
 **MCP behavior:** `permission.tools.mcp` is the coarse entry/fallback permission for a registered `mcp` tool when one is available. More specific `permission.mcp` target rules override that fallback when they match.
 
 **Limitations:** The frontmatter parser is intentionally minimal. Use only `key: value` scalars and nested maps. Avoid arrays, multi-line scalars, and YAML anchors.
+
+### Project-Level Policy Files
+
+The extension can also layer project-local permission files relative to the active session working directory:
+
+| Scope | Path |
+|-------|------|
+| Project policy | `<cwd>/.pi/agent/pi-permissions.jsonc` |
+| Project agent override | `<cwd>/.pi/agent/agents/<agent>.md` |
+
+Project-local files use the same formats as the global policy file and global agent frontmatter. These project files are resolved from Pi's current session `cwd`, so they are workspace-specific and do **not** move under `PI_CODING_AGENT_DIR`.
+
+**Precedence order:**
+1. Global policy file
+2. Project policy file
+3. Global agent frontmatter
+4. Project agent frontmatter
+
+Later layers override earlier layers within the same permission category. For wildcard-based sections like `bash`, `mcp`, `skills`, and `special`, matching still follows the extension's existing **last matching rule wins** behavior after the layers are combined.
 
 ---
 
@@ -258,7 +276,7 @@ A registered `mcp` tool can use `tools.mcp` as an entry permission point. This p
 This is useful for per-agent configurations where you want to grant MCP access broadly:
 
 ```yaml
-# In ~/.pi/agent/agents/researcher.md
+# In the global Pi agents directory (default: ~/.pi/agent/agents/researcher.md; respects PI_CODING_AGENT_DIR)
 ---
 name: researcher
 permission:
@@ -355,7 +373,7 @@ Reserved permission checks:
 
 ### Per-Agent Lockdown
 
-In `~/.pi/agent/agents/reviewer.md`:
+In the global Pi agents directory (default: `~/.pi/agent/agents/reviewer.md`, respects `PI_CODING_AGENT_DIR`):
 
 ```yaml
 ---
@@ -383,7 +401,8 @@ This keeps `ask` policies usable even when the original permission check happens
 When the extension prompts, denies, or forwards permission requests, it can append structured JSONL entries under:
 
 ```text
-~/.pi/agent/extensions/pi-permission-system/logs/
+Default global logs directory: ~/.pi/agent/extensions/pi-permission-system/logs/
+Actual global logs directory: $PI_CODING_AGENT_DIR/extensions/pi-permission-system/logs when PI_CODING_AGENT_DIR is set
 ```
 
 - `pi-permission-system-permission-review.jsonl` — enabled by default for permission review/audit history
@@ -394,16 +413,19 @@ When the extension prompts, denies, or forwards permission requests, it can appe
 ```
 index.ts                    → Root Pi entrypoint shim
 src/
-├── index.ts                → Extension bootstrap, permission checks, review logging, and subagent forwarding
+├── index.ts                → Extension bootstrap, permission checks, review logging, reload handling, and subagent forwarding
 ├── extension-config.ts     → Extension-local config loading and default creation
 ├── logging.ts              → File-only debug/review logging helpers
-├── permission-manager.ts   → Policy loading, merging, and resolution with caching
+├── permission-manager.ts   → Global/project policy loading, merging, and resolution with caching
 ├── bash-filter.ts          → Bash command wildcard pattern matching
 ├── wildcard-matcher.ts     → Shared wildcard pattern compilation and matching
 ├── common.ts               → Shared utilities (YAML parsing, type guards, etc.)
 ├── tool-registry.ts        → Registered tool name resolution
-├── types.ts                → TypeScript type definitions
-└── test.ts                 → Test runner
+└── types.ts                → TypeScript type definitions
+tests/
+├── permission-system.test.ts → Core permission, layering, forwarding, and policy tests
+├── config-modal.test.ts      → Config command and modal behavior tests
+└── test-harness.ts           → Shared lightweight test helpers
 schemas/
 └── permissions.schema.json → JSON Schema for policy validation
 config/
@@ -458,10 +480,10 @@ npx --yes ajv-cli@5 validate \
 
 | Problem | Cause | Solution |
 |---------|-------|----------|
-| Config not applied (everything asks) | File not found or parse error | Verify file at `~/.pi/agent/pi-permissions.jsonc`; check for trailing commas |
+| Config not applied (everything asks) | File not found or parse error | Verify the global Pi policy file (default: `~/.pi/agent/pi-permissions.jsonc`, respects `PI_CODING_AGENT_DIR`); check for trailing commas |
 | Per-agent override not applied | Frontmatter parsing issue | Ensure `---` delimiters at file top; keep YAML simple; restart session |
 | Tool blocked as unregistered | Unknown tool name | Use a registered `mcp` tool for server tools: `{ "tool": "server:tool" }` |
-| `/skill:<name>` blocked | Missing context or deny policy | Requires active agent context; `ask` behaves as block in headless mode |
+| `/skill:<name>` blocked | Deny policy or confirmation unavailable | Check merged `skills` policy (global/project/agent layers). Active agent context is optional in the main session; `ask` still requires UI or forwarded confirmation. |
 
 ---
 
@@ -470,7 +492,7 @@ npx --yes ajv-cli@5 validate \
 ```bash
 npm run build    # Compile TypeScript
 npm run lint     # Run linter (uses build)
-npm run test     # Run tests
+npm run test     # Run tests from ./tests
 npm run check    # Run lint + test
 ```
 
