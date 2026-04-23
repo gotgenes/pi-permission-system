@@ -430,7 +430,31 @@ function formatUserDeniedReason(result: PermissionCheckResult, denialReason?: st
   return `${base}${reasonSuffix} ${formatPermissionHardStopHint(result)}`;
 }
 
-function formatAskPrompt(result: PermissionCheckResult, agentName?: string): string {
+function formatToolInputForPrompt(input: unknown): string {
+  if (input === undefined || input === null) {
+    return "";
+  }
+
+  if (typeof input === "object" && !Array.isArray(input) && Object.keys(input as Record<string, unknown>).length === 0) {
+    return "";
+  }
+
+  let serialized: string;
+  try {
+    serialized = JSON.stringify(input);
+  } catch {
+    return "";
+  }
+
+  if (!serialized || serialized === "{}" || serialized === "null") {
+    return "";
+  }
+
+  const MAX = 200;
+  return serialized.length > MAX ? `${serialized.slice(0, MAX)}…` : serialized;
+}
+
+function formatAskPrompt(result: PermissionCheckResult, agentName?: string, input?: unknown): string {
   const subject = agentName ? `Agent '${agentName}'` : "Current agent";
 
   if (result.toolName === "bash") {
@@ -444,7 +468,9 @@ function formatAskPrompt(result: PermissionCheckResult, agentName?: string): str
   }
 
   const patternInfo = result.matchedPattern ? ` (matched '${result.matchedPattern}')` : "";
-  return `${subject} requested tool '${result.toolName}'${patternInfo}. Allow this call?`;
+  const inputPreview = formatToolInputForPrompt(input);
+  const inputSuffix = inputPreview ? ` with input ${inputPreview}` : "";
+  return `${subject} requested tool '${result.toolName}'${patternInfo}${inputSuffix}. Allow this call?`;
 }
 
 function formatSkillAskPrompt(skillName: string, agentName?: string): string {
@@ -1454,7 +1480,7 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
           ? "Using tool 'mcp' requires approval, but no interactive UI is available."
           : `Using tool '${toolName}' requires approval, but no interactive UI is available.`;
 
-      const message = formatAskPrompt(check, agentName ?? undefined);
+      const message = formatAskPrompt(check, agentName ?? undefined, input);
       if (!canRequestPermissionConfirmation(ctx)) {
         writeReviewLog("permission_request.blocked", {
           source: "tool_call",
