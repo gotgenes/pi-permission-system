@@ -7,7 +7,6 @@ Permission enforcement extension for the Pi coding agent that provides centraliz
 
 > **Fork notice:** This package is a friendly fork of [MasuRii/pi-permission-system](https://github.com/MasuRii/pi-permission-system), published to npm as `@gotgenes/pi-permission-system`. The extension's on-disk identity (config directory, log filenames, `/permission-system` slash command, and event channel names) is intentionally preserved so this fork and upstream share runtime state and remain drop-in interchangeable.
 
-
 ## Features
 
 - **Tool Filtering** — Hides disallowed tools from the agent before it starts (reduces "try another tool" behavior)
@@ -41,7 +40,7 @@ Or place this repository's folder directly in one of the locations Pi auto-disco
 | Project | `.pi/extensions/pi-permission-system` |
 
 > The directory name stays `pi-permission-system` (not scoped) because it matches the extension's internal ID and determines where pi reads this extension's config and logs from — keeping it unchanged means this fork shares state with upstream.
-
+>
 > **Tip:** All `~/.pi/agent` paths shown in this document are defaults. If the `PI_CODING_AGENT_DIR` environment variable is set, pi uses that directory instead. The extension automatically follows pi's `getAgentDir()` helper, so global policy files, per-agent overrides, session directories, and extension installation paths all resolve under the configured agent directory.
 
 ## Usage
@@ -66,7 +65,7 @@ Or place this repository's folder directly in one of the locations Pi auto-disco
 }
 ```
 
-2. Start Pi — the extension automatically loads and enforces your policy.
+1. Start Pi — the extension automatically loads and enforces your policy.
 
 ### Permission States
 
@@ -89,6 +88,7 @@ The extension integrates via Pi's lifecycle hooks:
 | `input`              | Intercepts `/skill:<name>` requests and enforces skill policy                             |
 
 **Additional behaviors:**
+
 - Unknown/unregistered tools are blocked before permission checks (prevents bypass attempts)
 - The `Available tools:` system prompt section is rewritten to match the filtered active tool set
 - Extension-provided tools like `task`, `mcp`, and third-party tools are handled by exact registered name instead of private built-in hardcodes
@@ -176,6 +176,7 @@ The extension can also layer project-local permission files relative to the acti
 Project-local files use the same formats as the global policy file and global agent frontmatter. These project files are resolved from Pi's current session `cwd`, so they are workspace-specific and do **not** move under `PI_CODING_AGENT_DIR`.
 
 **Precedence order:**
+
 1. Global policy file
 2. Project policy file
 3. Global agent frontmatter
@@ -297,6 +298,7 @@ permission:
 ```
 
 The permission resolution order for MCP operations:
+
 1. Specific `mcp` patterns (e.g., `myServer:toolName`, `myServer_*`)
 2. `tools.mcp` fallback (if set)
 3. `defaultPolicy.mcp`
@@ -438,7 +440,7 @@ Actual global logs directory: $PI_CODING_AGENT_DIR/extensions/pi-permission-syst
 
 ### Architecture
 
-```
+```text
 index.ts                    → Root Pi entrypoint shim
 src/
 ├── index.ts                → Extension bootstrap, permission checks, readable prompts, review logging, reload handling, and subagent forwarding
@@ -484,12 +486,14 @@ The extension uses a modular architecture with shared utilities:
 **Goal:** Enforce policy at the host level, not the model level.
 
 **What this stops:**
+
 - Agent calling tools it shouldn't use (e.g., `write`, dangerous `bash`)
 - Tool switching attempts (calling non-existent tool names)
 - Accidental escalation via skill loading
 - Unapproved path-bearing tool access outside the active working directory when `external_directory` is `ask` or `deny`
 
 **Limitations:**
+
 - If a dangerous action is possible via an allowed tool, policy must explicitly restrict it
 - This is a permission decision layer, not a sandbox
 
