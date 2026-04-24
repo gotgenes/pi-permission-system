@@ -19,7 +19,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "npx --yes -p typescript@5.7.3 tsc -p tsconfig.json --noCheck",
+    "build": "tsc -p tsconfig.json --noCheck",
     "lint": "npm run build",
     "test": "bun ./tests/permission-system.test.ts && bun ./tests/config-modal.test.ts",
     "check": "npm run lint && npm run test"
@@ -61,5 +61,8 @@
     "@mariozechner/pi-coding-agent": "^0.70.2",
     "@mariozechner/pi-tui": "^0.70.2",
     "@sinclair/typebox": "^0.34.49"
+  },
+  "devDependencies": {
+    "typescript": "5.7.3"
   }
 }
