@@ -1,15 +1,17 @@
 import type { BashPermissions, PermissionState } from "./types.js";
 import {
+  type CompiledWildcardPattern,
   compileWildcardPatterns,
   findCompiledWildcardMatch,
-  type CompiledWildcardPattern,
 } from "./wildcard-matcher.js";
 
 type CompiledPattern = CompiledWildcardPattern<PermissionState>;
 
 type BashPermissionSource = BashPermissions | readonly CompiledPattern[];
 
-function isCompiledPatternList(value: BashPermissionSource): value is readonly CompiledPattern[] {
+function isCompiledPatternList(
+  value: BashPermissionSource,
+): value is readonly CompiledPattern[] {
   return Array.isArray(value);
 }
 

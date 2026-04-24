@@ -40,7 +40,10 @@ export function parseSimpleYamlMap(input: string): Record<string, unknown> {
       continue;
     }
 
-    const key = line.slice(0, separatorIndex).trim().replace(/^['"]|['"]$/g, "");
+    const key = line
+      .slice(0, separatorIndex)
+      .trim()
+      .replace(/^['"]|['"]$/g, "");
     const rawValue = line.slice(separatorIndex + 1).trim();
 
     while (stack.length > 1 && indent <= stack[stack.length - 1].indent) {
@@ -57,7 +60,10 @@ export function parseSimpleYamlMap(input: string): Record<string, unknown> {
     }
 
     let scalar = rawValue;
-    if ((scalar.startsWith('"') && scalar.endsWith('"')) || (scalar.startsWith("'") && scalar.endsWith("'"))) {
+    if (
+      (scalar.startsWith('"') && scalar.endsWith('"')) ||
+      (scalar.startsWith("'") && scalar.endsWith("'"))
+    ) {
       scalar = scalar.slice(1, -1);
     }
 

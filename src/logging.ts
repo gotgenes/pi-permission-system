@@ -3,9 +3,9 @@ import { appendFileSync } from "node:fs";
 import {
   DEBUG_LOG_PATH,
   EXTENSION_ID,
+  ensurePermissionSystemLogsDirectory,
   LOGS_DIR,
   PERMISSION_REVIEW_LOG_PATH,
-  ensurePermissionSystemLogsDirectory,
   type PermissionSystemExtensionConfig,
 } from "./extension-config.js";
 
@@ -36,8 +36,14 @@ function safeJsonStringify(value: unknown): string {
 }
 
 export interface PermissionSystemLogger {
-  debug: (event: string, details?: Record<string, unknown>) => string | undefined;
-  review: (event: string, details?: Record<string, unknown>) => string | undefined;
+  debug: (
+    event: string,
+    details?: Record<string, unknown>,
+  ) => string | undefined;
+  review: (
+    event: string,
+    details?: Record<string, unknown>,
+  ) => string | undefined;
 }
 
 interface PermissionSystemLoggerOptions {
@@ -47,12 +53,21 @@ interface PermissionSystemLoggerOptions {
   ensureLogsDirectory?: () => string | undefined;
 }
 
-export function createPermissionSystemLogger(options: PermissionSystemLoggerOptions): PermissionSystemLogger {
+export function createPermissionSystemLogger(
+  options: PermissionSystemLoggerOptions,
+): PermissionSystemLogger {
   const debugLogPath = options.debugLogPath ?? DEBUG_LOG_PATH;
   const reviewLogPath = options.reviewLogPath ?? PERMISSION_REVIEW_LOG_PATH;
-  const ensureLogsDirectory = options.ensureLogsDirectory ?? (() => ensurePermissionSystemLogsDirectory(LOGS_DIR));
+  const ensureLogsDirectory =
+    options.ensureLogsDirectory ??
+    (() => ensurePermissionSystemLogsDirectory(LOGS_DIR));
 
-  const writeLine = (stream: "debug" | "review", path: string, event: string, details: Record<string, unknown>): string | undefined => {
+  const writeLine = (
+    stream: "debug" | "review",
+    path: string,
+    event: string,
+    details: Record<string, unknown>,
+  ): string | undefined => {
     const directoryError = ensureLogsDirectory();
     if (directoryError) {
       return directoryError;
@@ -74,7 +89,10 @@ export function createPermissionSystemLogger(options: PermissionSystemLoggerOpti
     }
   };
 
-  const debug = (event: string, details: Record<string, unknown> = {}): string | undefined => {
+  const debug = (
+    event: string,
+    details: Record<string, unknown> = {},
+  ): string | undefined => {
     if (!options.getConfig().debugLog) {
       return undefined;
     }
@@ -82,7 +100,10 @@ export function createPermissionSystemLogger(options: PermissionSystemLoggerOpti
     return writeLine("debug", debugLogPath, event, details);
   };
 
-  const review = (event: string, details: Record<string, unknown> = {}): string | undefined => {
+  const review = (
+    event: string,
+    details: Record<string, unknown> = {},
+  ): string | undefined => {
     if (!options.getConfig().permissionReviewLog) {
       return undefined;
     }

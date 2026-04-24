@@ -1,5 +1,20 @@
-import { getAgentDir, isToolCallEventType, type ExtensionAPI, type ExtensionCommandContext, type ExtensionContext } from "@mariozechner/pi-coding-agent";
-import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmdirSync, unlinkSync, writeFileSync } from "node:fs";
+import {
+  getAgentDir,
+  isToolCallEventType,
+  type ExtensionAPI,
+  type ExtensionCommandContext,
+  type ExtensionContext,
+} from "@mariozechner/pi-coding-agent";
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  renameSync,
+  rmdirSync,
+  unlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { homedir } from "node:os";
 import { join, normalize, resolve, sep } from "node:path";
 
@@ -42,10 +57,19 @@ import {
   type SkillPromptEntry,
 } from "./skill-prompt-sanitizer.js";
 import { sanitizeAvailableToolsSection } from "./system-prompt-sanitizer.js";
-import { checkRequestedToolRegistration, getToolNameFromValue } from "./tool-registry.js";
+import {
+  checkRequestedToolRegistration,
+  getToolNameFromValue,
+} from "./tool-registry.js";
 import type { PermissionCheckResult } from "./types.js";
-import { PERMISSION_SYSTEM_STATUS_KEY, syncPermissionSystemStatus } from "./status.js";
-import { canResolveAskPermissionRequest, shouldAutoApprovePermissionState } from "./yolo-mode.js";
+import {
+  PERMISSION_SYSTEM_STATUS_KEY,
+  syncPermissionSystemStatus,
+} from "./status.js";
+import {
+  canResolveAskPermissionRequest,
+  shouldAutoApprovePermissionState,
+} from "./yolo-mode.js";
 
 const PI_AGENT_DIR = getAgentDir();
 const SESSIONS_DIR = join(PI_AGENT_DIR, "sessions");
@@ -71,10 +95,20 @@ type PermissionRequestEvent = {
   agentName?: string | null;
 };
 
-const PERMISSION_REQUEST_EVENT_CHANNEL = "pi-permission-system:permission-request";
-const PATH_BEARING_TOOLS = new Set(["read", "write", "edit", "find", "grep", "ls"]);
+const PERMISSION_REQUEST_EVENT_CHANNEL =
+  "pi-permission-system:permission-request";
+const PATH_BEARING_TOOLS = new Set([
+  "read",
+  "write",
+  "edit",
+  "find",
+  "grep",
+  "ls",
+]);
 
-let extensionConfig: PermissionSystemExtensionConfig = { ...DEFAULT_EXTENSION_CONFIG };
+let extensionConfig: PermissionSystemExtensionConfig = {
+  ...DEFAULT_EXTENSION_CONFIG,
+};
 const extensionLogger = createPermissionSystemLogger({
   getConfig: () => extensionConfig,
 });
@@ -85,7 +119,9 @@ function setExtensionConfig(config: PermissionSystemExtensionConfig): void {
   extensionConfig = normalizePermissionSystemConfig(config);
 }
 
-function setLoggingWarningReporter(reporter: ((message: string) => void) | null): void {
+function setLoggingWarningReporter(
+  reporter: ((message: string) => void) | null,
+): void {
   loggingWarningReporter = reporter;
 }
 
@@ -98,14 +134,20 @@ function reportLoggingWarning(message: string): void {
   loggingWarningReporter(message);
 }
 
-function writeDebugLog(event: string, details: Record<string, unknown> = {}): void {
+function writeDebugLog(
+  event: string,
+  details: Record<string, unknown> = {},
+): void {
   const warning = extensionLogger.debug(event, details);
   if (warning) {
     reportLoggingWarning(warning);
   }
 }
 
-function writeReviewLog(event: string, details: Record<string, unknown> = {}): void {
+function writeReviewLog(
+  event: string,
+  details: Record<string, unknown> = {},
+): void {
   const warning = extensionLogger.review(event, details);
   if (warning) {
     reportLoggingWarning(warning);
@@ -122,13 +164,18 @@ function normalizePathForComparison(pathValue: string, cwd: string): string {
 
   if (normalizedPath === "~") {
     normalizedPath = homedir();
-  } else if (normalizedPath.startsWith("~/") || normalizedPath.startsWith("~\\")) {
+  } else if (
+    normalizedPath.startsWith("~/") ||
+    normalizedPath.startsWith("~\\")
+  ) {
     normalizedPath = join(homedir(), normalizedPath.slice(2));
   }
 
   const absolutePath = resolve(cwd, normalizedPath);
   const normalizedAbsolutePath = normalize(absolutePath);
-  return process.platform === "win32" ? normalizedAbsolutePath.toLowerCase() : normalizedAbsolutePath;
+  return process.platform === "win32"
+    ? normalizedAbsolutePath.toLowerCase()
+    : normalizedAbsolutePath;
 }
 
 function isPathWithinDirectory(pathValue: string, directory: string): boolean {
@@ -144,7 +191,10 @@ function isPathWithinDirectory(pathValue: string, directory: string): boolean {
   return pathValue.startsWith(prefix);
 }
 
-function getPathBearingToolPath(toolName: string, input: unknown): string | null {
+function getPathBearingToolPath(
+  toolName: string,
+  input: unknown,
+): string | null {
   if (!PATH_BEARING_TOOLS.has(toolName)) {
     return null;
   }
@@ -152,12 +202,18 @@ function getPathBearingToolPath(toolName: string, input: unknown): string | null
   return getNonEmptyString(toRecord(input).path);
 }
 
-function isPathOutsideWorkingDirectory(pathValue: string, cwd: string): boolean {
+function isPathOutsideWorkingDirectory(
+  pathValue: string,
+  cwd: string,
+): boolean {
   const normalizedCwd = normalizePathForComparison(cwd, cwd);
   const normalizedPath = normalizePathForComparison(pathValue, cwd);
-  return Boolean(normalizedCwd && normalizedPath && !isPathWithinDirectory(normalizedPath, normalizedCwd));
+  return Boolean(
+    normalizedCwd &&
+      normalizedPath &&
+      !isPathWithinDirectory(normalizedPath, normalizedCwd),
+  );
 }
-
 
 function extractSkillNameFromInput(text: string): string | null {
   const trimmed = text.trim();
@@ -171,7 +227,9 @@ function extractSkillNameFromInput(text: string): string | null {
   }
 
   const firstWhitespace = afterPrefix.search(/\s/);
-  const skillName = (firstWhitespace === -1 ? afterPrefix : afterPrefix.slice(0, firstWhitespace)).trim();
+  const skillName = (
+    firstWhitespace === -1 ? afterPrefix : afterPrefix.slice(0, firstWhitespace)
+  ).trim();
   return skillName || null;
 }
 
@@ -205,7 +263,11 @@ function normalizeAgentName(value: unknown): string | null {
 function getActiveAgentName(ctx: ExtensionContext): string | null {
   const entries = ctx.sessionManager.getEntries();
   for (let i = entries.length - 1; i >= 0; i--) {
-    const entry = entries[i] as { type: string; customType?: string; data?: unknown };
+    const entry = entries[i] as {
+      type: string;
+      customType?: string;
+      data?: unknown;
+    };
     if (entry.type !== "custom" || entry.customType !== "active_agent") {
       continue;
     }
@@ -224,7 +286,9 @@ function getActiveAgentName(ctx: ExtensionContext): string | null {
   return null;
 }
 
-function getActiveAgentNameFromSystemPrompt(systemPrompt: string | undefined): string | null {
+function getActiveAgentNameFromSystemPrompt(
+  systemPrompt: string | undefined,
+): string | null {
   if (!systemPrompt) {
     return null;
   }
@@ -241,14 +305,19 @@ function formatMissingToolNameReason(): string {
   return "Tool call was blocked because no tool name was provided. Use a registered tool name from pi.getAllTools().";
 }
 
-function formatUnknownToolReason(toolName: string, availableToolNames: readonly string[]): string {
+function formatUnknownToolReason(
+  toolName: string,
+  availableToolNames: readonly string[],
+): string {
   const preview = availableToolNames.slice(0, 10);
   const suffix = availableToolNames.length > preview.length ? ", ..." : "";
-  const availableList = preview.length > 0 ? `${preview.join(", ")}${suffix}` : "none";
+  const availableList =
+    preview.length > 0 ? `${preview.join(", ")}${suffix}` : "none";
 
-  const mcpHint = toolName === "mcp"
-    ? ""
-    : " If this was intended as an MCP server tool, call the registered 'mcp' tool when available (for example: {\"tool\":\"server:tool\"}).";
+  const mcpHint =
+    toolName === "mcp"
+      ? ""
+      : ' If this was intended as an MCP server tool, call the registered \'mcp\' tool when available (for example: {"tool":"server:tool"}).';
 
   return `Tool '${toolName}' is not registered in this runtime and was blocked before permission checks.${mcpHint} Registered tools: ${availableList}.`;
 }
@@ -261,7 +330,10 @@ function formatPermissionHardStopHint(result: PermissionCheckResult): string {
   return "Hard stop: this permission denial is policy-enforced. Do not retry or investigate bypasses; report the block to the user.";
 }
 
-function formatDenyReason(result: PermissionCheckResult, agentName?: string): string {
+function formatDenyReason(
+  result: PermissionCheckResult,
+  agentName?: string,
+): string {
   const parts: string[] = [];
 
   if (agentName) {
@@ -285,12 +357,16 @@ function formatDenyReason(result: PermissionCheckResult, agentName?: string): st
   return `${parts.join(" ")}. ${formatPermissionHardStopHint(result)}`;
 }
 
-function formatUserDeniedReason(result: PermissionCheckResult, denialReason?: string): string {
-  const base = (result.source === "mcp" || result.toolName === "mcp") && result.target
-    ? `User denied MCP target '${result.target}'.`
-    : result.toolName === "bash" && result.command
-      ? `User denied bash command '${result.command}'.`
-      : `User denied tool '${result.toolName}'.`;
+function formatUserDeniedReason(
+  result: PermissionCheckResult,
+  denialReason?: string,
+): string {
+  const base =
+    (result.source === "mcp" || result.toolName === "mcp") && result.target
+      ? `User denied MCP target '${result.target}'.`
+      : result.toolName === "bash" && result.command
+        ? `User denied bash command '${result.command}'.`
+        : `User denied tool '${result.toolName}'.`;
   const reasonSuffix = denialReason ? ` Reason: ${denialReason}.` : "";
 
   return `${base}${reasonSuffix} ${formatPermissionHardStopHint(result)}`;
@@ -303,7 +379,10 @@ function truncateInlineText(value: string, maxLength: number): string {
   return value.length > maxLength ? `${value.slice(0, maxLength)}…` : value;
 }
 
-function sanitizeInlineText(value: string, maxLength = TOOL_TEXT_SUMMARY_MAX_LENGTH): string {
+function sanitizeInlineText(
+  value: string,
+  maxLength = TOOL_TEXT_SUMMARY_MAX_LENGTH,
+): string {
   const normalized = value.replace(/\s+/g, " ").trim();
   return normalized ? truncateInlineText(normalized, maxLength) : "empty text";
 }
@@ -334,7 +413,10 @@ function formatEditInputForPrompt(input: Record<string, unknown>): string {
 
   const edits = rawEdits
     .map((edit) => toRecord(edit))
-    .filter((edit) => typeof edit.oldText === "string" && typeof edit.newText === "string");
+    .filter(
+      (edit) =>
+        typeof edit.oldText === "string" && typeof edit.newText === "string",
+    );
 
   const pathPart = path ? `for '${path}'` : "";
   if (edits.length === 0) {
@@ -345,7 +427,10 @@ function formatEditInputForPrompt(input: Record<string, unknown>): string {
   const oldText = String(firstEdit.oldText);
   const newText = String(firstEdit.newText);
   const firstEditSummary = `edit #1 replaces ${formatCount(countTextLines(oldText), "line", "lines")} with ${formatCount(countTextLines(newText), "line", "lines")}`;
-  const extraEdits = edits.length > 1 ? `, plus ${formatCount(edits.length - 1, "additional edit", "additional edits")}` : "";
+  const extraEdits =
+    edits.length > 1
+      ? `, plus ${formatCount(edits.length - 1, "additional edit", "additional edits")}`
+      : "";
   const summary = `(${formatCount(edits.length, "replacement", "replacements")}: ${firstEditSummary}${extraEdits})`;
   return pathPart ? `${pathPart} ${summary}` : summary;
 }
@@ -369,7 +454,10 @@ function formatReadInputForPrompt(input: Record<string, unknown>): string {
   return parts.length > 0 ? `for ${parts.join(", ")}` : "";
 }
 
-function formatSearchInputForPrompt(toolName: string, input: Record<string, unknown>): string {
+function formatSearchInputForPrompt(
+  toolName: string,
+  input: Record<string, unknown>,
+): string {
   const parts: string[] = [];
   const path = getPromptPath(input);
   const pattern = getNonEmptyString(input.pattern);
@@ -395,7 +483,11 @@ function formatJsonInputForPrompt(input: unknown): string {
     return "";
   }
 
-  if (typeof input === "object" && !Array.isArray(input) && Object.keys(input as Record<string, unknown>).length === 0) {
+  if (
+    typeof input === "object" &&
+    !Array.isArray(input) &&
+    Object.keys(input as Record<string, unknown>).length === 0
+  ) {
     return "";
   }
 
@@ -414,7 +506,9 @@ function formatJsonInputForPrompt(input: unknown): string {
     .replace(/\\r\\n|\\n|\\r|\\t/g, " ")
     .replace(/\s+/g, " ")
     .trim();
-  return inline ? `with input ${truncateInlineText(inline, TOOL_INPUT_PREVIEW_MAX_LENGTH)}` : "";
+  return inline
+    ? `with input ${truncateInlineText(inline, TOOL_INPUT_PREVIEW_MAX_LENGTH)}`
+    : "";
 }
 
 function formatToolInputForPrompt(toolName: string, input: unknown): string {
@@ -436,20 +530,30 @@ function formatToolInputForPrompt(toolName: string, input: unknown): string {
   }
 }
 
-function formatAskPrompt(result: PermissionCheckResult, agentName?: string, input?: unknown): string {
+function formatAskPrompt(
+  result: PermissionCheckResult,
+  agentName?: string,
+  input?: unknown,
+): string {
   const subject = agentName ? `Agent '${agentName}'` : "Current agent";
 
   if (result.toolName === "bash") {
-    const patternInfo = result.matchedPattern ? ` (matched '${result.matchedPattern}')` : "";
+    const patternInfo = result.matchedPattern
+      ? ` (matched '${result.matchedPattern}')`
+      : "";
     return `${subject} requested bash command '${result.command || ""}'${patternInfo}. Allow this command?`;
   }
 
   if ((result.source === "mcp" || result.toolName === "mcp") && result.target) {
-    const patternInfo = result.matchedPattern ? ` (matched '${result.matchedPattern}')` : "";
+    const patternInfo = result.matchedPattern
+      ? ` (matched '${result.matchedPattern}')`
+      : "";
     return `${subject} requested MCP target '${result.target}'${patternInfo}. Allow this call?`;
   }
 
-  const patternInfo = result.matchedPattern ? ` (matched '${result.matchedPattern}')` : "";
+  const patternInfo = result.matchedPattern
+    ? ` (matched '${result.matchedPattern}')`
+    : "";
   const inputPreview = formatToolInputForPrompt(result.toolName, input);
   const inputSuffix = inputPreview ? ` ${inputPreview}` : "";
   return `${subject} requested tool '${result.toolName}'${patternInfo}${inputSuffix}. Allow this call?`;
@@ -460,12 +564,20 @@ function formatSkillAskPrompt(skillName: string, agentName?: string): string {
   return `${subject} requested skill '${skillName}'. Allow loading this skill?`;
 }
 
-function formatSkillPathAskPrompt(skill: SkillPromptEntry, readPath: string, agentName?: string): string {
+function formatSkillPathAskPrompt(
+  skill: SkillPromptEntry,
+  readPath: string,
+  agentName?: string,
+): string {
   const subject = agentName ? `Agent '${agentName}'` : "Current agent";
   return `${subject} requested access to skill '${skill.name}' via '${readPath}'. Allow this read?`;
 }
 
-function formatSkillPathDenyReason(skill: SkillPromptEntry, readPath: string, agentName?: string): string {
+function formatSkillPathDenyReason(
+  skill: SkillPromptEntry,
+  readPath: string,
+  agentName?: string,
+): string {
   const subject = agentName ? `Agent '${agentName}'` : "Current agent";
   return `${subject} is not permitted to access skill '${skill.name}' via '${readPath}'.`;
 }
@@ -503,7 +615,10 @@ function formatExternalDirectoryUserDeniedReason(
   return `User denied external directory access for tool '${toolName}' path '${pathValue}'.${reasonSuffix} ${formatExternalDirectoryHardStopHint()}`;
 }
 
-function getPermissionLogContext(result: PermissionCheckResult): { command?: string; target?: string } {
+function getPermissionLogContext(result: PermissionCheckResult): {
+  command?: string;
+  target?: string;
+} {
   return {
     command: result.command,
     target: result.target,
@@ -518,7 +633,9 @@ function sleep(ms: number): Promise<void> {
 
 function normalizeFilesystemPath(pathValue: string): string {
   const normalizedPath = normalize(pathValue);
-  return process.platform === "win32" ? normalizedPath.toLowerCase() : normalizedPath;
+  return process.platform === "win32"
+    ? normalizedPath.toLowerCase()
+    : normalizedPath;
 }
 
 function getSessionId(ctx: ExtensionContext): string {
@@ -527,8 +644,7 @@ function getSessionId(ctx: ExtensionContext): string {
     if (typeof sessionId === "string" && sessionId.trim()) {
       return sessionId.trim();
     }
-  } catch {
-  }
+  } catch {}
 
   return "unknown";
 }
@@ -567,22 +683,32 @@ function formatUnknownErrorMessage(error: unknown): string {
 }
 
 function isErrnoCode(error: unknown, code: string): boolean {
-  return Boolean(error && typeof error === "object" && "code" in error && (error as { code?: string }).code === code);
+  return Boolean(
+    error &&
+      typeof error === "object" &&
+      "code" in error &&
+      (error as { code?: string }).code === code,
+  );
 }
 
-function logPermissionForwardingWarning(message: string, error?: unknown): void {
-  const details = typeof error === "undefined"
-    ? { message }
-    : { message, error: formatUnknownErrorMessage(error) };
+function logPermissionForwardingWarning(
+  message: string,
+  error?: unknown,
+): void {
+  const details =
+    typeof error === "undefined"
+      ? { message }
+      : { message, error: formatUnknownErrorMessage(error) };
 
   writeReviewLog("permission_forwarding.warning", details);
   writeDebugLog("permission_forwarding.warning", details);
 }
 
 function logPermissionForwardingError(message: string, error?: unknown): void {
-  const details = typeof error === "undefined"
-    ? { message }
-    : { message, error: formatUnknownErrorMessage(error) };
+  const details =
+    typeof error === "undefined"
+      ? { message }
+      : { message, error: formatUnknownErrorMessage(error) };
 
   writeReviewLog("permission_forwarding.error", details);
   writeDebugLog("permission_forwarding.error", details);
@@ -593,32 +719,56 @@ function ensureDirectoryExists(path: string, description: string): boolean {
     mkdirSync(path, { recursive: true });
     return true;
   } catch (error) {
-    logPermissionForwardingError(`Failed to create ${description} directory '${path}'`, error);
+    logPermissionForwardingError(
+      `Failed to create ${description} directory '${path}'`,
+      error,
+    );
     return false;
   }
 }
 
-function getPermissionForwardingLocationForSession(sessionId: string): PermissionForwardingLocation {
-  return createPermissionForwardingLocation(PERMISSION_FORWARDING_DIR, sessionId);
+function getPermissionForwardingLocationForSession(
+  sessionId: string,
+): PermissionForwardingLocation {
+  return createPermissionForwardingLocation(
+    PERMISSION_FORWARDING_DIR,
+    sessionId,
+  );
 }
 
-function ensurePermissionForwardingLocation(sessionId: string): PermissionForwardingLocation | null {
+function ensurePermissionForwardingLocation(
+  sessionId: string,
+): PermissionForwardingLocation | null {
   let location: PermissionForwardingLocation;
   try {
     location = getPermissionForwardingLocationForSession(sessionId);
   } catch (error) {
-    logPermissionForwardingError("Failed to resolve permission forwarding location", error);
+    logPermissionForwardingError(
+      "Failed to resolve permission forwarding location",
+      error,
+    );
     return null;
   }
 
-  const sessionRootReady = ensureDirectoryExists(location.sessionRootDir, "permission forwarding session root");
-  const requestsReady = ensureDirectoryExists(location.requestsDir, "permission forwarding requests");
-  const responsesReady = ensureDirectoryExists(location.responsesDir, "permission forwarding responses");
+  const sessionRootReady = ensureDirectoryExists(
+    location.sessionRootDir,
+    "permission forwarding session root",
+  );
+  const requestsReady = ensureDirectoryExists(
+    location.requestsDir,
+    "permission forwarding requests",
+  );
+  const responsesReady = ensureDirectoryExists(
+    location.responsesDir,
+    "permission forwarding responses",
+  );
 
   return sessionRootReady && requestsReady && responsesReady ? location : null;
 }
 
-function getExistingPermissionForwardingLocation(sessionId: string): PermissionForwardingLocation | null {
+function getExistingPermissionForwardingLocation(
+  sessionId: string,
+): PermissionForwardingLocation | null {
   let location: PermissionForwardingLocation;
   try {
     location = getPermissionForwardingLocationForSession(sessionId);
@@ -638,7 +788,10 @@ function tryRemoveDirectoryIfEmpty(path: string, description: string): void {
   try {
     entries = readdirSync(path);
   } catch (error) {
-    logPermissionForwardingWarning(`Failed to inspect ${description} directory '${path}'`, error);
+    logPermissionForwardingWarning(
+      `Failed to inspect ${description} directory '${path}'`,
+      error,
+    );
     return;
   }
 
@@ -653,14 +806,28 @@ function tryRemoveDirectoryIfEmpty(path: string, description: string): void {
       return;
     }
 
-    logPermissionForwardingWarning(`Failed to remove empty ${description} directory '${path}'`, error);
+    logPermissionForwardingWarning(
+      `Failed to remove empty ${description} directory '${path}'`,
+      error,
+    );
   }
 }
 
-function cleanupPermissionForwardingLocationIfEmpty(location: PermissionForwardingLocation): void {
-  tryRemoveDirectoryIfEmpty(location.requestsDir, `${location.label} permission forwarding requests`);
-  tryRemoveDirectoryIfEmpty(location.responsesDir, `${location.label} permission forwarding responses`);
-  tryRemoveDirectoryIfEmpty(location.sessionRootDir, `${location.label} permission forwarding session root`);
+function cleanupPermissionForwardingLocationIfEmpty(
+  location: PermissionForwardingLocation,
+): void {
+  tryRemoveDirectoryIfEmpty(
+    location.requestsDir,
+    `${location.label} permission forwarding requests`,
+  );
+  tryRemoveDirectoryIfEmpty(
+    location.responsesDir,
+    `${location.label} permission forwarding responses`,
+  );
+  tryRemoveDirectoryIfEmpty(
+    location.sessionRootDir,
+    `${location.label} permission forwarding session root`,
+  );
 }
 
 function safeDeleteFile(filePath: string, description: string): void {
@@ -671,7 +838,10 @@ function safeDeleteFile(filePath: string, description: string): void {
       return;
     }
 
-    logPermissionForwardingWarning(`Failed to delete ${description} file '${filePath}'`, error);
+    logPermissionForwardingWarning(
+      `Failed to delete ${description} file '${filePath}'`,
+      error,
+    );
   }
 }
 
@@ -687,20 +857,24 @@ function writeJsonFileAtomic(filePath: string, value: unknown): void {
   }
 }
 
-function readForwardedPermissionRequest(filePath: string): ForwardedPermissionRequest | null {
+function readForwardedPermissionRequest(
+  filePath: string,
+): ForwardedPermissionRequest | null {
   try {
     const raw = readFileSync(filePath, "utf-8");
     const parsed = JSON.parse(raw) as Partial<ForwardedPermissionRequest>;
     if (
-      !parsed
-      || typeof parsed.id !== "string"
-      || typeof parsed.createdAt !== "number"
-      || typeof parsed.requesterSessionId !== "string"
-      || typeof parsed.targetSessionId !== "string"
-      || typeof parsed.requesterAgentName !== "string"
-      || typeof parsed.message !== "string"
+      !parsed ||
+      typeof parsed.id !== "string" ||
+      typeof parsed.createdAt !== "number" ||
+      typeof parsed.requesterSessionId !== "string" ||
+      typeof parsed.targetSessionId !== "string" ||
+      typeof parsed.requesterAgentName !== "string" ||
+      typeof parsed.message !== "string"
     ) {
-      logPermissionForwardingWarning(`Ignoring invalid forwarded permission request format in '${filePath}'`);
+      logPermissionForwardingWarning(
+        `Ignoring invalid forwarded permission request format in '${filePath}'`,
+      );
       return null;
     }
 
@@ -713,39 +887,57 @@ function readForwardedPermissionRequest(filePath: string): ForwardedPermissionRe
       message: parsed.message,
     };
   } catch (error) {
-    logPermissionForwardingWarning(`Failed to read forwarded permission request '${filePath}'`, error);
+    logPermissionForwardingWarning(
+      `Failed to read forwarded permission request '${filePath}'`,
+      error,
+    );
     return null;
   }
 }
 
-function readForwardedPermissionResponse(filePath: string): ForwardedPermissionResponse | null {
+function readForwardedPermissionResponse(
+  filePath: string,
+): ForwardedPermissionResponse | null {
   try {
     const raw = readFileSync(filePath, "utf-8");
     const parsed = JSON.parse(raw) as Partial<ForwardedPermissionResponse>;
     if (
-      !parsed
-      || typeof parsed.approved !== "boolean"
-      || !isPermissionDecisionState(parsed.state)
-      || typeof parsed.responderSessionId !== "string"
+      !parsed ||
+      typeof parsed.approved !== "boolean" ||
+      !isPermissionDecisionState(parsed.state) ||
+      typeof parsed.responderSessionId !== "string"
     ) {
-      logPermissionForwardingWarning(`Ignoring invalid forwarded permission response format in '${filePath}'`);
+      logPermissionForwardingWarning(
+        `Ignoring invalid forwarded permission response format in '${filePath}'`,
+      );
       return null;
     }
 
     return {
       approved: parsed.approved,
       state: parsed.state,
-      denialReason: typeof parsed.denialReason === "string" ? parsed.denialReason : undefined,
+      denialReason:
+        typeof parsed.denialReason === "string"
+          ? parsed.denialReason
+          : undefined,
       responderSessionId: parsed.responderSessionId,
-      respondedAt: typeof parsed.respondedAt === "number" ? parsed.respondedAt : Date.now(),
+      respondedAt:
+        typeof parsed.respondedAt === "number"
+          ? parsed.respondedAt
+          : Date.now(),
     };
   } catch (error) {
-    logPermissionForwardingWarning(`Failed to read forwarded permission response '${filePath}'`, error);
+    logPermissionForwardingWarning(
+      `Failed to read forwarded permission response '${filePath}'`,
+      error,
+    );
     return null;
   }
 }
 
-function formatForwardedPermissionPrompt(request: ForwardedPermissionRequest): string {
+function formatForwardedPermissionPrompt(
+  request: ForwardedPermissionRequest,
+): string {
   const agentName = request.requesterAgentName || "unknown";
   const sessionId = request.requesterSessionId || "unknown";
   return [
@@ -784,7 +976,10 @@ async function waitForForwardedPermissionApproval(
   }
 
   const requestId = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}-${process.pid}`;
-  const requesterAgentName = getActiveAgentName(ctx) || getActiveAgentNameFromSystemPrompt(ctx.getSystemPrompt()) || "unknown";
+  const requesterAgentName =
+    getActiveAgentName(ctx) ||
+    getActiveAgentNameFromSystemPrompt(ctx.getSystemPrompt()) ||
+    "unknown";
   const request: ForwardedPermissionRequest = {
     id: requestId,
     createdAt: Date.now(),
@@ -809,7 +1004,10 @@ async function waitForForwardedPermissionApproval(
   try {
     writeJsonFileAtomic(requestPath, request);
   } catch (error) {
-    logPermissionForwardingError(`Failed to write forwarded permission request '${requestPath}'`, error);
+    logPermissionForwardingError(
+      `Failed to write forwarded permission request '${requestPath}'`,
+      error,
+    );
     return { approved: false, state: "denied" };
   }
 
@@ -835,7 +1033,9 @@ async function waitForForwardedPermissionApproval(
     await sleep(PERMISSION_FORWARDING_POLL_INTERVAL_MS);
   }
 
-  logPermissionForwardingWarning(`Timed out waiting for forwarded permission response '${responsePath}'`);
+  logPermissionForwardingWarning(
+    `Timed out waiting for forwarded permission response '${responsePath}'`,
+  );
   writeReviewLog("forwarded_permission.response_timed_out", {
     requestId,
     requesterAgentName,
@@ -847,7 +1047,9 @@ async function waitForForwardedPermissionApproval(
   return { approved: false, state: "denied" };
 }
 
-async function processForwardedPermissionRequests(ctx: ExtensionContext): Promise<void> {
+async function processForwardedPermissionRequests(
+  ctx: ExtensionContext,
+): Promise<void> {
   if (!ctx.hasUI) {
     return;
   }
@@ -864,7 +1066,10 @@ async function processForwardedPermissionRequests(ctx: ExtensionContext): Promis
       .filter((name) => name.endsWith(".json"))
       .sort();
   } catch (error) {
-    logPermissionForwardingWarning(`Failed to read ${location.label} permission forwarding requests from '${location.requestsDir}'`, error);
+    logPermissionForwardingWarning(
+      `Failed to read ${location.label} permission forwarding requests from '${location.requestsDir}'`,
+      error,
+    );
     return;
   }
 
@@ -872,7 +1077,10 @@ async function processForwardedPermissionRequests(ctx: ExtensionContext): Promis
     const requestPath = join(location.requestsDir, fileName);
     const request = readForwardedPermissionRequest(requestPath);
     if (!request) {
-      safeDeleteFile(requestPath, `${location.label} forwarded permission request`);
+      safeDeleteFile(
+        requestPath,
+        `${location.label} forwarded permission request`,
+      );
       continue;
     }
 
@@ -880,7 +1088,10 @@ async function processForwardedPermissionRequests(ctx: ExtensionContext): Promis
       logPermissionForwardingWarning(
         `Ignoring forwarded permission request '${request.id}' because it targets session '${request.targetSessionId}' instead of '${currentSessionId}'`,
       );
-      safeDeleteFile(requestPath, `${location.label} forwarded permission request`);
+      safeDeleteFile(
+        requestPath,
+        `${location.label} forwarded permission request`,
+      );
       continue;
     }
 
@@ -893,12 +1104,21 @@ async function processForwardedPermissionRequests(ctx: ExtensionContext): Promis
       requestPath,
     };
 
-    let decision: PermissionPromptDecision = { approved: false, state: "denied" };
+    let decision: PermissionPromptDecision = {
+      approved: false,
+      state: "denied",
+    };
     if (shouldAutoApprovePermissionState("ask", extensionConfig)) {
-      writeReviewLog("forwarded_permission.auto_approved", forwardedPermissionLogDetails);
+      writeReviewLog(
+        "forwarded_permission.auto_approved",
+        forwardedPermissionLogDetails,
+      );
       decision = { approved: true, state: "approved" };
     } else {
-      writeReviewLog("forwarded_permission.prompted", forwardedPermissionLogDetails);
+      writeReviewLog(
+        "forwarded_permission.prompted",
+        forwardedPermissionLogDetails,
+      );
       try {
         decision = await requestPermissionDecisionFromUi(
           ctx.ui,
@@ -906,22 +1126,30 @@ async function processForwardedPermissionRequests(ctx: ExtensionContext): Promis
           formatForwardedPermissionPrompt(request),
         );
       } catch (error) {
-        logPermissionForwardingError("Failed to show forwarded permission confirmation dialog", error);
+        logPermissionForwardingError(
+          "Failed to show forwarded permission confirmation dialog",
+          error,
+        );
         decision = { approved: false, state: "denied" };
       }
     }
 
     const responsePath = join(location.responsesDir, `${request.id}.json`);
-    writeReviewLog(decision.approved ? "forwarded_permission.approved" : "forwarded_permission.denied", {
-      requestId: request.id,
-      source: location.label,
-      requesterAgentName: request.requesterAgentName,
-      requesterSessionId: request.requesterSessionId,
-      targetSessionId: request.targetSessionId,
-      responsePath,
-      resolution: decision.state,
-      denialReason: decision.denialReason ?? null,
-    });
+    writeReviewLog(
+      decision.approved
+        ? "forwarded_permission.approved"
+        : "forwarded_permission.denied",
+      {
+        requestId: request.id,
+        source: location.label,
+        requesterAgentName: request.requesterAgentName,
+        requesterSessionId: request.requesterSessionId,
+        targetSessionId: request.targetSessionId,
+        responsePath,
+        resolution: decision.state,
+        denialReason: decision.denialReason ?? null,
+      },
+    );
     try {
       writeJsonFileAtomic(responsePath, {
         approved: decision.approved,
@@ -931,11 +1159,17 @@ async function processForwardedPermissionRequests(ctx: ExtensionContext): Promis
         respondedAt: Date.now(),
       } satisfies ForwardedPermissionResponse);
     } catch (error) {
-      logPermissionForwardingError(`Failed to write ${location.label} forwarded permission response '${responsePath}'`, error);
+      logPermissionForwardingError(
+        `Failed to write ${location.label} forwarded permission response '${responsePath}'`,
+        error,
+      );
       continue;
     }
 
-    safeDeleteFile(requestPath, `${location.label} forwarded permission request`);
+    safeDeleteFile(
+      requestPath,
+      `${location.label} forwarded permission request`,
+    );
   }
 
   cleanupPermissionForwardingLocationIfEmpty(location);
@@ -946,7 +1180,11 @@ async function confirmPermission(
   message: string,
 ): Promise<PermissionPromptDecision> {
   if (ctx.hasUI) {
-    return requestPermissionDecisionFromUi(ctx.ui, "Permission Required", message);
+    return requestPermissionDecisionFromUi(
+      ctx.ui,
+      "Permission Required",
+      message,
+    );
   }
 
   if (!isSubagentExecutionContext(ctx)) {
@@ -971,7 +1209,9 @@ function derivePiProjectPaths(cwd: string | undefined | null): {
   };
 }
 
-function createPermissionManagerForCwd(cwd: string | undefined | null): PermissionManager {
+function createPermissionManagerForCwd(
+  cwd: string | undefined | null,
+): PermissionManager {
   const projectPaths = derivePiProjectPaths(cwd);
   if (!projectPaths) {
     return new PermissionManager();
@@ -1037,7 +1277,10 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
     });
   };
 
-  const saveExtensionConfig = (next: PermissionSystemExtensionConfig, ctx: ExtensionCommandContext): void => {
+  const saveExtensionConfig = (
+    next: PermissionSystemExtensionConfig,
+    ctx: ExtensionCommandContext,
+  ): void => {
     const normalized = normalizePermissionSystemConfig(next);
     const saved = savePermissionSystemConfig(normalized);
     if (!saved.success) {
@@ -1166,11 +1409,16 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
     });
 
     const decision = await confirmPermission(ctx, details.message);
-    reviewPermissionDecision(decision.approved ? "permission_request.approved" : "permission_request.denied", {
-      ...details,
-      resolution: decision.state,
-      denialReason: decision.denialReason,
-    });
+    reviewPermissionDecision(
+      decision.approved
+        ? "permission_request.approved"
+        : "permission_request.denied",
+      {
+        ...details,
+        resolution: decision.state,
+        denialReason: decision.denialReason,
+      },
+    );
     emitPermissionRequestEvent({
       requestId: details.requestId,
       source: details.source,
@@ -1215,14 +1463,18 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
       }
 
       isProcessingForwardedRequests = true;
-      void processForwardedPermissionRequests(permissionForwardingContext)
-        .finally(() => {
-          isProcessingForwardedRequests = false;
-        });
+      void processForwardedPermissionRequests(
+        permissionForwardingContext,
+      ).finally(() => {
+        isProcessingForwardedRequests = false;
+      });
     }, PERMISSION_FORWARDING_POLL_INTERVAL_MS);
   };
 
-  const resolveAgentName = (ctx: ExtensionContext, systemPrompt?: string): string | null => {
+  const resolveAgentName = (
+    ctx: ExtensionContext,
+    systemPrompt?: string,
+  ): string | null => {
     const fromSession = getActiveAgentName(ctx);
     if (fromSession) {
       lastKnownActiveAgentName = fromSession;
@@ -1238,11 +1490,17 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
     return lastKnownActiveAgentName;
   };
 
-  const shouldExposeTool = (toolName: string, agentName: string | null): boolean => {
+  const shouldExposeTool = (
+    toolName: string,
+    agentName: string | null,
+  ): boolean => {
     // Use tool-level permission check for tool injection decisions
     // This ensures that agent-specific tool deny rules (e.g., bash: deny) are respected
     // before any command-level permissions are considered
-    const toolPermission = permissionManager.getToolPermission(toolName, agentName ?? undefined);
+    const toolPermission = permissionManager.getToolPermission(
+      toolName,
+      agentName ?? undefined,
+    );
     return toolPermission !== "deny";
   };
 
@@ -1274,7 +1532,9 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
 
   pi.on("resources_discover", async (event, _ctx) => {
     if (event.reason === "reload") {
-      permissionManager = runtimeContext ? createPermissionManagerForCwd(runtimeContext.cwd) : new PermissionManager();
+      permissionManager = runtimeContext
+        ? createPermissionManagerForCwd(runtimeContext.cwd)
+        : new PermissionManager();
       invalidateAgentStartCache();
       writeDebugLog("lifecycle.reload", {
         triggeredBy: "resources_discover",
@@ -1283,7 +1543,6 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
       });
     }
   });
-
 
   pi.on("session_shutdown", async () => {
     runtimeContext?.ui.setStatus(PERMISSION_SYSTEM_STATUS_KEY, undefined);
@@ -1312,7 +1571,12 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
     }
 
     const activeToolsCacheKey = createActiveToolsCacheKey(allowedTools);
-    if (shouldApplyCachedAgentStartState(lastActiveToolsCacheKey, activeToolsCacheKey)) {
+    if (
+      shouldApplyCachedAgentStartState(
+        lastActiveToolsCacheKey,
+        activeToolsCacheKey,
+      )
+    ) {
       pi.setActiveTools(allowedTools);
       lastActiveToolsCacheKey = activeToolsCacheKey;
     }
@@ -1320,18 +1584,33 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
     const promptStateCacheKey = createBeforeAgentStartPromptStateKey({
       agentName,
       cwd: ctx.cwd,
-      permissionStamp: permissionManager.getPolicyCacheStamp(agentName ?? undefined),
+      permissionStamp: permissionManager.getPolicyCacheStamp(
+        agentName ?? undefined,
+      ),
       systemPrompt: event.systemPrompt,
       allowedToolNames: allowedTools,
     });
 
-    if (!shouldApplyCachedAgentStartState(lastPromptStateCacheKey, promptStateCacheKey)) {
+    if (
+      !shouldApplyCachedAgentStartState(
+        lastPromptStateCacheKey,
+        promptStateCacheKey,
+      )
+    ) {
       return {};
     }
 
     lastPromptStateCacheKey = promptStateCacheKey;
-    const toolPromptResult = sanitizeAvailableToolsSection(event.systemPrompt, allowedTools);
-    const skillPromptResult = resolveSkillPromptEntries(toolPromptResult.prompt, permissionManager, agentName, ctx.cwd);
+    const toolPromptResult = sanitizeAvailableToolsSection(
+      event.systemPrompt,
+      allowedTools,
+    );
+    const skillPromptResult = resolveSkillPromptEntries(
+      toolPromptResult.prompt,
+      permissionManager,
+      agentName,
+      ctx.cwd,
+    );
     activeSkillEntries = skillPromptResult.entries;
 
     if (skillPromptResult.prompt !== event.systemPrompt) {
@@ -1350,7 +1629,11 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
     }
 
     const agentName = resolveAgentName(ctx);
-    const check = permissionManager.checkPermission("skill", { name: skillName }, agentName ?? undefined);
+    const check = permissionManager.checkPermission(
+      "skill",
+      { name: skillName },
+      agentName ?? undefined,
+    );
 
     if (check.state === "deny") {
       if (ctx.hasUI) {
@@ -1406,7 +1689,10 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
       return { block: true, reason: formatMissingToolNameReason() };
     }
 
-    const registrationCheck = checkRequestedToolRegistration(toolName, pi.getAllTools());
+    const registrationCheck = checkRequestedToolRegistration(
+      toolName,
+      pi.getAllTools(),
+    );
     if (registrationCheck.status === "missing-tool-name") {
       return { block: true, reason: formatMissingToolNameReason() };
     }
@@ -1414,13 +1700,22 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
     if (registrationCheck.status === "unregistered") {
       return {
         block: true,
-        reason: formatUnknownToolReason(registrationCheck.requestedToolName, registrationCheck.availableToolNames),
+        reason: formatUnknownToolReason(
+          registrationCheck.requestedToolName,
+          registrationCheck.availableToolNames,
+        ),
       };
     }
 
     if (isToolCallEventType("read", event) && activeSkillEntries.length > 0) {
-      const normalizedReadPath = normalizePathForComparison(event.input.path, ctx.cwd);
-      const matchedSkill = findSkillPathMatch(normalizedReadPath, activeSkillEntries);
+      const normalizedReadPath = normalizePathForComparison(
+        event.input.path,
+        ctx.cwd,
+      );
+      const matchedSkill = findSkillPathMatch(
+        normalizedReadPath,
+        activeSkillEntries,
+      );
 
       if (matchedSkill) {
         if (matchedSkill.state === "deny") {
@@ -1433,12 +1728,20 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
           });
           return {
             block: true,
-            reason: formatSkillPathDenyReason(matchedSkill, event.input.path, agentName ?? undefined),
+            reason: formatSkillPathDenyReason(
+              matchedSkill,
+              event.input.path,
+              agentName ?? undefined,
+            ),
           };
         }
 
         if (matchedSkill.state === "ask") {
-          const message = formatSkillPathAskPrompt(matchedSkill, event.input.path, agentName ?? undefined);
+          const message = formatSkillPathAskPrompt(
+            matchedSkill,
+            event.input.path,
+            agentName ?? undefined,
+          );
           if (!canRequestPermissionConfirmation(ctx)) {
             writeReviewLog("permission_request.blocked", {
               source: "skill_read",
@@ -1465,18 +1768,33 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
             path: event.input.path,
           });
           if (!decision.approved) {
-            const denialReason = decision.denialReason ? ` Reason: ${decision.denialReason}.` : "";
-            return { block: true, reason: `User denied access to skill '${matchedSkill.name}'.${denialReason}` };
+            const denialReason = decision.denialReason
+              ? ` Reason: ${decision.denialReason}.`
+              : "";
+            return {
+              block: true,
+              reason: `User denied access to skill '${matchedSkill.name}'.${denialReason}`,
+            };
           }
         }
       }
     }
 
     const input = getEventInput(event);
-    const externalDirectoryPath = ctx.cwd ? getPathBearingToolPath(toolName, input) : null;
+    const externalDirectoryPath = ctx.cwd
+      ? getPathBearingToolPath(toolName, input)
+      : null;
 
-    if (ctx.cwd && externalDirectoryPath && isPathOutsideWorkingDirectory(externalDirectoryPath, ctx.cwd)) {
-      const extCheck = permissionManager.checkPermission("external_directory", {}, agentName ?? undefined);
+    if (
+      ctx.cwd &&
+      externalDirectoryPath &&
+      isPathOutsideWorkingDirectory(externalDirectoryPath, ctx.cwd)
+    ) {
+      const extCheck = permissionManager.checkPermission(
+        "external_directory",
+        {},
+        agentName ?? undefined,
+      );
 
       if (extCheck.state === "deny") {
         writeReviewLog("permission_request.blocked", {
@@ -1545,7 +1863,11 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
       // state === "allow" → fall through to normal permission check
     }
 
-    const check = permissionManager.checkPermission(toolName, input, agentName ?? undefined);
+    const check = permissionManager.checkPermission(
+      toolName,
+      input,
+      agentName ?? undefined,
+    );
     const permissionLogContext = getPermissionLogContext(check);
 
     if (check.state === "deny") {
@@ -1557,15 +1879,19 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
         ...permissionLogContext,
         resolution: "policy_denied",
       });
-      return { block: true, reason: formatDenyReason(check, agentName ?? undefined) };
+      return {
+        block: true,
+        reason: formatDenyReason(check, agentName ?? undefined),
+      };
     }
 
     if (check.state === "ask") {
-      const unavailableReason = toolName === "bash" && isToolCallEventType("bash", event)
-        ? `Running bash command '${event.input.command}' requires approval, but no interactive UI is available.`
-        : toolName === "mcp"
-          ? "Using tool 'mcp' requires approval, but no interactive UI is available."
-          : `Using tool '${toolName}' requires approval, but no interactive UI is available.`;
+      const unavailableReason =
+        toolName === "bash" && isToolCallEventType("bash", event)
+          ? `Running bash command '${event.input.command}' requires approval, but no interactive UI is available.`
+          : toolName === "mcp"
+            ? "Using tool 'mcp' requires approval, but no interactive UI is available."
+            : `Using tool '${toolName}' requires approval, but no interactive UI is available.`;
 
       const message = formatAskPrompt(check, agentName ?? undefined, input);
       if (!canRequestPermissionConfirmation(ctx)) {
@@ -1594,7 +1920,10 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
         ...permissionLogContext,
       });
       if (!decision.approved) {
-        return { block: true, reason: formatUserDeniedReason(check, decision.denialReason) };
+        return {
+          block: true,
+          reason: formatUserDeniedReason(check, decision.denialReason),
+        };
       }
     }
 

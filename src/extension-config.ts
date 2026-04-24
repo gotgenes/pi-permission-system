@@ -1,4 +1,11 @@
-import { existsSync, mkdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  renameSync,
+  unlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -37,7 +44,10 @@ export const EXTENSION_ROOT = resolveExtensionRoot();
 export const CONFIG_PATH = join(EXTENSION_ROOT, "config.json");
 export const LOGS_DIR = join(EXTENSION_ROOT, "logs");
 export const DEBUG_LOG_PATH = join(LOGS_DIR, `${EXTENSION_ID}-debug.jsonl`);
-export const PERMISSION_REVIEW_LOG_PATH = join(LOGS_DIR, `${EXTENSION_ID}-permission-review.jsonl`);
+export const PERMISSION_REVIEW_LOG_PATH = join(
+  LOGS_DIR,
+  `${EXTENSION_ID}-permission-review.jsonl`,
+);
 
 function cloneDefaultConfig(): PermissionSystemExtensionConfig {
   return {
@@ -51,7 +61,9 @@ function createDefaultConfigContent(): string {
   return `${JSON.stringify(DEFAULT_EXTENSION_CONFIG, null, 2)}\n`;
 }
 
-export function normalizePermissionSystemConfig(raw: unknown): PermissionSystemExtensionConfig {
+export function normalizePermissionSystemConfig(
+  raw: unknown,
+): PermissionSystemExtensionConfig {
   const record = toRecord(raw);
   return {
     debugLog: record.debugLog === true,
@@ -64,7 +76,10 @@ function ensureConfigDirectory(configPath: string): void {
   mkdirSync(dirname(configPath), { recursive: true });
 }
 
-export function ensurePermissionSystemConfig(configPath = CONFIG_PATH): { created: boolean; warning?: string } {
+export function ensurePermissionSystemConfig(configPath = CONFIG_PATH): {
+  created: boolean;
+  warning?: string;
+} {
   if (existsSync(configPath)) {
     return { created: false };
   }
@@ -82,7 +97,9 @@ export function ensurePermissionSystemConfig(configPath = CONFIG_PATH): { create
   }
 }
 
-export function loadPermissionSystemConfig(configPath = CONFIG_PATH): PermissionSystemConfigLoadResult {
+export function loadPermissionSystemConfig(
+  configPath = CONFIG_PATH,
+): PermissionSystemConfigLoadResult {
   const ensureResult = ensurePermissionSystemConfig(configPath);
 
   try {
@@ -99,7 +116,9 @@ export function loadPermissionSystemConfig(configPath = CONFIG_PATH): Permission
     return {
       config: cloneDefaultConfig(),
       created: ensureResult.created,
-      warning: ensureResult.warning ?? `Failed to read permission-system config at '${configPath}': ${message}`,
+      warning:
+        ensureResult.warning ??
+        `Failed to read permission-system config at '${configPath}': ${message}`,
     };
   }
 }
@@ -133,11 +152,15 @@ export function savePermissionSystemConfig(
   }
 }
 
-export function getPermissionSystemConfigPath(configPath = CONFIG_PATH): string {
+export function getPermissionSystemConfigPath(
+  configPath = CONFIG_PATH,
+): string {
   return configPath;
 }
 
-export function ensurePermissionSystemLogsDirectory(logsDir = LOGS_DIR): string | undefined {
+export function ensurePermissionSystemLogsDirectory(
+  logsDir = LOGS_DIR,
+): string | undefined {
   try {
     mkdirSync(logsDir, { recursive: true });
     return undefined;

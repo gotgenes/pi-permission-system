@@ -1,5 +1,13 @@
 import assert from "node:assert/strict";
-import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, unlinkSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdtempSync,
+  mkdirSync,
+  readFileSync,
+  rmSync,
+  unlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
@@ -9,7 +17,12 @@ import {
   createBeforeAgentStartPromptStateKey,
   shouldApplyCachedAgentStartState,
 } from "../src/before-agent-start-cache.js";
-import { CONFIG_PATH, DEFAULT_EXTENSION_CONFIG, loadPermissionSystemConfig, savePermissionSystemConfig } from "../src/extension-config.js";
+import {
+  CONFIG_PATH,
+  DEFAULT_EXTENSION_CONFIG,
+  loadPermissionSystemConfig,
+  savePermissionSystemConfig,
+} from "../src/extension-config.js";
 import { createPermissionSystemLogger } from "../src/logging.js";
 import {
   createPermissionForwardingLocation,
@@ -23,11 +36,17 @@ import {
   resolveSkillPromptEntries,
   findSkillPathMatch,
 } from "../src/skill-prompt-sanitizer.js";
-import { checkRequestedToolRegistration, getToolNameFromValue } from "../src/tool-registry.js";
+import {
+  checkRequestedToolRegistration,
+  getToolNameFromValue,
+} from "../src/tool-registry.js";
 import { getPermissionSystemStatus } from "../src/status.js";
 import { sanitizeAvailableToolsSection } from "../src/system-prompt-sanitizer.js";
 import type { AgentPermissions, GlobalPermissionConfig } from "../src/types.js";
-import { canResolveAskPermissionRequest, shouldAutoApprovePermissionState } from "../src/yolo-mode.js";
+import {
+  canResolveAskPermissionRequest,
+  shouldAutoApprovePermissionState,
+} from "../src/yolo-mode.js";
 import { test } from "vitest";
 
 type CreateManagerOptions = {
@@ -44,7 +63,11 @@ function createManager(
   const agentsDir = join(baseDir, "agents");
 
   mkdirSync(agentsDir, { recursive: true });
-  writeFileSync(globalConfigPath, `${JSON.stringify(config, null, 2)}\n`, "utf8");
+  writeFileSync(
+    globalConfigPath,
+    `${JSON.stringify(config, null, 2)}\n`,
+    "utf8",
+  );
 
   for (const [name, content] of Object.entries(agentFiles)) {
     writeFileSync(join(agentsDir, `${name}.md`), content, "utf8");
@@ -95,12 +118,22 @@ function createToolCallHarness(
   const prompts: string[] = [];
   const handlers: Record<string, MockHandler> = {};
   const originalAgentDir = process.env.PI_CODING_AGENT_DIR;
-  const originalExtensionConfig = existsSync(CONFIG_PATH) ? readFileSync(CONFIG_PATH, "utf8") : null;
+  const originalExtensionConfig = existsSync(CONFIG_PATH)
+    ? readFileSync(CONFIG_PATH, "utf8")
+    : null;
 
   mkdirSync(join(baseDir, "agents"), { recursive: true });
   mkdirSync(cwd, { recursive: true });
-  writeFileSync(join(baseDir, "pi-permissions.jsonc"), `${JSON.stringify(config, null, 2)}\n`, "utf8");
-  writeFileSync(CONFIG_PATH, `${JSON.stringify(DEFAULT_EXTENSION_CONFIG, null, 2)}\n`, "utf8");
+  writeFileSync(
+    join(baseDir, "pi-permissions.jsonc"),
+    `${JSON.stringify(config, null, 2)}\n`,
+    "utf8",
+  );
+  writeFileSync(
+    CONFIG_PATH,
+    `${JSON.stringify(DEFAULT_EXTENSION_CONFIG, null, 2)}\n`,
+    "utf8",
+  );
 
   process.env.PI_CODING_AGENT_DIR = baseDir;
   try {
@@ -109,7 +142,8 @@ function createToolCallHarness(
         handlers[name] = handler;
       },
       registerCommand: (): void => {},
-      getAllTools: (): Array<{ name: string }> => toolNames.map((name) => ({ name })),
+      getAllTools: (): Array<{ name: string }> =>
+        toolNames.map((name) => ({ name })),
       setActiveTools: (): void => {},
       events: {
         emit: (): void => {},
@@ -129,7 +163,12 @@ function createToolCallHarness(
     handlers,
     prompts,
     cleanup: async (): Promise<void> => {
-      await Promise.resolve(handlers.session_shutdown?.({}, createMockContext(cwd, prompts, options)));
+      await Promise.resolve(
+        handlers.session_shutdown?.(
+          {},
+          createMockContext(cwd, prompts, options),
+        ),
+      );
       if (originalExtensionConfig === null) {
         if (existsSync(CONFIG_PATH)) {
           unlinkSync(CONFIG_PATH);
@@ -175,7 +214,9 @@ async function runToolCall(
   const handler = harness.handlers.tool_call;
   assert.equal(typeof handler, "function");
 
-  const result = await Promise.resolve(handler(event, createMockContext(harness.cwd, harness.prompts, options)));
+  const result = await Promise.resolve(
+    handler(event, createMockContext(harness.cwd, harness.prompts, options)),
+  );
   return (result ?? {}) as Record<string, unknown>;
 }
 
@@ -190,7 +231,10 @@ test("Permission-system extension config defaults debug off, review log on, and 
     assert.deepEqual(result.config, DEFAULT_EXTENSION_CONFIG);
     assert.equal(existsSync(configPath), true);
 
-    const raw = JSON.parse(readFileSync(configPath, "utf8")) as Record<string, unknown>;
+    const raw = JSON.parse(readFileSync(configPath, "utf8")) as Record<
+      string,
+      unknown
+    >;
     assert.equal(raw.debugLog, false);
     assert.equal(raw.permissionReviewLog, true);
     assert.equal(raw.yoloMode, false);
@@ -200,17 +244,23 @@ test("Permission-system extension config defaults debug off, review log on, and 
 });
 
 test("Permission-system extension config loads yolo mode when explicitly enabled", () => {
-  const baseDir = mkdtempSync(join(tmpdir(), "pi-permission-system-config-yolo-"));
+  const baseDir = mkdtempSync(
+    join(tmpdir(), "pi-permission-system-config-yolo-"),
+  );
   const configPath = join(baseDir, "config.json");
 
   try {
     writeFileSync(
       configPath,
-      `${JSON.stringify({
-        debugLog: true,
-        permissionReviewLog: false,
-        yoloMode: true,
-      }, null, 2)}\n`,
+      `${JSON.stringify(
+        {
+          debugLog: true,
+          permissionReviewLog: false,
+          yoloMode: true,
+        },
+        null,
+        2,
+      )}\n`,
       "utf8",
     );
 
@@ -228,17 +278,23 @@ test("Permission-system extension config loads yolo mode when explicitly enabled
 });
 
 test("Permission-system extension config normalizes invalid persisted values back to defaults", () => {
-  const baseDir = mkdtempSync(join(tmpdir(), "pi-permission-system-config-invalid-"));
+  const baseDir = mkdtempSync(
+    join(tmpdir(), "pi-permission-system-config-invalid-"),
+  );
   const configPath = join(baseDir, "config.json");
 
   try {
     writeFileSync(
       configPath,
-      `${JSON.stringify({
-        debugLog: "true",
-        permissionReviewLog: null,
-        yoloMode: 1,
-      }, null, 2)}\n`,
+      `${JSON.stringify(
+        {
+          debugLog: "true",
+          permissionReviewLog: null,
+          yoloMode: 1,
+        },
+        null,
+        2,
+      )}\n`,
       "utf8",
     );
 
@@ -252,7 +308,9 @@ test("Permission-system extension config normalizes invalid persisted values bac
 });
 
 test("Permission-system extension config save persists normalized config", () => {
-  const baseDir = mkdtempSync(join(tmpdir(), "pi-permission-system-config-save-"));
+  const baseDir = mkdtempSync(
+    join(tmpdir(), "pi-permission-system-config-save-"),
+  );
   const configPath = join(baseDir, "config.json");
 
   try {
@@ -280,17 +338,29 @@ test("Permission-system extension config save persists normalized config", () =>
 });
 
 test("Yolo mode only auto-approves ask-state permissions", () => {
-  assert.equal(shouldAutoApprovePermissionState("ask", DEFAULT_EXTENSION_CONFIG), false);
   assert.equal(
-    shouldAutoApprovePermissionState("ask", { ...DEFAULT_EXTENSION_CONFIG, yoloMode: true }),
-    true,
-  );
-  assert.equal(
-    shouldAutoApprovePermissionState("deny", { ...DEFAULT_EXTENSION_CONFIG, yoloMode: true }),
+    shouldAutoApprovePermissionState("ask", DEFAULT_EXTENSION_CONFIG),
     false,
   );
   assert.equal(
-    shouldAutoApprovePermissionState("allow", { ...DEFAULT_EXTENSION_CONFIG, yoloMode: true }),
+    shouldAutoApprovePermissionState("ask", {
+      ...DEFAULT_EXTENSION_CONFIG,
+      yoloMode: true,
+    }),
+    true,
+  );
+  assert.equal(
+    shouldAutoApprovePermissionState("deny", {
+      ...DEFAULT_EXTENSION_CONFIG,
+      yoloMode: true,
+    }),
+    false,
+  );
+  assert.equal(
+    shouldAutoApprovePermissionState("allow", {
+      ...DEFAULT_EXTENSION_CONFIG,
+      yoloMode: true,
+    }),
     false,
   );
 });
@@ -369,7 +439,10 @@ test("System prompt sanitizer removes denied tool guidelines while keeping globa
   assert.match(result.prompt, /Use mcp for MCP discovery first/i);
   assert.match(result.prompt, /Prefer grep\/find\/ls tools over bash/i);
   assert.match(result.prompt, /Be concise in your responses/);
-  assert.match(result.prompt, /Show file paths clearly when working with files/);
+  assert.match(
+    result.prompt,
+    /Show file paths clearly when working with files/,
+  );
 });
 
 test("System prompt sanitizer removes inactive built-in write guidance", () => {
@@ -383,8 +456,14 @@ test("System prompt sanitizer removes inactive built-in write guidance", () => {
   const result = sanitizeAvailableToolsSection(prompt, ["read"]);
 
   assert.equal(result.removed, true);
-  assert.equal(result.prompt.includes("Use write only for new files or complete rewrites"), false);
-  assert.equal(result.prompt.includes("do NOT use cat or bash to display what you did"), false);
+  assert.equal(
+    result.prompt.includes("Use write only for new files or complete rewrites"),
+    false,
+  );
+  assert.equal(
+    result.prompt.includes("do NOT use cat or bash to display what you did"),
+    false,
+  );
   assert.match(result.prompt, /Be concise in your responses/);
 });
 
@@ -400,9 +479,15 @@ test("Before-agent-start cache dedupes unchanged active-tool exposure and prompt
   });
 
   assert.equal(shouldApplyCachedAgentStartState(null, activeToolsKey), true);
-  assert.equal(shouldApplyCachedAgentStartState(activeToolsKey, activeToolsKey), false);
+  assert.equal(
+    shouldApplyCachedAgentStartState(activeToolsKey, activeToolsKey),
+    false,
+  );
   assert.equal(shouldApplyCachedAgentStartState(null, promptStateKey), true);
-  assert.equal(shouldApplyCachedAgentStartState(promptStateKey, promptStateKey), false);
+  assert.equal(
+    shouldApplyCachedAgentStartState(promptStateKey, promptStateKey),
+    false,
+  );
 });
 
 test("Before-agent-start prompt cache invalidates on permission changes while runtime enforcement stays authoritative", () => {
@@ -433,28 +518,39 @@ test("Before-agent-start prompt cache invalidates on permission changes while ru
       allowedToolNames: ["read"],
     });
 
-    assert.equal(shouldApplyCachedAgentStartState(baselineKey, baselineKey), false);
+    assert.equal(
+      shouldApplyCachedAgentStartState(baselineKey, baselineKey),
+      false,
+    );
     assert.equal(manager.checkPermission("write", {}, undefined).state, "deny");
 
-    const updatedConfig = `${JSON.stringify({
-      defaultPolicy: {
-        tools: "allow",
-        bash: "allow",
-        mcp: "allow",
-        skills: "allow",
-        special: "allow",
+    const updatedConfig = `${JSON.stringify(
+      {
+        defaultPolicy: {
+          tools: "allow",
+          bash: "allow",
+          mcp: "allow",
+          skills: "allow",
+          special: "allow",
+        },
+        tools: {
+          write: "allow",
+        },
+        bash: {},
+        mcp: {},
+        skills: {},
+        special: {},
       },
-      tools: {
-        write: "allow",
-      },
-      bash: {},
-      mcp: {},
-      skills: {},
-      special: {},
-    }, null, 2)}\n`;
+      null,
+      2,
+    )}\n`;
 
     let updatedStamp = baselineStamp;
-    for (let attempt = 0; attempt < 10 && updatedStamp === baselineStamp; attempt += 1) {
+    for (
+      let attempt = 0;
+      attempt < 10 && updatedStamp === baselineStamp;
+      attempt += 1
+    ) {
       const waitUntil = Date.now() + 2;
       while (Date.now() < waitUntil) {
         // Wait for the filesystem timestamp granularity to advance.
@@ -474,8 +570,14 @@ test("Before-agent-start prompt cache invalidates on permission changes while ru
       allowedToolNames: ["read", "write"],
     });
 
-    assert.equal(shouldApplyCachedAgentStartState(baselineKey, invalidatedKey), true);
-    assert.equal(manager.checkPermission("write", {}, undefined).state, "allow");
+    assert.equal(
+      shouldApplyCachedAgentStartState(baselineKey, invalidatedKey),
+      true,
+    );
+    assert.equal(
+      manager.checkPermission("write", {}, undefined).state,
+      "allow",
+    );
   } finally {
     cleanup();
   }
@@ -498,14 +600,21 @@ test("Permission-system logger respects debug toggle and keeps review log enable
   });
 
   try {
-    const initialDebugWarning = logger.debug("debug.disabled", { sample: true });
-    const reviewWarning = logger.review("permission_request.waiting", { toolName: "write" });
+    const initialDebugWarning = logger.debug("debug.disabled", {
+      sample: true,
+    });
+    const reviewWarning = logger.review("permission_request.waiting", {
+      toolName: "write",
+    });
 
     assert.equal(initialDebugWarning, undefined);
     assert.equal(reviewWarning, undefined);
     assert.equal(existsSync(debugLogPath), false);
     assert.equal(existsSync(reviewLogPath), true);
-    assert.match(readFileSync(reviewLogPath, "utf8"), /permission_request\.waiting/);
+    assert.match(
+      readFileSync(reviewLogPath, "utf8"),
+      /permission_request\.waiting/,
+    );
 
     config.debugLog = true;
     const enabledDebugWarning = logger.debug("debug.enabled", { sample: true });
@@ -594,12 +703,20 @@ permission:
   );
 
   try {
-    const denied = manager.checkPermission("bash", { command: "rm -rf build" }, "reviewer");
+    const denied = manager.checkPermission(
+      "bash",
+      { command: "rm -rf build" },
+      "reviewer",
+    );
     assert.equal(denied.state, "deny");
     assert.equal(denied.source, "bash");
     assert.equal(denied.matchedPattern, "rm -rf *");
 
-    const fallback = manager.checkPermission("bash", { command: "echo hello" }, "reviewer");
+    const fallback = manager.checkPermission(
+      "bash",
+      { command: "echo hello" },
+      "reviewer",
+    );
     assert.equal(fallback.state, "allow");
     assert.equal(fallback.source, "bash");
     assert.equal(fallback.matchedPattern, undefined);
@@ -625,13 +742,17 @@ test("MCP wildcard matching uses the registered mcp tool", () => {
   });
 
   try {
-    const queryDocs = manager.checkPermission("mcp", { tool: "research:query-docs" });
+    const queryDocs = manager.checkPermission("mcp", {
+      tool: "research:query-docs",
+    });
     assert.equal(queryDocs.state, "allow");
     assert.equal(queryDocs.source, "mcp");
     assert.equal(queryDocs.matchedPattern, "research_query-*");
     assert.equal(queryDocs.target, "research_query-docs");
 
-    const resolve = manager.checkPermission("mcp", { tool: "research:resolve-context" });
+    const resolve = manager.checkPermission("mcp", {
+      tool: "research:resolve-context",
+    });
     assert.equal(resolve.state, "ask");
     assert.equal(resolve.matchedPattern, "research_*");
     assert.equal(resolve.target, "research_resolve-context");
@@ -692,16 +813,22 @@ test("Skill permission matching", () => {
   });
 
   try {
-    const allowed = manager.checkPermission("skill", { name: "requesting-code-review" });
+    const allowed = manager.checkPermission("skill", {
+      name: "requesting-code-review",
+    });
     assert.equal(allowed.state, "allow");
     assert.equal(allowed.matchedPattern, "requesting-code-review");
     assert.equal(allowed.source, "skill");
 
-    const denied = manager.checkPermission("skill", { name: "web-design-guidelines" });
+    const denied = manager.checkPermission("skill", {
+      name: "web-design-guidelines",
+    });
     assert.equal(denied.state, "deny");
     assert.equal(denied.matchedPattern, "web-*");
 
-    const fallback = manager.checkPermission("skill", { name: "unknown-skill" });
+    const fallback = manager.checkPermission("skill", {
+      name: "unknown-skill",
+    });
     assert.equal(fallback.state, "ask");
     assert.equal(fallback.matchedPattern, "*");
   } finally {
@@ -731,7 +858,9 @@ test("MCP proxy tool infers server-prefixed aliases from configured server names
   );
 
   try {
-    const result = manager.checkPermission("mcp", { tool: "get_code_context_exa" });
+    const result = manager.checkPermission("mcp", {
+      tool: "get_code_context_exa",
+    });
     assert.equal(result.state, "allow");
     assert.equal(result.source, "mcp");
     assert.equal(result.matchedPattern, "exa_get_code_context_exa");
@@ -763,7 +892,10 @@ test("MCP describe mode normalizes qualified tool names without duplicating serv
   );
 
   try {
-    const result = manager.checkPermission("mcp", { describe: "exa:web_search_exa", server: "exa" });
+    const result = manager.checkPermission("mcp", {
+      describe: "exa:web_search_exa",
+      server: "exa",
+    });
     assert.equal(result.state, "allow");
     assert.equal(result.source, "mcp");
     assert.equal(result.matchedPattern, "exa_web_search_exa");
@@ -824,7 +956,11 @@ permission:
   );
 
   try {
-    const result = manager.checkPermission("mcp", { tool: "exa:web_search_exa" }, "reviewer");
+    const result = manager.checkPermission(
+      "mcp",
+      { tool: "exa:web_search_exa" },
+      "reviewer",
+    );
     assert.equal(result.state, "allow");
     assert.equal(result.source, "tool");
     assert.equal(result.target, "exa_web_search_exa");
@@ -861,7 +997,11 @@ permission:
   );
 
   try {
-    const result = manager.checkPermission("mcp", { tool: "web_search_exa" }, "reviewer");
+    const result = manager.checkPermission(
+      "mcp",
+      { tool: "web_search_exa" },
+      "reviewer",
+    );
     assert.equal(result.state, "deny");
     assert.equal(result.source, "mcp");
     assert.equal(result.matchedPattern, "exa_web_search_exa");
@@ -899,13 +1039,21 @@ permission:
   );
 
   try {
-    const allowed = manager.checkPermission("mcp", { tool: "web_search_exa" }, "reviewer");
+    const allowed = manager.checkPermission(
+      "mcp",
+      { tool: "web_search_exa" },
+      "reviewer",
+    );
     assert.equal(allowed.state, "allow");
     assert.equal(allowed.source, "mcp");
     assert.equal(allowed.matchedPattern, "exa_web_search_exa");
     assert.equal(allowed.target, "exa_web_search_exa");
 
-    const fallback = manager.checkPermission("mcp", { tool: "other_exa" }, "reviewer");
+    const fallback = manager.checkPermission(
+      "mcp",
+      { tool: "other_exa" },
+      "reviewer",
+    );
     assert.equal(fallback.state, "deny");
     assert.equal(fallback.source, "tool");
     assert.equal(fallback.target, "exa_other_exa");
@@ -941,7 +1089,11 @@ permission:
     assert.equal(readResult.state, "deny");
     assert.equal(readResult.source, "tool");
 
-    const mcpResult = manager.checkPermission("mcp", { tool: "exa:web_search_exa" }, "reviewer");
+    const mcpResult = manager.checkPermission(
+      "mcp",
+      { tool: "exa:web_search_exa" },
+      "reviewer",
+    );
     assert.equal(mcpResult.state, "allow");
     assert.equal(mcpResult.source, "default");
   } finally {
@@ -1016,7 +1168,11 @@ permission:
     assert.equal(taskResult.state, "deny");
     assert.equal(taskResult.source, "default");
 
-    const mcpResult = manager.checkPermission("mcp", { tool: "exa:web_search_exa" }, "reviewer");
+    const mcpResult = manager.checkPermission(
+      "mcp",
+      { tool: "exa:web_search_exa" },
+      "reviewer",
+    );
     assert.equal(mcpResult.state, "deny");
     assert.equal(mcpResult.source, "default");
   } finally {
@@ -1025,20 +1181,18 @@ permission:
 });
 
 test("task uses exact-name tool permissions like any registered extension tool", () => {
-  const { manager, cleanup } = createManager(
-    {
-      defaultPolicy: {
-        tools: "deny",
-        bash: "ask",
-        mcp: "allow",
-        skills: "ask",
-        special: "ask",
-      },
-      tools: {
-        task: "allow",
-      },
+  const { manager, cleanup } = createManager({
+    defaultPolicy: {
+      tools: "deny",
+      bash: "ask",
+      mcp: "allow",
+      skills: "ask",
+      special: "ask",
     },
-  );
+    tools: {
+      task: "allow",
+    },
+  });
 
   try {
     const taskResult = manager.checkPermission("task", {});
@@ -1058,18 +1212,32 @@ test("Tool registry resolves event tool names from string and object payloads", 
 });
 
 test("Tool registry blocks unregistered tools and handles aliases", () => {
-  const registeredTools = [{ toolName: "mcp" }, { toolName: "read" }, { toolName: "bash" }];
+  const registeredTools = [
+    { toolName: "mcp" },
+    { toolName: "read" },
+    { toolName: "bash" },
+  ];
 
-  const unknownCheck = checkRequestedToolRegistration("third_party_tool", registeredTools);
+  const unknownCheck = checkRequestedToolRegistration(
+    "third_party_tool",
+    registeredTools,
+  );
   assert.equal(unknownCheck.status, "unregistered");
   if (unknownCheck.status === "unregistered") {
     assert.deepEqual(unknownCheck.availableToolNames, ["bash", "mcp", "read"]);
   }
 
-  const aliasCheck = checkRequestedToolRegistration("legacy_read", registeredTools, { legacy_read: "read" });
+  const aliasCheck = checkRequestedToolRegistration(
+    "legacy_read",
+    registeredTools,
+    { legacy_read: "read" },
+  );
   assert.equal(aliasCheck.status, "registered");
 
-  const missingNameCheck = checkRequestedToolRegistration("   ", registeredTools);
+  const missingNameCheck = checkRequestedToolRegistration(
+    "   ",
+    registeredTools,
+  );
   assert.equal(missingNameCheck.status, "missing-tool-name");
 });
 
@@ -1152,7 +1320,9 @@ test("getToolPermission supports arbitrary extension tool names", () => {
     const explicitPermission = manager.getToolPermission("third_party_tool");
     assert.equal(explicitPermission, "allow");
 
-    const fallbackPermission = manager.getToolPermission("missing_extension_tool");
+    const fallbackPermission = manager.getToolPermission(
+      "missing_extension_tool",
+    );
     assert.equal(fallbackPermission, "deny");
   } finally {
     cleanup();
@@ -1177,7 +1347,10 @@ test("Yolo mode bypasses delegated ask routing when no parent forwarding target 
     true,
   );
   assert.equal(
-    shouldAutoApprovePermissionState("ask", { ...DEFAULT_EXTENSION_CONFIG, yoloMode: true }),
+    shouldAutoApprovePermissionState("ask", {
+      ...DEFAULT_EXTENSION_CONFIG,
+      yoloMode: true,
+    }),
     true,
   );
 });
@@ -1208,8 +1381,14 @@ test("Permission forwarding does not guess a target session when subagent runtim
 
 test("Permission forwarding uses session-scoped directories per interactive session", () => {
   const forwardingRoot = join(tmpdir(), "pi-permission-system-forwarding-root");
-  const sessionA = createPermissionForwardingLocation(forwardingRoot, "session-a");
-  const sessionB = createPermissionForwardingLocation(forwardingRoot, "session-b");
+  const sessionA = createPermissionForwardingLocation(
+    forwardingRoot,
+    "session-a",
+  );
+  const sessionB = createPermissionForwardingLocation(
+    forwardingRoot,
+    "session-b",
+  );
 
   assert.notEqual(sessionA.sessionRootDir, sessionB.sessionRootDir);
   assert.notEqual(sessionA.requestsDir, sessionB.requestsDir);
@@ -1218,11 +1397,17 @@ test("Permission forwarding uses session-scoped directories per interactive sess
 
 test("Permission forwarding request routing only matches the intended UI session", () => {
   assert.equal(
-    isForwardedPermissionRequestForSession({ targetSessionId: "session-a" }, "session-a"),
+    isForwardedPermissionRequestForSession(
+      { targetSessionId: "session-a" },
+      "session-a",
+    ),
     true,
   );
   assert.equal(
-    isForwardedPermissionRequestForSession({ targetSessionId: "session-a" }, "session-b"),
+    isForwardedPermissionRequestForSession(
+      { targetSessionId: "session-a" },
+      "session-b",
+    ),
     false,
   );
 });
@@ -1247,7 +1432,9 @@ function createManagerWithProject(
   agentFiles: Record<string, string> = {},
   options: CreateManagerWithProjectOptions = {},
 ) {
-  const baseDir = mkdtempSync(join(tmpdir(), "pi-permission-system-proj-test-"));
+  const baseDir = mkdtempSync(
+    join(tmpdir(), "pi-permission-system-proj-test-"),
+  );
   const globalConfigPath = join(baseDir, "pi-permissions.jsonc");
   const agentsDir = join(baseDir, "agents");
   const projectRoot = join(baseDir, "project");
@@ -1257,16 +1444,26 @@ function createManagerWithProject(
   mkdirSync(agentsDir, { recursive: true });
   mkdirSync(projectAgentsDir, { recursive: true });
 
-  writeFileSync(globalConfigPath, `${JSON.stringify(config, null, 2)}\n`, "utf8");
+  writeFileSync(
+    globalConfigPath,
+    `${JSON.stringify(config, null, 2)}\n`,
+    "utf8",
+  );
   if (options.projectConfig) {
-    writeFileSync(projectGlobalConfigPath, `${JSON.stringify(options.projectConfig, null, 2)}\n`, "utf8");
+    writeFileSync(
+      projectGlobalConfigPath,
+      `${JSON.stringify(options.projectConfig, null, 2)}\n`,
+      "utf8",
+    );
   }
 
   for (const [name, content] of Object.entries(agentFiles)) {
     writeFileSync(join(agentsDir, `${name}.md`), content, "utf8");
   }
 
-  for (const [name, content] of Object.entries(options.projectAgentFiles ?? {})) {
+  for (const [name, content] of Object.entries(
+    options.projectAgentFiles ?? {},
+  )) {
     writeFileSync(join(projectAgentsDir, `${name}.md`), content, "utf8");
   }
 
@@ -1311,11 +1508,15 @@ test("Project-level config overrides base bash patterns", () => {
   );
 
   try {
-    const allowed = manager.checkPermission("bash", { command: "rm -rf build" });
+    const allowed = manager.checkPermission("bash", {
+      command: "rm -rf build",
+    });
     assert.equal(allowed.state, "allow");
     assert.equal(allowed.matchedPattern, "rm -rf build");
 
-    const denied = manager.checkPermission("bash", { command: "rm -rf node_modules" });
+    const denied = manager.checkPermission("bash", {
+      command: "rm -rf node_modules",
+    });
     assert.equal(denied.state, "deny");
     assert.equal(denied.matchedPattern, "rm -rf *");
   } finally {
@@ -1353,11 +1554,19 @@ permission:
   );
 
   try {
-    const allowed = manager.checkPermission("bash", { command: "git log --oneline" }, "reviewer");
+    const allowed = manager.checkPermission(
+      "bash",
+      { command: "git log --oneline" },
+      "reviewer",
+    );
     assert.equal(allowed.state, "allow");
     assert.equal(allowed.matchedPattern, "git log *");
 
-    const denied = manager.checkPermission("bash", { command: "git status" }, "reviewer");
+    const denied = manager.checkPermission(
+      "bash",
+      { command: "git status" },
+      "reviewer",
+    );
     assert.equal(denied.state, "deny");
     assert.equal(denied.matchedPattern, "git *");
   } finally {
@@ -1446,7 +1655,11 @@ permission:
   );
 
   try {
-    const reviewerResult = manager.checkPermission("custom_extension_tool", {}, "reviewer");
+    const reviewerResult = manager.checkPermission(
+      "custom_extension_tool",
+      {},
+      "reviewer",
+    );
     assert.equal(reviewerResult.state, "deny");
     assert.equal(reviewerResult.source, "default");
 
@@ -1506,14 +1719,24 @@ test("PermissionManager reads config from PI_CODING_AGENT_DIR when set", () => {
   mkdirSync(agentsDir, { recursive: true });
 
   const config: GlobalPermissionConfig = {
-    defaultPolicy: { tools: "deny", bash: "deny", mcp: "deny", skills: "deny", special: "deny" },
+    defaultPolicy: {
+      tools: "deny",
+      bash: "deny",
+      mcp: "deny",
+      skills: "deny",
+      special: "deny",
+    },
     tools: { read: "allow" },
     bash: {},
     mcp: {},
     skills: {},
     special: {},
   };
-  writeFileSync(join(baseDir, "pi-permissions.jsonc"), JSON.stringify(config), "utf8");
+  writeFileSync(
+    join(baseDir, "pi-permissions.jsonc"),
+    JSON.stringify(config),
+    "utf8",
+  );
 
   const original = process.env.PI_CODING_AGENT_DIR;
   process.env.PI_CODING_AGENT_DIR = baseDir;
@@ -1568,7 +1791,13 @@ test("parseAllSkillPromptSections finds every available_skills block", () => {
 
 test("REGRESSION: resolveSkillPromptEntries sanitizes every available_skills block", () => {
   const { manager, cleanup } = createManager({
-    defaultPolicy: { tools: "ask", bash: "ask", mcp: "ask", skills: "ask", special: "ask" },
+    defaultPolicy: {
+      tools: "ask",
+      bash: "ask",
+      mcp: "ask",
+      skills: "ask",
+      special: "ask",
+    },
     skills: {
       "denied-skill": "deny",
     },
@@ -1602,10 +1831,26 @@ test("REGRESSION: resolveSkillPromptEntries sanitizes every available_skills blo
 
     const result = resolveSkillPromptEntries(prompt, manager, null, "/cwd");
 
-    assert.equal(result.prompt.includes("denied-skill"), false, "Denied skill should be removed from every block");
-    assert.equal(result.prompt.includes("visible-skill"), true, "Visible skill should remain in the prompt");
-    assert.equal((result.prompt.match(/<available_skills>/g) || []).length, 1, "Fully denied blocks should be removed");
-    assert.deepEqual(result.entries.map((entry) => entry.name), ["visible-skill"], "Tracked skill entries should exclude denied skills");
+    assert.equal(
+      result.prompt.includes("denied-skill"),
+      false,
+      "Denied skill should be removed from every block",
+    );
+    assert.equal(
+      result.prompt.includes("visible-skill"),
+      true,
+      "Visible skill should remain in the prompt",
+    );
+    assert.equal(
+      (result.prompt.match(/<available_skills>/g) || []).length,
+      1,
+      "Fully denied blocks should be removed",
+    );
+    assert.deepEqual(
+      result.entries.map((entry) => entry.name),
+      ["visible-skill"],
+      "Tracked skill entries should exclude denied skills",
+    );
   } finally {
     cleanup();
   }
@@ -1613,7 +1858,13 @@ test("REGRESSION: resolveSkillPromptEntries sanitizes every available_skills blo
 
 test("REGRESSION: resolveSkillPromptEntries keeps only visible skills available for path matching", () => {
   const { manager, cleanup } = createManager({
-    defaultPolicy: { tools: "ask", bash: "ask", mcp: "ask", skills: "ask", special: "ask" },
+    defaultPolicy: {
+      tools: "ask",
+      bash: "ask",
+      mcp: "ask",
+      skills: "ask",
+      special: "ask",
+    },
     skills: {
       "blocked-skill": "deny",
     },
@@ -1643,11 +1894,21 @@ test("REGRESSION: resolveSkillPromptEntries keeps only visible skills available 
     const result = resolveSkillPromptEntries(prompt, manager, null, "/cwd");
     const visiblePath = resolve("/cwd", "./skills/visible/file.ts");
     const blockedPath = resolve("/cwd", "./skills/blocked/file.ts");
-    const matchedVisibleSkill = findSkillPathMatch(process.platform === "win32" ? visiblePath.toLowerCase() : visiblePath, result.entries);
-    const matchedBlockedSkill = findSkillPathMatch(process.platform === "win32" ? blockedPath.toLowerCase() : blockedPath, result.entries);
+    const matchedVisibleSkill = findSkillPathMatch(
+      process.platform === "win32" ? visiblePath.toLowerCase() : visiblePath,
+      result.entries,
+    );
+    const matchedBlockedSkill = findSkillPathMatch(
+      process.platform === "win32" ? blockedPath.toLowerCase() : blockedPath,
+      result.entries,
+    );
 
     assert.equal(matchedVisibleSkill?.name, "visible-skill");
-    assert.equal(matchedBlockedSkill, null, "Denied skills should not remain in tracked entries");
+    assert.equal(
+      matchedBlockedSkill,
+      null,
+      "Denied skills should not remain in tracked entries",
+    );
   } finally {
     cleanup();
   }
@@ -1757,7 +2018,11 @@ permission:
     assert.equal(globalResult.state, "deny");
 
     // Trusted agent overrides to allow
-    const agentResult = manager.checkPermission("external_directory", {}, "trusted");
+    const agentResult = manager.checkPermission(
+      "external_directory",
+      {},
+      "trusted",
+    );
     assert.equal(agentResult.state, "allow");
     assert.equal(agentResult.source, "special");
   } finally {
@@ -1801,7 +2066,13 @@ test("tool_call blocks path-bearing tools outside cwd when external_directory is
 
   const harness = createToolCallHarness(
     {
-      defaultPolicy: { tools: "allow", bash: "allow", mcp: "allow", skills: "allow", special: "ask" },
+      defaultPolicy: {
+        tools: "allow",
+        bash: "allow",
+        mcp: "allow",
+        skills: "allow",
+        special: "ask",
+      },
       special: { external_directory: "deny" },
     },
     ["read"],
@@ -1816,7 +2087,10 @@ test("tool_call blocks path-bearing tools outside cwd when external_directory is
     });
 
     assert.equal(result.block, true);
-    assert.match(String(result.reason), /external directory permission denial/i);
+    assert.match(
+      String(result.reason),
+      /external directory permission denial/i,
+    );
     assert.match(String(result.reason), /repo-sibling/);
   } finally {
     await harness.cleanup();
@@ -1827,7 +2101,13 @@ test("tool_call blocks path-bearing tools outside cwd when external_directory is
 test("tool_call allows path-bearing tools inside cwd without external_directory prompt", async () => {
   const harness = createToolCallHarness(
     {
-      defaultPolicy: { tools: "allow", bash: "allow", mcp: "allow", skills: "allow", special: "ask" },
+      defaultPolicy: {
+        tools: "allow",
+        bash: "allow",
+        mcp: "allow",
+        skills: "allow",
+        special: "ask",
+      },
       special: { external_directory: "deny" },
     },
     ["read"],
@@ -1850,7 +2130,13 @@ test("tool_call allows path-bearing tools inside cwd without external_directory 
 test("tool_call blocks external_directory ask when no confirmation channel is available", async () => {
   const harness = createToolCallHarness(
     {
-      defaultPolicy: { tools: "allow", bash: "allow", mcp: "allow", skills: "allow", special: "ask" },
+      defaultPolicy: {
+        tools: "allow",
+        bash: "allow",
+        mcp: "allow",
+        skills: "allow",
+        special: "ask",
+      },
       special: { external_directory: "ask" },
     },
     ["write"],
@@ -1860,11 +2146,17 @@ test("tool_call blocks external_directory ask when no confirmation channel is av
     const result = await runToolCall(harness, {
       toolName: "write",
       toolCallId: "external-ask-no-ui",
-      input: { path: join(harness.cwd, "..", "outside.txt"), content: "blocked" },
+      input: {
+        path: join(harness.cwd, "..", "outside.txt"),
+        content: "blocked",
+      },
     });
 
     assert.equal(result.block, true);
-    assert.match(String(result.reason), /requires approval, but no interactive UI is available/i);
+    assert.match(
+      String(result.reason),
+      /requires approval, but no interactive UI is available/i,
+    );
   } finally {
     await harness.cleanup();
   }
@@ -1873,7 +2165,13 @@ test("tool_call blocks external_directory ask when no confirmation channel is av
 test("tool_call prompts for external_directory and then falls through to normal tool policy", async () => {
   const harness = createToolCallHarness(
     {
-      defaultPolicy: { tools: "allow", bash: "allow", mcp: "allow", skills: "allow", special: "ask" },
+      defaultPolicy: {
+        tools: "allow",
+        bash: "allow",
+        mcp: "allow",
+        skills: "allow",
+        special: "ask",
+      },
       special: { external_directory: "ask" },
     },
     ["grep"],
@@ -1904,7 +2202,13 @@ test("tool_call prompts for external_directory and then falls through to normal 
 test("tool_call skips external_directory checks for optional path tools without a path", async () => {
   const harness = createToolCallHarness(
     {
-      defaultPolicy: { tools: "allow", bash: "allow", mcp: "allow", skills: "allow", special: "ask" },
+      defaultPolicy: {
+        tools: "allow",
+        bash: "allow",
+        mcp: "allow",
+        skills: "allow",
+        special: "ask",
+      },
       special: { external_directory: "deny" },
     },
     ["find"],
@@ -1927,7 +2231,13 @@ test("tool_call skips external_directory checks for optional path tools without 
 test("generic ask prompts include serialized tool input for informed approval", async () => {
   const harness = createToolCallHarness(
     {
-      defaultPolicy: { tools: "ask", bash: "ask", mcp: "ask", skills: "ask", special: "ask" },
+      defaultPolicy: {
+        tools: "ask",
+        bash: "ask",
+        mcp: "ask",
+        skills: "ask",
+        special: "ask",
+      },
     },
     ["weather_lookup"],
   );
@@ -1951,4 +2261,3 @@ test("generic ask prompts include serialized tool input for informed approval", 
     await harness.cleanup();
   }
 });
-
