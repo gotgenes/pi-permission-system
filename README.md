@@ -1,9 +1,11 @@
-# 🔐 pi-permission-system
+# 🔐 @gotgenes/pi-permission-system
 
 [![Version](https://img.shields.io/badge/version-0.4.4-blue.svg)](package.json)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Permission enforcement extension for the Pi coding agent that provides centralized, deterministic permission gates for tool, bash, MCP, skill, and special operations.
+
+> **Fork notice:** This package is a friendly fork of [MasuRii/pi-permission-system](https://github.com/MasuRii/pi-permission-system), published to npm as `@gotgenes/pi-permission-system`. The extension's on-disk identity (config directory, log filenames, `/permission-system` slash command, and event channel names) is intentionally preserved so this fork and upstream share runtime state and remain drop-in interchangeable.
 
 <img width="1360" height="752" alt="image" src="https://github.com/user-attachments/assets/3e85190a-17fa-4d94-ac8e-efa54337df5d" />
 
@@ -25,14 +27,22 @@ Permission enforcement extension for the Pi coding agent that provides centraliz
 
 ## Installation
 
-Place this folder in one of the following locations:
+Install from npm:
+
+```bash
+npm install @gotgenes/pi-permission-system
+# or
+bun add @gotgenes/pi-permission-system
+```
+
+Or place this repository's folder directly in one of the locations Pi auto-discovers extensions from:
 
 | Scope   | Path |
 |---------|------|
 | Global default | `~/.pi/agent/extensions/pi-permission-system` (respects `PI_CODING_AGENT_DIR`) |
 | Project | `.pi/extensions/pi-permission-system` |
 
-Pi auto-discovers extensions in these paths.
+> The directory name stays `pi-permission-system` (not scoped) because it matches the extension's internal ID and determines where pi reads this extension's config and logs from — keeping it unchanged means this fork shares state with upstream.
 
 > **Tip:** All `~/.pi/agent` paths shown in this document are defaults. If the `PI_CODING_AGENT_DIR` environment variable is set, pi uses that directory instead. The extension automatically follows pi's `getAgentDir()` helper, so global policy files, per-agent overrides, session directories, and extension installation paths all resolve under the configured agent directory.
 
@@ -515,10 +525,11 @@ npx --yes ajv-cli@5 validate \
 ## Development
 
 ```bash
-npm run build    # Compile TypeScript
-npm run lint     # Run linter (uses build)
-npm run test     # Run tests from ./tests
-npm run check    # Run lint + test
+npm run build       # Type-check TypeScript (no emit)
+npm run lint        # Run linter (currently aliased to build)
+npm run test        # Run the vitest suite
+npm run test:watch  # Re-run vitest on file changes
+npm run check       # Run lint + test
 ```
 
 ---
