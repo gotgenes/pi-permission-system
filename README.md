@@ -7,8 +7,6 @@ Permission enforcement extension for the Pi coding agent that provides centraliz
 
 > **Fork notice:** This package is a friendly fork of [MasuRii/pi-permission-system](https://github.com/MasuRii/pi-permission-system), published to npm as `@gotgenes/pi-permission-system`. The extension's on-disk identity (config directory, log filenames, `/permission-system` slash command, and event channel names) is intentionally preserved so this fork and upstream share runtime state and remain drop-in interchangeable.
 
-<img width="1360" height="752" alt="image" src="https://github.com/user-attachments/assets/3e85190a-17fa-4d94-ac8e-efa54337df5d" />
-
 
 ## Features
 
