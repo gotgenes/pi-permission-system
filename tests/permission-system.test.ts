@@ -28,7 +28,7 @@ import { getPermissionSystemStatus } from "../src/status.js";
 import { sanitizeAvailableToolsSection } from "../src/system-prompt-sanitizer.js";
 import type { AgentPermissions, GlobalPermissionConfig } from "../src/types.js";
 import { canResolveAskPermissionRequest, shouldAutoApprovePermissionState } from "../src/yolo-mode.js";
-import { runAsyncTest, runTest } from "./test-harness.js";
+import { test } from "vitest";
 
 type CreateManagerOptions = {
   mcpServerNames?: readonly string[];
@@ -179,7 +179,7 @@ async function runToolCall(
   return (result ?? {}) as Record<string, unknown>;
 }
 
-runTest("Permission-system extension config defaults debug off, review log on, and yolo mode off", () => {
+test("Permission-system extension config defaults debug off, review log on, and yolo mode off", () => {
   const baseDir = mkdtempSync(join(tmpdir(), "pi-permission-system-config-"));
   const configPath = join(baseDir, "config.json");
 
@@ -199,7 +199,7 @@ runTest("Permission-system extension config defaults debug off, review log on, a
   }
 });
 
-runTest("Permission-system extension config loads yolo mode when explicitly enabled", () => {
+test("Permission-system extension config loads yolo mode when explicitly enabled", () => {
   const baseDir = mkdtempSync(join(tmpdir(), "pi-permission-system-config-yolo-"));
   const configPath = join(baseDir, "config.json");
 
@@ -227,7 +227,7 @@ runTest("Permission-system extension config loads yolo mode when explicitly enab
   }
 });
 
-runTest("Permission-system extension config normalizes invalid persisted values back to defaults", () => {
+test("Permission-system extension config normalizes invalid persisted values back to defaults", () => {
   const baseDir = mkdtempSync(join(tmpdir(), "pi-permission-system-config-invalid-"));
   const configPath = join(baseDir, "config.json");
 
@@ -251,7 +251,7 @@ runTest("Permission-system extension config normalizes invalid persisted values 
   }
 });
 
-runTest("Permission-system extension config save persists normalized config", () => {
+test("Permission-system extension config save persists normalized config", () => {
   const baseDir = mkdtempSync(join(tmpdir(), "pi-permission-system-config-save-"));
   const configPath = join(baseDir, "config.json");
 
@@ -279,7 +279,7 @@ runTest("Permission-system extension config save persists normalized config", ()
   }
 });
 
-runTest("Yolo mode only auto-approves ask-state permissions", () => {
+test("Yolo mode only auto-approves ask-state permissions", () => {
   assert.equal(shouldAutoApprovePermissionState("ask", DEFAULT_EXTENSION_CONFIG), false);
   assert.equal(
     shouldAutoApprovePermissionState("ask", { ...DEFAULT_EXTENSION_CONFIG, yoloMode: true }),
@@ -295,7 +295,7 @@ runTest("Yolo mode only auto-approves ask-state permissions", () => {
   );
 });
 
-runTest("Yolo mode resolves ask permissions without UI or delegation forwarding", () => {
+test("Yolo mode resolves ask permissions without UI or delegation forwarding", () => {
   assert.equal(
     canResolveAskPermissionRequest({
       config: DEFAULT_EXTENSION_CONFIG,
@@ -322,7 +322,7 @@ runTest("Yolo mode resolves ask permissions without UI or delegation forwarding"
   );
 });
 
-runTest("Permission-system status is only exposed when yolo mode is enabled", () => {
+test("Permission-system status is only exposed when yolo mode is enabled", () => {
   assert.equal(getPermissionSystemStatus(DEFAULT_EXTENSION_CONFIG), undefined);
   assert.equal(
     getPermissionSystemStatus({ ...DEFAULT_EXTENSION_CONFIG, yoloMode: true }),
@@ -330,7 +330,7 @@ runTest("Permission-system status is only exposed when yolo mode is enabled", ()
   );
 });
 
-runTest("System prompt sanitizer removes the Available tools section and surrounding boilerplate", () => {
+test("System prompt sanitizer removes the Available tools section and surrounding boilerplate", () => {
   const prompt = [
     "Available tools:",
     "- read: Read file contents",
@@ -352,7 +352,7 @@ runTest("System prompt sanitizer removes the Available tools section and surroun
   assert.match(result.prompt, /Use mcp for MCP discovery first/i);
 });
 
-runTest("System prompt sanitizer removes denied tool guidelines while keeping global guidance", () => {
+test("System prompt sanitizer removes denied tool guidelines while keeping global guidance", () => {
   const prompt = [
     "Guidelines:",
     "- Use task when work SHOULD be delegated to one or more specialized agents instead of handled entirely in the current session.",
@@ -372,7 +372,7 @@ runTest("System prompt sanitizer removes denied tool guidelines while keeping gl
   assert.match(result.prompt, /Show file paths clearly when working with files/);
 });
 
-runTest("System prompt sanitizer removes inactive built-in write guidance", () => {
+test("System prompt sanitizer removes inactive built-in write guidance", () => {
   const prompt = [
     "Guidelines:",
     "- Use write only for new files or complete rewrites",
@@ -388,7 +388,7 @@ runTest("System prompt sanitizer removes inactive built-in write guidance", () =
   assert.match(result.prompt, /Be concise in your responses/);
 });
 
-runTest("Before-agent-start cache dedupes unchanged active-tool exposure and prompt state", () => {
+test("Before-agent-start cache dedupes unchanged active-tool exposure and prompt state", () => {
   const allowedTools = ["read", "mcp"];
   const activeToolsKey = createActiveToolsCacheKey(allowedTools);
   const promptStateKey = createBeforeAgentStartPromptStateKey({
@@ -405,7 +405,7 @@ runTest("Before-agent-start cache dedupes unchanged active-tool exposure and pro
   assert.equal(shouldApplyCachedAgentStartState(promptStateKey, promptStateKey), false);
 });
 
-runTest("Before-agent-start prompt cache invalidates on permission changes while runtime enforcement stays authoritative", () => {
+test("Before-agent-start prompt cache invalidates on permission changes while runtime enforcement stays authoritative", () => {
   const { manager, globalConfigPath, cleanup } = createManager({
     defaultPolicy: {
       tools: "allow",
@@ -481,7 +481,7 @@ runTest("Before-agent-start prompt cache invalidates on permission changes while
   }
 });
 
-runTest("Permission-system logger respects debug toggle and keeps review log enabled by default", () => {
+test("Permission-system logger respects debug toggle and keeps review log enabled by default", () => {
   const baseDir = mkdtempSync(join(tmpdir(), "pi-permission-system-logs-"));
   const logsDir = join(baseDir, "logs");
   const debugLogPath = join(logsDir, "debug.jsonl");
@@ -517,7 +517,7 @@ runTest("Permission-system logger respects debug toggle and keeps review log ena
   }
 });
 
-runTest("BashFilter uses opencode-style last-match hierarchy", () => {
+test("BashFilter uses opencode-style last-match hierarchy", () => {
   const filter = new BashFilter(
     {
       "*": "ask",
@@ -541,7 +541,7 @@ runTest("BashFilter uses opencode-style last-match hierarchy", () => {
   assert.equal(generic.matchedPattern, "git *");
 });
 
-runTest("PermissionManager canonical built-in permission checking", () => {
+test("PermissionManager canonical built-in permission checking", () => {
   const { manager, cleanup } = createManager({
     defaultPolicy: {
       tools: "deny",
@@ -568,7 +568,7 @@ runTest("PermissionManager canonical built-in permission checking", () => {
   }
 });
 
-runTest("Bash patterns stay higher priority than tool-level bash fallback", () => {
+test("Bash patterns stay higher priority than tool-level bash fallback", () => {
   const { manager, cleanup } = createManager(
     {
       defaultPolicy: {
@@ -608,7 +608,7 @@ permission:
   }
 });
 
-runTest("MCP wildcard matching uses the registered mcp tool", () => {
+test("MCP wildcard matching uses the registered mcp tool", () => {
   const { manager, cleanup } = createManager({
     defaultPolicy: {
       tools: "ask",
@@ -645,7 +645,7 @@ runTest("MCP wildcard matching uses the registered mcp tool", () => {
   }
 });
 
-runTest("Arbitrary extension tools use exact-name tool permissions instead of MCP fallback", () => {
+test("Arbitrary extension tools use exact-name tool permissions instead of MCP fallback", () => {
   const { manager, cleanup } = createManager({
     defaultPolicy: {
       tools: "deny",
@@ -675,7 +675,7 @@ runTest("Arbitrary extension tools use exact-name tool permissions instead of MC
   }
 });
 
-runTest("Skill permission matching", () => {
+test("Skill permission matching", () => {
   const { manager, cleanup } = createManager({
     defaultPolicy: {
       tools: "ask",
@@ -709,7 +709,7 @@ runTest("Skill permission matching", () => {
   }
 });
 
-runTest("MCP proxy tool infers server-prefixed aliases from configured server names", () => {
+test("MCP proxy tool infers server-prefixed aliases from configured server names", () => {
   const { manager, cleanup } = createManager(
     {
       defaultPolicy: {
@@ -741,7 +741,7 @@ runTest("MCP proxy tool infers server-prefixed aliases from configured server na
   }
 });
 
-runTest("MCP describe mode normalizes qualified tool names without duplicating server prefixes", () => {
+test("MCP describe mode normalizes qualified tool names without duplicating server prefixes", () => {
   const { manager, cleanup } = createManager(
     {
       defaultPolicy: {
@@ -773,7 +773,7 @@ runTest("MCP describe mode normalizes qualified tool names without duplicating s
   }
 });
 
-runTest("Canonical tools map directly without legacy aliases", () => {
+test("Canonical tools map directly without legacy aliases", () => {
   const { manager, cleanup } = createManager({
     defaultPolicy: {
       tools: "ask",
@@ -801,7 +801,7 @@ runTest("Canonical tools map directly without legacy aliases", () => {
   }
 });
 
-runTest("tools.mcp acts as fallback allow for unmatched MCP targets", () => {
+test("tools.mcp acts as fallback allow for unmatched MCP targets", () => {
   const { manager, cleanup } = createManager(
     {
       defaultPolicy: {
@@ -833,7 +833,7 @@ permission:
   }
 });
 
-runTest("specific MCP rules override tools.mcp fallback", () => {
+test("specific MCP rules override tools.mcp fallback", () => {
   const { manager, cleanup } = createManager(
     {
       defaultPolicy: {
@@ -871,7 +871,7 @@ permission:
   }
 });
 
-runTest("specific MCP rules still win when tools.mcp is deny", () => {
+test("specific MCP rules still win when tools.mcp is deny", () => {
   const { manager, cleanup } = createManager(
     {
       defaultPolicy: {
@@ -914,7 +914,7 @@ permission:
   }
 });
 
-runTest("partial agent defaultPolicy overrides preserve global defaults", () => {
+test("partial agent defaultPolicy overrides preserve global defaults", () => {
   const { manager, cleanup } = createManager(
     {
       defaultPolicy: {
@@ -949,7 +949,7 @@ permission:
   }
 });
 
-runTest("Agent frontmatter canonical tools resolve correctly", () => {
+test("Agent frontmatter canonical tools resolve correctly", () => {
   const { manager, cleanup } = createManager(
     {
       defaultPolicy: {
@@ -984,7 +984,7 @@ permission:
   }
 });
 
-runTest("Only canonical built-ins support top-level shorthand in agent frontmatter", () => {
+test("Only canonical built-ins support top-level shorthand in agent frontmatter", () => {
   const { manager, cleanup } = createManager(
     {
       defaultPolicy: {
@@ -1024,7 +1024,7 @@ permission:
   }
 });
 
-runTest("task uses exact-name tool permissions like any registered extension tool", () => {
+test("task uses exact-name tool permissions like any registered extension tool", () => {
   const { manager, cleanup } = createManager(
     {
       defaultPolicy: {
@@ -1049,7 +1049,7 @@ runTest("task uses exact-name tool permissions like any registered extension too
   }
 });
 
-runTest("Tool registry resolves event tool names from string and object payloads", () => {
+test("Tool registry resolves event tool names from string and object payloads", () => {
   assert.equal(getToolNameFromValue("  read  "), "read");
   assert.equal(getToolNameFromValue({ toolName: "write" }), "write");
   assert.equal(getToolNameFromValue({ name: "find" }), "find");
@@ -1057,7 +1057,7 @@ runTest("Tool registry resolves event tool names from string and object payloads
   assert.equal(getToolNameFromValue({}), null);
 });
 
-runTest("Tool registry blocks unregistered tools and handles aliases", () => {
+test("Tool registry blocks unregistered tools and handles aliases", () => {
   const registeredTools = [{ toolName: "mcp" }, { toolName: "read" }, { toolName: "bash" }];
 
   const unknownCheck = checkRequestedToolRegistration("third_party_tool", registeredTools);
@@ -1073,7 +1073,7 @@ runTest("Tool registry blocks unregistered tools and handles aliases", () => {
   assert.equal(missingNameCheck.status, "missing-tool-name");
 });
 
-runTest("getToolPermission returns tool-level policy for canonical and extension tools", () => {
+test("getToolPermission returns tool-level policy for canonical and extension tools", () => {
   const { manager, cleanup } = createManager(
     {
       defaultPolicy: {
@@ -1134,7 +1134,7 @@ permission:
   }
 });
 
-runTest("getToolPermission supports arbitrary extension tool names", () => {
+test("getToolPermission supports arbitrary extension tool names", () => {
   const { manager, cleanup } = createManager({
     defaultPolicy: {
       tools: "deny",
@@ -1159,7 +1159,7 @@ runTest("getToolPermission supports arbitrary extension tool names", () => {
   }
 });
 
-runTest("Yolo mode bypasses delegated ask routing when no parent forwarding target is available", () => {
+test("Yolo mode bypasses delegated ask routing when no parent forwarding target is available", () => {
   const targetSessionId = resolvePermissionForwardingTargetSessionId({
     hasUI: false,
     isSubagent: true,
@@ -1182,7 +1182,7 @@ runTest("Yolo mode bypasses delegated ask routing when no parent forwarding targ
   );
 });
 
-runTest("Permission forwarding resolves the parent interactive session from subagent runtime env", () => {
+test("Permission forwarding resolves the parent interactive session from subagent runtime env", () => {
   const targetSessionId = resolvePermissionForwardingTargetSessionId({
     hasUI: false,
     isSubagent: true,
@@ -1195,7 +1195,7 @@ runTest("Permission forwarding resolves the parent interactive session from suba
   assert.equal(targetSessionId, "parent-session");
 });
 
-runTest("Permission forwarding does not guess a target session when subagent runtime env is missing", () => {
+test("Permission forwarding does not guess a target session when subagent runtime env is missing", () => {
   const targetSessionId = resolvePermissionForwardingTargetSessionId({
     hasUI: false,
     isSubagent: true,
@@ -1206,7 +1206,7 @@ runTest("Permission forwarding does not guess a target session when subagent run
   assert.equal(targetSessionId, null);
 });
 
-runTest("Permission forwarding uses session-scoped directories per interactive session", () => {
+test("Permission forwarding uses session-scoped directories per interactive session", () => {
   const forwardingRoot = join(tmpdir(), "pi-permission-system-forwarding-root");
   const sessionA = createPermissionForwardingLocation(forwardingRoot, "session-a");
   const sessionB = createPermissionForwardingLocation(forwardingRoot, "session-b");
@@ -1216,7 +1216,7 @@ runTest("Permission forwarding uses session-scoped directories per interactive s
   assert.notEqual(sessionA.responsesDir, sessionB.responsesDir);
 });
 
-runTest("Permission forwarding request routing only matches the intended UI session", () => {
+test("Permission forwarding request routing only matches the intended UI session", () => {
   assert.equal(
     isForwardedPermissionRequestForSession({ targetSessionId: "session-a" }, "session-a"),
     true,
@@ -1227,7 +1227,7 @@ runTest("Permission forwarding request routing only matches the intended UI sess
   );
 });
 
-runTest("Permission forwarding rejects unresolved sentinel session ids", () => {
+test("Permission forwarding rejects unresolved sentinel session ids", () => {
   const targetSessionId = resolvePermissionForwardingTargetSessionId({
     hasUI: true,
     isSubagent: false,
@@ -1286,7 +1286,7 @@ function createManagerWithProject(
   };
 }
 
-runTest("Project-level config overrides base bash patterns", () => {
+test("Project-level config overrides base bash patterns", () => {
   const { manager, cleanup } = createManagerWithProject(
     {
       defaultPolicy: {
@@ -1323,7 +1323,7 @@ runTest("Project-level config overrides base bash patterns", () => {
   }
 });
 
-runTest("System-agent config overrides project-level bash patterns", () => {
+test("System-agent config overrides project-level bash patterns", () => {
   const { manager, cleanup } = createManagerWithProject(
     {
       defaultPolicy: {
@@ -1365,7 +1365,7 @@ permission:
   }
 });
 
-runTest("Project-agent config overrides system-agent tool rules", () => {
+test("Project-agent config overrides system-agent tool rules", () => {
   const { manager, cleanup } = createManagerWithProject(
     {
       defaultPolicy: {
@@ -1407,7 +1407,7 @@ permission:
   }
 });
 
-runTest("Full precedence chain base < project < system-agent < project-agent for defaultPolicy", () => {
+test("Full precedence chain base < project < system-agent < project-agent for defaultPolicy", () => {
   const { manager, cleanup } = createManagerWithProject(
     {
       defaultPolicy: {
@@ -1458,7 +1458,7 @@ permission:
   }
 });
 
-runTest("Project-agent applies even without a matching system-agent file", () => {
+test("Project-agent applies even without a matching system-agent file", () => {
   const { manager, cleanup } = createManagerWithProject(
     {
       defaultPolicy: {
@@ -1500,7 +1500,7 @@ permission:
 // PI_CODING_AGENT_DIR support
 // ---------------------------------------------------------------------------
 
-runTest("PermissionManager reads config from PI_CODING_AGENT_DIR when set", () => {
+test("PermissionManager reads config from PI_CODING_AGENT_DIR when set", () => {
   const baseDir = mkdtempSync(join(tmpdir(), "pi-permission-system-envdir-"));
   const agentsDir = join(baseDir, "agents");
   mkdirSync(agentsDir, { recursive: true });
@@ -1538,7 +1538,7 @@ runTest("PermissionManager reads config from PI_CODING_AGENT_DIR when set", () =
 // Skill prompt sanitization - multi-block regression tests
 // ---------------------------------------------------------------------------
 
-runTest("parseAllSkillPromptSections finds every available_skills block", () => {
+test("parseAllSkillPromptSections finds every available_skills block", () => {
   const prompt = [
     "Some preamble",
     "<available_skills>",
@@ -1566,7 +1566,7 @@ runTest("parseAllSkillPromptSections finds every available_skills block", () => 
   assert.equal(sections[1].entries[0]?.name, "skill-two");
 });
 
-runTest("REGRESSION: resolveSkillPromptEntries sanitizes every available_skills block", () => {
+test("REGRESSION: resolveSkillPromptEntries sanitizes every available_skills block", () => {
   const { manager, cleanup } = createManager({
     defaultPolicy: { tools: "ask", bash: "ask", mcp: "ask", skills: "ask", special: "ask" },
     skills: {
@@ -1611,7 +1611,7 @@ runTest("REGRESSION: resolveSkillPromptEntries sanitizes every available_skills 
   }
 });
 
-runTest("REGRESSION: resolveSkillPromptEntries keeps only visible skills available for path matching", () => {
+test("REGRESSION: resolveSkillPromptEntries keeps only visible skills available for path matching", () => {
   const { manager, cleanup } = createManager({
     defaultPolicy: { tools: "ask", bash: "ask", mcp: "ask", skills: "ask", special: "ask" },
     skills: {
@@ -1657,7 +1657,7 @@ runTest("REGRESSION: resolveSkillPromptEntries keeps only visible skills availab
 // external_directory special permission
 // ---------------------------------------------------------------------------
 
-runTest("external_directory permission falls back to special default policy when not explicitly configured", () => {
+test("external_directory permission falls back to special default policy when not explicitly configured", () => {
   const { manager, cleanup } = createManager({
     defaultPolicy: {
       tools: "allow",
@@ -1678,7 +1678,7 @@ runTest("external_directory permission falls back to special default policy when
   }
 });
 
-runTest("external_directory permission respects explicit deny in special config", () => {
+test("external_directory permission respects explicit deny in special config", () => {
   const { manager, cleanup } = createManager({
     defaultPolicy: {
       tools: "allow",
@@ -1702,7 +1702,7 @@ runTest("external_directory permission respects explicit deny in special config"
   }
 });
 
-runTest("external_directory permission can be explicitly allowed", () => {
+test("external_directory permission can be explicitly allowed", () => {
   const { manager, cleanup } = createManager({
     defaultPolicy: {
       tools: "allow",
@@ -1726,7 +1726,7 @@ runTest("external_directory permission can be explicitly allowed", () => {
   }
 });
 
-runTest("external_directory permission respects per-agent override", () => {
+test("external_directory permission respects per-agent override", () => {
   const { manager, cleanup } = createManager(
     {
       defaultPolicy: {
@@ -1765,7 +1765,7 @@ permission:
   }
 });
 
-runTest("external_directory permission is independent of doom_loop in the same special config", () => {
+test("external_directory permission is independent of doom_loop in the same special config", () => {
   const { manager, cleanup } = createManager({
     defaultPolicy: {
       tools: "allow",
@@ -1793,7 +1793,7 @@ runTest("external_directory permission is independent of doom_loop in the same s
   }
 });
 
-await runAsyncTest("tool_call blocks path-bearing tools outside cwd when external_directory is denied", async () => {
+test("tool_call blocks path-bearing tools outside cwd when external_directory is denied", async () => {
   const rootDir = mkdtempSync(join(tmpdir(), "pi-permission-system-boundary-"));
   const cwd = join(rootDir, "repo");
   const siblingPath = join(rootDir, "repo-sibling", "secret.txt");
@@ -1824,7 +1824,7 @@ await runAsyncTest("tool_call blocks path-bearing tools outside cwd when externa
   }
 });
 
-await runAsyncTest("tool_call allows path-bearing tools inside cwd without external_directory prompt", async () => {
+test("tool_call allows path-bearing tools inside cwd without external_directory prompt", async () => {
   const harness = createToolCallHarness(
     {
       defaultPolicy: { tools: "allow", bash: "allow", mcp: "allow", skills: "allow", special: "ask" },
@@ -1847,7 +1847,7 @@ await runAsyncTest("tool_call allows path-bearing tools inside cwd without exter
   }
 });
 
-await runAsyncTest("tool_call blocks external_directory ask when no confirmation channel is available", async () => {
+test("tool_call blocks external_directory ask when no confirmation channel is available", async () => {
   const harness = createToolCallHarness(
     {
       defaultPolicy: { tools: "allow", bash: "allow", mcp: "allow", skills: "allow", special: "ask" },
@@ -1870,7 +1870,7 @@ await runAsyncTest("tool_call blocks external_directory ask when no confirmation
   }
 });
 
-await runAsyncTest("tool_call prompts for external_directory and then falls through to normal tool policy", async () => {
+test("tool_call prompts for external_directory and then falls through to normal tool policy", async () => {
   const harness = createToolCallHarness(
     {
       defaultPolicy: { tools: "allow", bash: "allow", mcp: "allow", skills: "allow", special: "ask" },
@@ -1901,7 +1901,7 @@ await runAsyncTest("tool_call prompts for external_directory and then falls thro
   }
 });
 
-await runAsyncTest("tool_call skips external_directory checks for optional path tools without a path", async () => {
+test("tool_call skips external_directory checks for optional path tools without a path", async () => {
   const harness = createToolCallHarness(
     {
       defaultPolicy: { tools: "allow", bash: "allow", mcp: "allow", skills: "allow", special: "ask" },
@@ -1924,7 +1924,7 @@ await runAsyncTest("tool_call skips external_directory checks for optional path 
   }
 });
 
-await runAsyncTest("generic ask prompts include serialized tool input for informed approval", async () => {
+test("generic ask prompts include serialized tool input for informed approval", async () => {
   const harness = createToolCallHarness(
     {
       defaultPolicy: { tools: "ask", bash: "ask", mcp: "ask", skills: "ask", special: "ask" },
@@ -1952,4 +1952,3 @@ await runAsyncTest("generic ask prompts include serialized tool input for inform
   }
 });
 
-console.log("All permission system tests passed.");
