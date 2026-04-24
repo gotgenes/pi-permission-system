@@ -524,10 +524,14 @@ npx --yes ajv-cli@5 validate \
 
 ```bash
 npm run build       # Type-check TypeScript (no emit)
-npm run lint        # Run linter (currently aliased to build)
+npm run lint        # Biome lint + format check
+npm run lint:fix    # Biome lint + format auto-fix
+npm run lint:md     # markdownlint-cli2 on README etc.
+npm run lint:all    # lint + lint:md
+npm run format      # Biome format --write
 npm run test        # Run the vitest suite
 npm run test:watch  # Re-run vitest on file changes
-npm run check       # Run lint + test
+npm run check       # build + lint:all + test
 ```
 
 ---
