@@ -20,7 +20,8 @@
   "scripts": {
     "build": "tsc -p tsconfig.json --noCheck",
     "lint": "npm run build",
-    "test": "bun ./tests/permission-system.test.ts && bun ./tests/config-modal.test.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "check": "npm run lint && npm run test"
   },
   "keywords": [
@@ -63,6 +64,7 @@
     "@sinclair/typebox": "^0.34.49"
   },
   "devDependencies": {
-    "typescript": "6.0.3"
+"typescript": "6.0.3",
+    "vitest": "^4.1.5"
   }
 }

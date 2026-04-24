@@ -71,12 +71,6 @@ declare module "node:url" {
   export function fileURLToPath(url: unknown): string;
 }
 
-declare module "bun:test" {
-  export const mock: {
-    module(name: string, factory: () => Record<string, unknown>): void;
-  };
-}
-
 declare module "@mariozechner/pi-coding-agent" {
   export type Theme = any;
 
