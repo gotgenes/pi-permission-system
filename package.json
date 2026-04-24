@@ -19,9 +19,13 @@
   ],
   "scripts": {
     "build": "npx --yes -p typescript@5.7.3 tsc -p tsconfig.json --noCheck",
-    "lint": "npm run build",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "lint:md": "markdownlint-cli2 '*.md'",
+    "lint:all": "npm run lint && npm run lint:md",
+    "format": "biome format --write .",
     "test": "bun ./tests/permission-system.test.ts && bun ./tests/config-modal.test.ts",
-    "check": "npm run lint && npm run test"
+    "check": "npm run build && npm run lint:all && npm run test"
   },
   "keywords": [
     "pi-package",
@@ -61,5 +65,9 @@
     "@mariozechner/pi-coding-agent": "^0.70.5",
     "@mariozechner/pi-tui": "^0.70.5",
     "@sinclair/typebox": "^0.34.49"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.13",
+    "markdownlint-cli2": "^0.22.1"
   }
 }

@@ -523,10 +523,14 @@ npx --yes ajv-cli@5 validate \
 ## Development
 
 ```bash
-npm run build    # Compile TypeScript
-npm run lint     # Run linter (uses build)
-npm run test     # Run tests from ./tests
-npm run check    # Run lint + test
+npm run build       # Type-check TypeScript (no emit)
+npm run lint        # Biome lint + format check
+npm run lint:fix    # Biome lint + format auto-fix
+npm run lint:md     # markdownlint-cli2 on README etc.
+npm run lint:all    # lint + lint:md
+npm run format      # Biome format --write
+npm run test        # Run tests from ./tests
+npm run check       # build + lint:all + test
 ```
 
 ---
