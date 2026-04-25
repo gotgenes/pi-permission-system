@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+## [0.4.3] - 2026-04-25
+
+### Added
+- Added runtime enforcement for the `external_directory` special permission on path-bearing tools (`read`, `write`, `edit`, `find`, `grep`, `ls`) before normal tool permission checks (thanks to @gotgenes for PR #9)
+- Added readable `ask` prompt summaries for built-in file tools and bounded input previews for generic extension tools so users can make informed approval decisions (thanks to @beantownbytes for PR #8)
+- Added `skill-prompt-sanitizer.ts` to parse and sanitize every `<available_skills>` block, including prompts with multiple skill sections
+
+### Changed
+- Updated `@mariozechner/pi-coding-agent` and `@mariozechner/pi-tui` peer dependencies to `^0.70.2`
+- Refactored skill prompt filtering out of `src/index.ts` into a dedicated module for clearer ownership and reuse
+- Permission prompts for `edit`, `write`, `read`, `find`, `grep`, and `ls` now show concise path/action summaries instead of raw multiline JSON
+
+### Fixed
+- Denied skills are now removed from all available-skill prompt blocks instead of only the first block
+- Denied skill entries are no longer retained for later skill-read path matching after prompt sanitization
+- External path access now honors `special.external_directory: deny` and blocks `ask` decisions when no UI or forwarding channel is available
+
+### Tests
+- Added runtime `tool_call` coverage for external directory deny, ask-without-UI, ask approval, internal path allow, and optional path omission
+- Added prompt regression coverage for generic tool input previews and readable built-in file-tool approval summaries
+- Added multi-block skill prompt sanitizer regression coverage
+
 ## [0.4.2] - 2026-04-20
 
 ### Added

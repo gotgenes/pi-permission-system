@@ -1,6 +1,6 @@
 # 🔐 pi-permission-system
 
-[![Version](https://img.shields.io/badge/version-0.4.2-blue.svg)](package.json)
+[![Version](https://img.shields.io/badge/version-0.4.3-blue.svg)](package.json)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Permission enforcement extension for the Pi coding agent that provides centralized, deterministic permission gates for tool, bash, MCP, skill, and special operations.
@@ -12,15 +12,16 @@ Permission enforcement extension for the Pi coding agent that provides centraliz
 
 - **Tool Filtering** — Hides disallowed tools from the agent before it starts (reduces "try another tool" behavior)
 - **System Prompt Sanitization** — Removes denied tool entries from the `Available tools:` system prompt section so the agent only sees tools it can actually call
-- **Runtime Enforcement** — Blocks/asks/allows at tool call time with UI confirmation dialogs
+- **Runtime Enforcement** — Blocks/asks/allows at tool call time with UI confirmation dialogs and readable approval summaries
 - **Bash Command Control** — Wildcard pattern matching for granular bash command permissions
 - **MCP Access Control** — Server and tool-level permissions for MCP operations
-- **Skill Protection** — Controls which skills can be loaded or read from disk
+- **Skill Protection** — Controls which skills can be loaded or read from disk, including multi-block prompt sanitization
 - **Per-Agent Overrides** — Agent-specific permission policies via YAML frontmatter
 - **Subagent Permission Forwarding** — Forwards `ask` confirmations from non-UI subagents back to the main interactive session
 - **File-Based Review Logging** — Writes permission request/denial review entries to a file by default for later auditing
 - **Optional Debug Logging** — Keeps verbose extension diagnostics in a separate file when enabled in `config.json`
 - **JSON Schema Validation** — Full schema for editor autocomplete and config validation
+- **External Directory Guard** — Enforces `special.external_directory` for path-bearing file tools that target paths outside the active working directory
 
 ## Installation
 
@@ -84,6 +85,8 @@ The extension integrates via Pi's lifecycle hooks:
 - The `Available tools:` system prompt section is rewritten to match the filtered active tool set
 - Extension-provided tools like `task`, `mcp`, and third-party tools are handled by exact registered name instead of private built-in hardcodes
 - When a subagent hits an `ask` permission without direct UI access, the request can be forwarded to the main interactive session for confirmation
+- Generic extension-tool approval prompts include a bounded input preview; built-in file tools use concise human-readable summaries instead of raw multiline JSON
+- Path-bearing file tools (`read`, `write`, `edit`, `find`, `grep`, `ls`) evaluate `special.external_directory` before their normal tool permission when an explicit path points outside `ctx.cwd`
 
 ## Configuration
 
@@ -122,7 +125,7 @@ The policy file is a JSON object with these sections:
 | `bash`          | Command pattern permissions                         |
 | `mcp`           | MCP server/tool permissions for calls routed through a registered `mcp` tool |
 | `skills`        | Skill name pattern permissions                      |
-| `special`       | Reserved permission checks                          |
+| `special`       | Reserved permission checks such as external directory access |
 
 > **Note:** Trailing commas are **not** supported. If parsing fails, the extension falls back to `ask` for all categories.
 
@@ -310,7 +313,7 @@ Reserved permission checks:
 | Key                  | Description                              |
 |----------------------|------------------------------------------|
 | `doom_loop`          | Controls doom loop detection behavior    |
-| `external_directory` | Controls access outside working directory |
+| `external_directory` | Enforces ask/allow/deny decisions for path-bearing built-in tools (`read`, `write`, `edit`, `find`, `grep`, `ls`) when they target paths outside the active working directory |
 | `tool_call_limit`    | *(schema only, not enforced yet)*        |
 
 ```jsonc
@@ -321,6 +324,8 @@ Reserved permission checks:
   }
 }
 ```
+
+`external_directory` is evaluated before the normal tool permission check. For example, `tools.read: "allow"` can permit ordinary reads while `special.external_directory: "ask"` still requires confirmation before reading `../outside.txt` or an absolute path outside `ctx.cwd`. Optional-path search tools (`find`, `grep`, `ls`) skip this check when no `path` is provided because they default to the active working directory.
 
 ---
 
@@ -390,6 +395,21 @@ permission:
 
 ## Technical Details
 
+### Permission Prompt Summaries
+
+When a tool permission resolves to `ask`, the prompt is designed to be readable enough for an informed approval decision:
+
+- `bash` prompts show the command and matched bash pattern when available.
+- `mcp` prompts show the derived MCP target and matched rule when available.
+- Built-in file tools show concise summaries, such as the target path and edit/write line counts, instead of raw multiline JSON.
+- Unknown or third-party extension tools show a bounded single-line JSON preview of the input so users are not asked to approve a blind tool name.
+
+Example edit approval prompt:
+
+```text
+Current agent requested tool 'edit' for '.gitignore' (1 replacement: edit #1 replaces 5 lines with 2 lines). Allow this call?
+```
+
 ### Subagent Permission Forwarding
 
 When a delegated or routed subagent runs without direct UI access, `ask` permissions can still be enforced by forwarding the confirmation request through Pi session directories. The main interactive session polls for forwarded requests, shows the confirmation prompt, writes the response, and the subagent resumes once that decision is available.
@@ -413,10 +433,11 @@ Actual global logs directory: $PI_CODING_AGENT_DIR/extensions/pi-permission-syst
 ```
 index.ts                    → Root Pi entrypoint shim
 src/
-├── index.ts                → Extension bootstrap, permission checks, review logging, reload handling, and subagent forwarding
+├── index.ts                → Extension bootstrap, permission checks, readable prompts, review logging, reload handling, and subagent forwarding
 ├── extension-config.ts     → Extension-local config loading and default creation
 ├── logging.ts              → File-only debug/review logging helpers
 ├── permission-manager.ts   → Global/project policy loading, merging, and resolution with caching
+├── skill-prompt-sanitizer.ts → Skill prompt parsing, multi-block sanitization, and skill-read path matching
 ├── bash-filter.ts          → Bash command wildcard pattern matching
 ├── wildcard-matcher.ts     → Shared wildcard pattern compilation and matching
 ├── common.ts               → Shared utilities (YAML parsing, type guards, etc.)
@@ -442,6 +463,7 @@ The extension uses a modular architecture with shared utilities:
 | `wildcard-matcher.ts` | Compile-once wildcard patterns with specificity sorting: `compileWildcardPatterns()`, `findCompiledWildcardMatch()` |
 | `permission-manager.ts` | Policy resolution with file stamp caching for performance |
 | `bash-filter.ts` | Uses shared wildcard matcher for bash command patterns |
+| `skill-prompt-sanitizer.ts` | Parses all available skill prompt blocks, removes denied skills, and tracks visible skill paths for read protection |
 
 #### Performance Optimizations
 
@@ -457,6 +479,7 @@ The extension uses a modular architecture with shared utilities:
 - Agent calling tools it shouldn't use (e.g., `write`, dangerous `bash`)
 - Tool switching attempts (calling non-existent tool names)
 - Accidental escalation via skill loading
+- Unapproved path-bearing tool access outside the active working directory when `external_directory` is `ask` or `deny`
 
 **Limitations:**
 - If a dangerous action is possible via an allowed tool, policy must explicitly restrict it
@@ -484,6 +507,8 @@ npx --yes ajv-cli@5 validate \
 | Per-agent override not applied | Frontmatter parsing issue | Ensure `---` delimiters at file top; keep YAML simple; restart session |
 | Tool blocked as unregistered | Unknown tool name | Use a registered `mcp` tool for server tools: `{ "tool": "server:tool" }` |
 | `/skill:<name>` blocked | Deny policy or confirmation unavailable | Check merged `skills` policy (global/project/agent layers). Active agent context is optional in the main session; `ask` still requires UI or forwarded confirmation. |
+| External file path blocked | `special.external_directory` is `ask` without UI or `deny` | Allow/ask the special permission or keep file tools inside the active working directory. |
+| Permission prompt is too verbose | Generic extension tool input is large | Built-in file tools are summarized automatically; third-party tools are capped to a bounded one-line JSON preview. |
 
 ---
 
