@@ -51,16 +51,6 @@
           }
         }
       }
-    },
-    {
-      "includes": ["**/*.d.ts"],
-      "linter": {
-        "rules": {
-          "suspicious": {
-            "noExplicitAny": "off"
-          }
-        }
-      }
     }
   ]
 }
