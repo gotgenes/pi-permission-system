@@ -1,9 +1,9 @@
 import { getAgentDir, isToolCallEventType, type ExtensionAPI, type ExtensionCommandContext, type ExtensionContext } from "@mariozechner/pi-coding-agent";
 import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmdirSync, unlinkSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
-import { dirname, join, normalize, resolve, sep } from "node:path";
+import { join, normalize, resolve, sep } from "node:path";
 
-import { toRecord } from "./common.js";
+import { getNonEmptyString, toRecord } from "./common.js";
 import {
   createActiveToolsCacheKey,
   createBeforeAgentStartPromptStateKey,
@@ -72,6 +72,7 @@ type PermissionRequestEvent = {
 };
 
 const PERMISSION_REQUEST_EVENT_CHANNEL = "pi-permission-system:permission-request";
+const PATH_BEARING_TOOLS = new Set(["read", "write", "edit", "find", "grep", "ls"]);
 
 let extensionConfig: PermissionSystemExtensionConfig = { ...DEFAULT_EXTENSION_CONFIG };
 const extensionLogger = createPermissionSystemLogger({
@@ -142,6 +143,21 @@ function isPathWithinDirectory(pathValue: string, directory: string): boolean {
   const prefix = directory.endsWith(sep) ? directory : `${directory}${sep}`;
   return pathValue.startsWith(prefix);
 }
+
+function getPathBearingToolPath(toolName: string, input: unknown): string | null {
+  if (!PATH_BEARING_TOOLS.has(toolName)) {
+    return null;
+  }
+
+  return getNonEmptyString(toRecord(input).path);
+}
+
+function isPathOutsideWorkingDirectory(pathValue: string, cwd: string): boolean {
+  const normalizedCwd = normalizePathForComparison(cwd, cwd);
+  const normalizedPath = normalizePathForComparison(pathValue, cwd);
+  return Boolean(normalizedCwd && normalizedPath && !isPathWithinDirectory(normalizedPath, normalizedCwd));
+}
+
 
 function extractSkillNameFromInput(text: string): string | null {
   const trimmed = text.trim();
@@ -280,7 +296,31 @@ function formatUserDeniedReason(result: PermissionCheckResult, denialReason?: st
   return `${base}${reasonSuffix} ${formatPermissionHardStopHint(result)}`;
 }
 
-function formatAskPrompt(result: PermissionCheckResult, agentName?: string): string {
+function formatToolInputForPrompt(input: unknown): string {
+  if (input === undefined || input === null) {
+    return "";
+  }
+
+  if (typeof input === "object" && !Array.isArray(input) && Object.keys(input as Record<string, unknown>).length === 0) {
+    return "";
+  }
+
+  let serialized: string;
+  try {
+    serialized = JSON.stringify(input);
+  } catch {
+    return "";
+  }
+
+  if (!serialized || serialized === "{}" || serialized === "null") {
+    return "";
+  }
+
+  const MAX = 200;
+  return serialized.length > MAX ? `${serialized.slice(0, MAX)}…` : serialized;
+}
+
+function formatAskPrompt(result: PermissionCheckResult, agentName?: string, input?: unknown): string {
   const subject = agentName ? `Agent '${agentName}'` : "Current agent";
 
   if (result.toolName === "bash") {
@@ -294,7 +334,9 @@ function formatAskPrompt(result: PermissionCheckResult, agentName?: string): str
   }
 
   const patternInfo = result.matchedPattern ? ` (matched '${result.matchedPattern}')` : "";
-  return `${subject} requested tool '${result.toolName}'${patternInfo}. Allow this call?`;
+  const inputPreview = formatToolInputForPrompt(input);
+  const inputSuffix = inputPreview ? ` with input ${inputPreview}` : "";
+  return `${subject} requested tool '${result.toolName}'${patternInfo}${inputSuffix}. Allow this call?`;
 }
 
 function formatSkillAskPrompt(skillName: string, agentName?: string): string {
@@ -310,6 +352,39 @@ function formatSkillPathAskPrompt(skill: SkillPromptEntry, readPath: string, age
 function formatSkillPathDenyReason(skill: SkillPromptEntry, readPath: string, agentName?: string): string {
   const subject = agentName ? `Agent '${agentName}'` : "Current agent";
   return `${subject} is not permitted to access skill '${skill.name}' via '${readPath}'.`;
+}
+
+function formatExternalDirectoryHardStopHint(): string {
+  return "Hard stop: this external directory permission denial is policy-enforced. Do not retry this path, do not attempt a filesystem bypass, and report the block to the user.";
+}
+
+function formatExternalDirectoryAskPrompt(
+  toolName: string,
+  pathValue: string,
+  cwd: string,
+  agentName?: string,
+): string {
+  const subject = agentName ? `Agent '${agentName}'` : "Current agent";
+  return `${subject} requested tool '${toolName}' for path '${pathValue}' outside working directory '${cwd}'. Allow this external directory access?`;
+}
+
+function formatExternalDirectoryDenyReason(
+  toolName: string,
+  pathValue: string,
+  cwd: string,
+  agentName?: string,
+): string {
+  const subject = agentName ? `Agent '${agentName}'` : "Current agent";
+  return `${subject} is not permitted to run tool '${toolName}' for path '${pathValue}' outside working directory '${cwd}'. ${formatExternalDirectoryHardStopHint()}`;
+}
+
+function formatExternalDirectoryUserDeniedReason(
+  toolName: string,
+  pathValue: string,
+  denialReason?: string,
+): string {
+  const reasonSuffix = denialReason ? ` Reason: ${denialReason}.` : "";
+  return `User denied external directory access for tool '${toolName}' path '${pathValue}'.${reasonSuffix} ${formatExternalDirectoryHardStopHint()}`;
 }
 
 function getPermissionLogContext(result: PermissionCheckResult): { command?: string; target?: string } {
@@ -1282,6 +1357,78 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
     }
 
     const input = getEventInput(event);
+    const externalDirectoryPath = ctx.cwd ? getPathBearingToolPath(toolName, input) : null;
+
+    if (ctx.cwd && externalDirectoryPath && isPathOutsideWorkingDirectory(externalDirectoryPath, ctx.cwd)) {
+      const extCheck = permissionManager.checkPermission("external_directory", {}, agentName ?? undefined);
+
+      if (extCheck.state === "deny") {
+        writeReviewLog("permission_request.blocked", {
+          source: "tool_call",
+          toolCallId: event.toolCallId,
+          toolName,
+          agentName,
+          path: externalDirectoryPath,
+          resolution: "policy_denied",
+        });
+        return {
+          block: true,
+          reason: formatExternalDirectoryDenyReason(
+            toolName,
+            externalDirectoryPath,
+            ctx.cwd,
+            agentName ?? undefined,
+          ),
+        };
+      }
+
+      if (extCheck.state === "ask") {
+        const message = formatExternalDirectoryAskPrompt(
+          toolName,
+          externalDirectoryPath,
+          ctx.cwd,
+          agentName ?? undefined,
+        );
+        if (!canRequestPermissionConfirmation(ctx)) {
+          writeReviewLog("permission_request.blocked", {
+            source: "tool_call",
+            toolCallId: event.toolCallId,
+            toolName,
+            agentName,
+            path: externalDirectoryPath,
+            message,
+            resolution: "confirmation_unavailable",
+          });
+          return {
+            block: true,
+            reason: `Accessing '${externalDirectoryPath}' outside the working directory requires approval, but no interactive UI is available.`,
+          };
+        }
+
+        const extDecision = await promptPermission(ctx, {
+          requestId: event.toolCallId,
+          source: "tool_call",
+          agentName,
+          message,
+          toolCallId: event.toolCallId,
+          toolName,
+          path: externalDirectoryPath,
+        });
+
+        if (!extDecision.approved) {
+          return {
+            block: true,
+            reason: formatExternalDirectoryUserDeniedReason(
+              toolName,
+              externalDirectoryPath,
+              extDecision.denialReason,
+            ),
+          };
+        }
+      }
+      // state === "allow" → fall through to normal permission check
+    }
+
     const check = permissionManager.checkPermission(toolName, input, agentName ?? undefined);
     const permissionLogContext = getPermissionLogContext(check);
 
@@ -1304,7 +1451,7 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
           ? "Using tool 'mcp' requires approval, but no interactive UI is available."
           : `Using tool '${toolName}' requires approval, but no interactive UI is available.`;
 
-      const message = formatAskPrompt(check, agentName ?? undefined);
+      const message = formatAskPrompt(check, agentName ?? undefined, input);
       if (!canRequestPermissionConfirmation(ctx)) {
         writeReviewLog("permission_request.blocked", {
           source: "tool_call",
