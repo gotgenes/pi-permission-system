@@ -1,15 +1,8 @@
 import {
-  getAgentDir,
-  isToolCallEventType,
-  type ExtensionAPI,
-  type ExtensionCommandContext,
-  type ExtensionContext,
-} from "@mariozechner/pi-coding-agent";
-import {
   existsSync,
   mkdirSync,
-  readFileSync,
   readdirSync,
+  readFileSync,
   renameSync,
   rmdirSync,
   unlinkSync,
@@ -17,38 +10,44 @@ import {
 } from "node:fs";
 import { homedir } from "node:os";
 import { join, normalize, resolve, sep } from "node:path";
-
-import { getNonEmptyString, toRecord } from "./common.js";
+import {
+  type ExtensionAPI,
+  type ExtensionCommandContext,
+  type ExtensionContext,
+  getAgentDir,
+  isToolCallEventType,
+} from "@mariozechner/pi-coding-agent";
 import {
   createActiveToolsCacheKey,
   createBeforeAgentStartPromptStateKey,
   shouldApplyCachedAgentStartState,
 } from "./before-agent-start-cache.js";
-import {
-  isPermissionDecisionState,
-  requestPermissionDecisionFromUi,
-  type PermissionPromptDecision,
-} from "./permission-dialog.js";
+import { getNonEmptyString, toRecord } from "./common.js";
+import { registerPermissionSystemCommand } from "./config-modal.js";
 import {
   DEFAULT_EXTENSION_CONFIG,
   getPermissionSystemConfigPath,
   loadPermissionSystemConfig,
   normalizePermissionSystemConfig,
-  savePermissionSystemConfig,
   type PermissionSystemExtensionConfig,
+  savePermissionSystemConfig,
 } from "./extension-config.js";
 import { createPermissionSystemLogger } from "./logging.js";
-import { registerPermissionSystemCommand } from "./config-modal.js";
+import {
+  isPermissionDecisionState,
+  type PermissionPromptDecision,
+  requestPermissionDecisionFromUi,
+} from "./permission-dialog.js";
 import {
   createPermissionForwardingLocation,
+  type ForwardedPermissionRequest,
+  type ForwardedPermissionResponse,
   isForwardedPermissionRequestForSession,
   PERMISSION_FORWARDING_POLL_INTERVAL_MS,
   PERMISSION_FORWARDING_TIMEOUT_MS,
+  type PermissionForwardingLocation,
   resolvePermissionForwardingTargetSessionId,
   SUBAGENT_ENV_HINT_KEYS,
-  type ForwardedPermissionRequest,
-  type ForwardedPermissionResponse,
-  type PermissionForwardingLocation,
 } from "./permission-forwarding.js";
 import { PermissionManager } from "./permission-manager.js";
 import {
@@ -56,16 +55,16 @@ import {
   resolveSkillPromptEntries,
   type SkillPromptEntry,
 } from "./skill-prompt-sanitizer.js";
+import {
+  PERMISSION_SYSTEM_STATUS_KEY,
+  syncPermissionSystemStatus,
+} from "./status.js";
 import { sanitizeAvailableToolsSection } from "./system-prompt-sanitizer.js";
 import {
   checkRequestedToolRegistration,
   getToolNameFromValue,
 } from "./tool-registry.js";
 import type { PermissionCheckResult } from "./types.js";
-import {
-  PERMISSION_SYSTEM_STATUS_KEY,
-  syncPermissionSystemStatus,
-} from "./status.js";
 import {
   canResolveAskPermissionRequest,
   shouldAutoApprovePermissionState,

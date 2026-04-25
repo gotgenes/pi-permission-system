@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import {
   existsSync,
-  mkdtempSync,
   mkdirSync,
+  mkdtempSync,
   readFileSync,
   rmSync,
   unlinkSync,
@@ -10,7 +10,7 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-
+import { test } from "vitest";
 import { BashFilter } from "../src/bash-filter.js";
 import {
   createActiveToolsCacheKey,
@@ -23,31 +23,30 @@ import {
   loadPermissionSystemConfig,
   savePermissionSystemConfig,
 } from "../src/extension-config.js";
+import piPermissionSystemExtension from "../src/index.js";
 import { createPermissionSystemLogger } from "../src/logging.js";
 import {
   createPermissionForwardingLocation,
   isForwardedPermissionRequestForSession,
   resolvePermissionForwardingTargetSessionId,
 } from "../src/permission-forwarding.js";
-import piPermissionSystemExtension from "../src/index.js";
 import { PermissionManager } from "../src/permission-manager.js";
 import {
+  findSkillPathMatch,
   parseAllSkillPromptSections,
   resolveSkillPromptEntries,
-  findSkillPathMatch,
 } from "../src/skill-prompt-sanitizer.js";
+import { getPermissionSystemStatus } from "../src/status.js";
+import { sanitizeAvailableToolsSection } from "../src/system-prompt-sanitizer.js";
 import {
   checkRequestedToolRegistration,
   getToolNameFromValue,
 } from "../src/tool-registry.js";
-import { getPermissionSystemStatus } from "../src/status.js";
-import { sanitizeAvailableToolsSection } from "../src/system-prompt-sanitizer.js";
 import type { AgentPermissions, GlobalPermissionConfig } from "../src/types.js";
 import {
   canResolveAskPermissionRequest,
   shouldAutoApprovePermissionState,
 } from "../src/yolo-mode.js";
-import { test } from "vitest";
 
 type CreateManagerOptions = {
   mcpServerNames?: readonly string[];

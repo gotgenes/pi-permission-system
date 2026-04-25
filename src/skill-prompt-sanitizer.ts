@@ -1,7 +1,7 @@
 import { homedir } from "node:os";
 import { dirname, join, normalize, resolve, sep } from "node:path";
 
-import { PermissionManager } from "./permission-manager.js";
+import type { PermissionManager } from "./permission-manager.js";
 import type { PermissionState } from "./types.js";
 
 const AVAILABLE_SKILLS_OPEN_TAG = "<available_skills>";
@@ -60,13 +60,18 @@ function normalizePathForComparison(pathValue: string, cwd: string): string {
 
   if (normalizedPath === "~") {
     normalizedPath = homedir();
-  } else if (normalizedPath.startsWith("~/") || normalizedPath.startsWith("~\\")) {
+  } else if (
+    normalizedPath.startsWith("~/") ||
+    normalizedPath.startsWith("~\\")
+  ) {
     normalizedPath = join(homedir(), normalizedPath.slice(2));
   }
 
   const absolutePath = resolve(cwd, normalizedPath);
   const normalizedAbsolutePath = normalize(absolutePath);
-  return process.platform === "win32" ? normalizedAbsolutePath.toLowerCase() : normalizedAbsolutePath;
+  return process.platform === "win32"
+    ? normalizedAbsolutePath.toLowerCase()
+    : normalizedAbsolutePath;
 }
 
 function isPathWithinDirectory(pathValue: string, directory: string): boolean {
@@ -110,19 +115,27 @@ function parseSkillEntries(sectionBody: string): ParsedSkillPromptEntry[] {
   return entries;
 }
 
-export function parseSkillPromptSection(prompt: string): SkillPromptSection | null {
+export function parseSkillPromptSection(
+  prompt: string,
+): SkillPromptSection | null {
   const start = prompt.indexOf(AVAILABLE_SKILLS_OPEN_TAG);
   if (start === -1) {
     return null;
   }
 
-  const closeStart = prompt.indexOf(AVAILABLE_SKILLS_CLOSE_TAG, start + AVAILABLE_SKILLS_OPEN_TAG.length);
+  const closeStart = prompt.indexOf(
+    AVAILABLE_SKILLS_CLOSE_TAG,
+    start + AVAILABLE_SKILLS_OPEN_TAG.length,
+  );
   if (closeStart === -1) {
     return null;
   }
 
   const end = closeStart + AVAILABLE_SKILLS_CLOSE_TAG.length;
-  const sectionBody = prompt.slice(start + AVAILABLE_SKILLS_OPEN_TAG.length, closeStart);
+  const sectionBody = prompt.slice(
+    start + AVAILABLE_SKILLS_OPEN_TAG.length,
+    closeStart,
+  );
 
   return {
     start,
@@ -131,7 +144,9 @@ export function parseSkillPromptSection(prompt: string): SkillPromptSection | nu
   };
 }
 
-export function parseAllSkillPromptSections(prompt: string): SkillPromptSection[] {
+export function parseAllSkillPromptSections(
+  prompt: string,
+): SkillPromptSection[] {
   const sections: SkillPromptSection[] = [];
   let searchStart = 0;
 
@@ -141,13 +156,19 @@ export function parseAllSkillPromptSections(prompt: string): SkillPromptSection[
       break;
     }
 
-    const closeStart = prompt.indexOf(AVAILABLE_SKILLS_CLOSE_TAG, start + AVAILABLE_SKILLS_OPEN_TAG.length);
+    const closeStart = prompt.indexOf(
+      AVAILABLE_SKILLS_CLOSE_TAG,
+      start + AVAILABLE_SKILLS_OPEN_TAG.length,
+    );
     if (closeStart === -1) {
       break;
     }
 
     const end = closeStart + AVAILABLE_SKILLS_CLOSE_TAG.length;
-    const sectionBody = prompt.slice(start + AVAILABLE_SKILLS_OPEN_TAG.length, closeStart);
+    const sectionBody = prompt.slice(
+      start + AVAILABLE_SKILLS_OPEN_TAG.length,
+      closeStart,
+    );
     sections.push({
       start,
       end,
@@ -170,7 +191,11 @@ function resolvePermissionState(
     return cachedState;
   }
 
-  const state = permissionManager.checkPermission("skill", { name: skillName }, agentName ?? undefined).state;
+  const state = permissionManager.checkPermission(
+    "skill",
+    { name: skillName },
+    agentName ?? undefined,
+  ).state;
   cache.set(skillName, state);
   return state;
 }
@@ -190,7 +215,9 @@ function createResolvedSkillEntry(
   };
 }
 
-function renderAvailableSkillsSection(entries: readonly SkillPromptEntry[]): string {
+function renderAvailableSkillsSection(
+  entries: readonly SkillPromptEntry[],
+): string {
   return [
     AVAILABLE_SKILLS_OPEN_TAG,
     ...entries.flatMap((entry) => [
@@ -223,15 +250,23 @@ export function resolveSkillPromptEntries(
 
   const permissionCache = new Map<string, PermissionState>();
   const visibleEntries: SkillPromptEntry[] = [];
-  const replacements: Array<{ start: number; end: number; content: string }> = [];
+  const replacements: Array<{ start: number; end: number; content: string }> =
+    [];
 
   for (const section of sections) {
     const resolvedEntries = section.entries.map((entry) => {
-      const state = resolvePermissionState(entry.name, permissionManager, agentName, permissionCache);
+      const state = resolvePermissionState(
+        entry.name,
+        permissionManager,
+        agentName,
+        permissionCache,
+      );
       return createResolvedSkillEntry(entry, state, cwd);
     });
 
-    const visibleSectionEntries = resolvedEntries.filter((entry) => entry.state !== "deny");
+    const visibleSectionEntries = resolvedEntries.filter(
+      (entry) => entry.state !== "deny",
+    );
     visibleEntries.push(...visibleSectionEntries);
 
     if (visibleSectionEntries.length === resolvedEntries.length) {
@@ -241,7 +276,10 @@ export function resolveSkillPromptEntries(
     replacements.push({
       start: section.start,
       end: section.end,
-      content: visibleSectionEntries.length > 0 ? renderAvailableSkillsSection(visibleSectionEntries) : "",
+      content:
+        visibleSectionEntries.length > 0
+          ? renderAvailableSkillsSection(visibleSectionEntries)
+          : "",
     });
   }
 
@@ -252,9 +290,14 @@ export function resolveSkillPromptEntries(
   let sanitizedPrompt = prompt;
   for (let i = replacements.length - 1; i >= 0; i--) {
     const replacement = replacements[i];
-    sanitizedPrompt = replacement.content.length > 0
-      ? `${sanitizedPrompt.slice(0, replacement.start)}${replacement.content}${sanitizedPrompt.slice(replacement.end)}`
-      : removePromptRange(sanitizedPrompt, replacement.start, replacement.end);
+    sanitizedPrompt =
+      replacement.content.length > 0
+        ? `${sanitizedPrompt.slice(0, replacement.start)}${replacement.content}${sanitizedPrompt.slice(replacement.end)}`
+        : removePromptRange(
+            sanitizedPrompt,
+            replacement.start,
+            replacement.end,
+          );
   }
 
   return {
@@ -263,24 +306,36 @@ export function resolveSkillPromptEntries(
   };
 }
 
-export function findSkillPathMatch(normalizedPath: string, entries: readonly SkillPromptEntry[]): SkillPromptEntry | null {
+export function findSkillPathMatch(
+  normalizedPath: string,
+  entries: readonly SkillPromptEntry[],
+): SkillPromptEntry | null {
   if (!normalizedPath || entries.length === 0) {
     return null;
   }
 
   for (const entry of entries) {
-    if (entry.normalizedLocation && normalizedPath === entry.normalizedLocation) {
+    if (
+      entry.normalizedLocation &&
+      normalizedPath === entry.normalizedLocation
+    ) {
       return entry;
     }
   }
 
   let bestMatch: SkillPromptEntry | null = null;
   for (const entry of entries) {
-    if (!entry.normalizedBaseDir || !isPathWithinDirectory(normalizedPath, entry.normalizedBaseDir)) {
+    if (
+      !entry.normalizedBaseDir ||
+      !isPathWithinDirectory(normalizedPath, entry.normalizedBaseDir)
+    ) {
       continue;
     }
 
-    if (!bestMatch || entry.normalizedBaseDir.length > bestMatch.normalizedBaseDir.length) {
+    if (
+      !bestMatch ||
+      entry.normalizedBaseDir.length > bestMatch.normalizedBaseDir.length
+    ) {
       bestMatch = entry;
     }
   }
