@@ -5,6 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0](https://github.com/gotgenes/pi-permission-system/compare/v0.4.2...v0.5.0) (2026-04-25)
+
+
+### Features
+
+* **special:** enforce external_directory CWD boundary in tool_call handler ([6c59781](https://github.com/gotgenes/pi-permission-system/commit/6c59781a6d69e33eb297ecfb60e6d5b21c3f88b6))
+
+
+### Bug Fixes
+
+* **events:** listen on session_start instead of nonexistent session_switch ([9bfc08a](https://github.com/gotgenes/pi-permission-system/commit/9bfc08a18d02b95b25dce05be6fc4562a3a34650))
+* **permission:** harden prompt and external directory enforcement ([48c3af1](https://github.com/gotgenes/pi-permission-system/commit/48c3af165a6f2c1a4c689c436d8c6c4112ec6aae))
+* **permission:** summarize file tool approval prompts ([3775894](https://github.com/gotgenes/pi-permission-system/commit/3775894f23756ad0ed06ae17961d547b0cb5bc47))
+
+
+### Documentation
+
+* **release:** prepare 0.4.3 notes ([73a255c](https://github.com/gotgenes/pi-permission-system/commit/73a255c991c7a14d10711f99973991a68ab50c1b))
+* **release:** prepare 0.4.4 notes ([78f5c48](https://github.com/gotgenes/pi-permission-system/commit/78f5c48aab6a94c7bb7356af4db1798340522848))
+* remove upstream screenshot from README ([17a34ba](https://github.com/gotgenes/pi-permission-system/commit/17a34ba9012bd094e9abbf90dac4f90fd58f06dd))
+* update README for [@gotgenes](https://github.com/gotgenes) fork ([0561069](https://github.com/gotgenes/pi-permission-system/commit/0561069a12749046a8df753a77474d2fecdfb7ca))
+
+
+### Miscellaneous Chores
+
+* add biome and markdownlint-cli2 tooling ([763a1c2](https://github.com/gotgenes/pi-permission-system/commit/763a1c2768a414826b591fbe141ab23ad8e2c9fa))
+* **deps:** update pi peer dependencies ([bf3d7e6](https://github.com/gotgenes/pi-permission-system/commit/bf3d7e6f3610ab69f2988a6748af5c6a6a1193eb))
+* pin typescript as devDependency ([0051123](https://github.com/gotgenes/pi-permission-system/commit/00511233038c3e9657371b534579b8c264c63254))
+* reconcile lockfile and biome lints after upstream rebase ([7942239](https://github.com/gotgenes/pi-permission-system/commit/794223967b90d8b8ff44fd1c98cabfd77fbca2a8))
+* rename package to @gotgenes/pi-permission-system ([1d840cd](https://github.com/gotgenes/pi-permission-system/commit/1d840cd323e4bf664e91f5d2a3e92310c2044e81))
+* resolve remaining biome and markdownlint diagnostics ([87c1513](https://github.com/gotgenes/pi-permission-system/commit/87c151316bc36e68f437c976ea485633abad3f5a))
+* **types:** replace types-shims.d.ts with real type packages ([aaf0ad4](https://github.com/gotgenes/pi-permission-system/commit/aaf0ad45405be95ff0e91d32adb09a3082dc4969))
+
 ## [Unreleased]
 
 ## [0.4.4] - 2026-04-25
