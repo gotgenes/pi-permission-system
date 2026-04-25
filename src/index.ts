@@ -36,9 +36,14 @@ import {
   type PermissionForwardingLocation,
 } from "./permission-forwarding.js";
 import { PermissionManager } from "./permission-manager.js";
+import {
+  findSkillPathMatch,
+  resolveSkillPromptEntries,
+  type SkillPromptEntry,
+} from "./skill-prompt-sanitizer.js";
 import { sanitizeAvailableToolsSection } from "./system-prompt-sanitizer.js";
 import { checkRequestedToolRegistration, getToolNameFromValue } from "./tool-registry.js";
-import type { PermissionCheckResult, PermissionState } from "./types.js";
+import type { PermissionCheckResult } from "./types.js";
 import { PERMISSION_SYSTEM_STATUS_KEY, syncPermissionSystemStatus } from "./status.js";
 import { canResolveAskPermissionRequest, shouldAutoApprovePermissionState } from "./yolo-mode.js";
 
@@ -47,28 +52,7 @@ const SESSIONS_DIR = join(PI_AGENT_DIR, "sessions");
 const SUBAGENT_SESSIONS_DIR = join(PI_AGENT_DIR, "subagent-sessions");
 const PERMISSION_FORWARDING_DIR = join(SESSIONS_DIR, "permission-forwarding");
 
-const AVAILABLE_SKILLS_OPEN_TAG = "<available_skills>";
-const AVAILABLE_SKILLS_CLOSE_TAG = "</available_skills>";
-const SKILL_BLOCK_PATTERN = "<skill>([\\s\\S]*?)<\\/skill>";
-const SKILL_NAME_REGEX = /<name>([\s\S]*?)<\/name>/;
-const SKILL_DESCRIPTION_REGEX = /<description>([\s\S]*?)<\/description>/;
-const SKILL_LOCATION_REGEX = /<location>([\s\S]*?)<\/location>/;
 const ACTIVE_AGENT_TAG_REGEX = /<active_agent\s+name=["']([^"']+)["'][^>]*>/i;
-
-type SkillPromptEntry = {
-  name: string;
-  description: string;
-  location: string;
-  state: PermissionState;
-  normalizedLocation: string;
-  normalizedBaseDir: string;
-};
-
-type SkillPromptSection = {
-  start: number;
-  end: number;
-  entries: Array<{ name: string; description: string; location: string }>;
-};
 
 type PermissionRequestSource = "tool_call" | "skill_input" | "skill_read";
 type PermissionRequestState = "waiting" | "approved" | "denied";
@@ -127,24 +111,6 @@ function writeReviewLog(event: string, details: Record<string, unknown> = {}): v
   }
 }
 
-function decodeXml(value: string): string {
-  return value
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&apos;/g, "'")
-    .replace(/&amp;/g, "&");
-}
-
-function encodeXml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&apos;");
-}
-
 function normalizePathForComparison(pathValue: string, cwd: string): string {
   const trimmed = pathValue.trim().replace(/^['"]|['"]$/g, "");
   if (!trimmed) {
@@ -175,122 +141,6 @@ function isPathWithinDirectory(pathValue: string, directory: string): boolean {
 
   const prefix = directory.endsWith(sep) ? directory : `${directory}${sep}`;
   return pathValue.startsWith(prefix);
-}
-
-function parseSkillPromptSection(prompt: string): SkillPromptSection | null {
-  const start = prompt.indexOf(AVAILABLE_SKILLS_OPEN_TAG);
-  if (start === -1) {
-    return null;
-  }
-
-  const closeStart = prompt.indexOf(AVAILABLE_SKILLS_CLOSE_TAG, start + AVAILABLE_SKILLS_OPEN_TAG.length);
-  if (closeStart === -1) {
-    return null;
-  }
-
-  const end = closeStart + AVAILABLE_SKILLS_CLOSE_TAG.length;
-  const sectionBody = prompt.slice(start + AVAILABLE_SKILLS_OPEN_TAG.length, closeStart);
-  const entries: Array<{ name: string; description: string; location: string }> = [];
-
-  const skillBlockRegex = new RegExp(SKILL_BLOCK_PATTERN, "g");
-  for (const match of sectionBody.matchAll(skillBlockRegex)) {
-    const block = match[1];
-    const nameMatch = block.match(SKILL_NAME_REGEX);
-    const descriptionMatch = block.match(SKILL_DESCRIPTION_REGEX);
-    const locationMatch = block.match(SKILL_LOCATION_REGEX);
-
-    if (!nameMatch || !descriptionMatch || !locationMatch) {
-      continue;
-    }
-
-    const name = decodeXml(nameMatch[1].trim());
-    const description = decodeXml(descriptionMatch[1].trim());
-    const location = decodeXml(locationMatch[1].trim());
-
-    if (!name || !location) {
-      continue;
-    }
-
-    entries.push({ name, description, location });
-  }
-
-  return {
-    start,
-    end,
-    entries,
-  };
-}
-
-function resolveSkillPromptEntries(
-  prompt: string,
-  permissionManager: PermissionManager,
-  agentName: string | null,
-  cwd: string,
-): { prompt: string; entries: SkillPromptEntry[] } {
-  const section = parseSkillPromptSection(prompt);
-  if (!section) {
-    return { prompt, entries: [] };
-  }
-
-  const resolvedEntries: SkillPromptEntry[] = section.entries.map((entry) => {
-    const check = permissionManager.checkPermission("skill", { name: entry.name }, agentName ?? undefined);
-    const state: PermissionState = check.state;
-    return {
-      name: entry.name,
-      description: entry.description,
-      location: entry.location,
-      state,
-      normalizedLocation: normalizePathForComparison(entry.location, cwd),
-      normalizedBaseDir: normalizePathForComparison(dirname(entry.location), cwd),
-    };
-  });
-
-  const visibleEntries = resolvedEntries.filter((entry) => entry.state !== "deny");
-  if (visibleEntries.length === resolvedEntries.length) {
-    return { prompt, entries: resolvedEntries };
-  }
-
-  const replacement = [
-    AVAILABLE_SKILLS_OPEN_TAG,
-    ...visibleEntries.flatMap((entry) => [
-      "  <skill>",
-      `    <name>${encodeXml(entry.name)}</name>`,
-      `    <description>${encodeXml(entry.description)}</description>`,
-      `    <location>${encodeXml(entry.location)}</location>`,
-      "  </skill>",
-    ]),
-    AVAILABLE_SKILLS_CLOSE_TAG,
-  ].join("\n");
-
-  return {
-    prompt: `${prompt.slice(0, section.start)}${replacement}${prompt.slice(section.end)}`,
-    entries: resolvedEntries,
-  };
-}
-
-function findSkillPathMatch(normalizedPath: string, entries: readonly SkillPromptEntry[]): SkillPromptEntry | null {
-  if (!normalizedPath || entries.length === 0) {
-    return null;
-  }
-
-  for (const entry of entries) {
-    if (entry.normalizedLocation && normalizedPath === entry.normalizedLocation) {
-      return entry;
-    }
-  }
-
-  let bestMatch: SkillPromptEntry | null = null;
-  for (const entry of entries) {
-    if (!entry.normalizedBaseDir || !isPathWithinDirectory(normalizedPath, entry.normalizedBaseDir)) {
-      continue;
-    }
-
-    if (!bestMatch || entry.normalizedBaseDir.length > bestMatch.normalizedBaseDir.length) {
-      bestMatch = entry;
-    }
-  }
-
-  return bestMatch;
 }
 
 function extractSkillNameFromInput(text: string): string | null {

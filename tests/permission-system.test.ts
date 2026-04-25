@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 
 import { BashFilter } from "../src/bash-filter.js";
 import {
@@ -17,6 +17,11 @@ import {
   resolvePermissionForwardingTargetSessionId,
 } from "../src/permission-forwarding.js";
 import { PermissionManager } from "../src/permission-manager.js";
+import {
+  parseAllSkillPromptSections,
+  resolveSkillPromptEntries,
+  findSkillPathMatch,
+} from "../src/skill-prompt-sanitizer.js";
 import { checkRequestedToolRegistration, getToolNameFromValue } from "../src/tool-registry.js";
 import { getPermissionSystemStatus } from "../src/status.js";
 import { sanitizeAvailableToolsSection } from "../src/system-prompt-sanitizer.js";
@@ -1411,6 +1416,125 @@ runTest("PermissionManager reads config from PI_CODING_AGENT_DIR when set", () =
       delete process.env.PI_CODING_AGENT_DIR;
     }
     rmSync(baseDir, { recursive: true, force: true });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Skill prompt sanitization - multi-block regression tests
+// ---------------------------------------------------------------------------
+
+runTest("parseAllSkillPromptSections finds every available_skills block", () => {
+  const prompt = [
+    "Some preamble",
+    "<available_skills>",
+    "  <skill>",
+    "    <name>skill-one</name>",
+    "    <description>First skill</description>",
+    "    <location>/path/to/one</location>",
+    "  </skill>",
+    "</available_skills>",
+    "Some content between",
+    "<available_skills>",
+    "  <skill>",
+    "    <name>skill-two</name>",
+    "    <description>Second skill</description>",
+    "    <location>/path/to/two</location>",
+    "  </skill>",
+    "</available_skills>",
+    "Footer",
+  ].join("\n");
+
+  const sections = parseAllSkillPromptSections(prompt);
+
+  assert.equal(sections.length, 2);
+  assert.equal(sections[0].entries[0]?.name, "skill-one");
+  assert.equal(sections[1].entries[0]?.name, "skill-two");
+});
+
+runTest("REGRESSION: resolveSkillPromptEntries sanitizes every available_skills block", () => {
+  const { manager, cleanup } = createManager({
+    defaultPolicy: { tools: "ask", bash: "ask", mcp: "ask", skills: "ask", special: "ask" },
+    skills: {
+      "denied-skill": "deny",
+    },
+  });
+
+  try {
+    const prompt = [
+      "System prompt start",
+      "<available_skills>",
+      "  <skill>",
+      "    <name>visible-skill</name>",
+      "    <description>Allowed skill</description>",
+      "    <location>/skills/visible/index.ts</location>",
+      "  </skill>",
+      "  <skill>",
+      "    <name>denied-skill</name>",
+      "    <description>Denied in first block</description>",
+      "    <location>/skills/blocked/one.ts</location>",
+      "  </skill>",
+      "</available_skills>",
+      "Agent identity section",
+      "<available_skills>",
+      "  <skill>",
+      "    <name>denied-skill</name>",
+      "    <description>Denied in second block</description>",
+      "    <location>/skills/blocked/two.ts</location>",
+      "  </skill>",
+      "</available_skills>",
+      "System prompt end",
+    ].join("\n");
+
+    const result = resolveSkillPromptEntries(prompt, manager, null, "/cwd");
+
+    assert.equal(result.prompt.includes("denied-skill"), false, "Denied skill should be removed from every block");
+    assert.equal(result.prompt.includes("visible-skill"), true, "Visible skill should remain in the prompt");
+    assert.equal((result.prompt.match(/<available_skills>/g) || []).length, 1, "Fully denied blocks should be removed");
+    assert.deepEqual(result.entries.map((entry) => entry.name), ["visible-skill"], "Tracked skill entries should exclude denied skills");
+  } finally {
+    cleanup();
+  }
+});
+
+runTest("REGRESSION: resolveSkillPromptEntries keeps only visible skills available for path matching", () => {
+  const { manager, cleanup } = createManager({
+    defaultPolicy: { tools: "ask", bash: "ask", mcp: "ask", skills: "ask", special: "ask" },
+    skills: {
+      "blocked-skill": "deny",
+    },
+  });
+
+  try {
+    const prompt = [
+      "System prompt start",
+      "<available_skills>",
+      "  <skill>",
+      "    <name>blocked-skill</name>",
+      "    <description>Blocked skill</description>",
+      "    <location>@./skills/blocked/entry.ts</location>",
+      "  </skill>",
+      "</available_skills>",
+      "Middle section",
+      "<available_skills>",
+      "  <skill>",
+      "    <name>visible-skill</name>",
+      "    <description>Visible skill</description>",
+      "    <location>@./skills/visible/entry.ts</location>",
+      "  </skill>",
+      "</available_skills>",
+      "System prompt end",
+    ].join("\n");
+
+    const result = resolveSkillPromptEntries(prompt, manager, null, "/cwd");
+    const visiblePath = resolve("/cwd", "./skills/visible/file.ts");
+    const blockedPath = resolve("/cwd", "./skills/blocked/file.ts");
+    const matchedVisibleSkill = findSkillPathMatch(process.platform === "win32" ? visiblePath.toLowerCase() : visiblePath, result.entries);
+    const matchedBlockedSkill = findSkillPathMatch(process.platform === "win32" ? blockedPath.toLowerCase() : blockedPath, result.entries);
+
+    assert.equal(matchedVisibleSkill?.name, "visible-skill");
+    assert.equal(matchedBlockedSkill, null, "Denied skills should not remain in tracked entries");
+  } finally {
+    cleanup();
   }
 });
 
