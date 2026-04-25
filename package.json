@@ -19,7 +19,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json --noCheck",
+    "build": "tsc -p tsconfig.json",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "lint:md": "markdownlint-cli2 '*.md'",
