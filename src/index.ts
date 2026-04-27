@@ -46,6 +46,7 @@ import { checkRequestedToolRegistration, getToolNameFromValue } from "./tool-reg
 import type { PermissionCheckResult } from "./types.js";
 import { PERMISSION_SYSTEM_STATUS_KEY, syncPermissionSystemStatus } from "./status.js";
 import { canResolveAskPermissionRequest, shouldAutoApprovePermissionState } from "./yolo-mode.js";
+import { registerModelOptionCompatibilityGuard } from "./model-option-compatibility.js";
 
 const PI_AGENT_DIR = getAgentDir();
 const SESSIONS_DIR = join(PI_AGENT_DIR, "sessions");
@@ -235,6 +236,21 @@ function getActiveAgentNameFromSystemPrompt(systemPrompt: string | undefined): s
   }
 
   return normalizeAgentName(match[1]);
+}
+
+function getContextSystemPrompt(ctx: ExtensionContext): string | undefined {
+  const getSystemPrompt = toRecord(ctx).getSystemPrompt;
+  if (typeof getSystemPrompt !== "function") {
+    return undefined;
+  }
+
+  try {
+    const systemPrompt = getSystemPrompt.call(ctx);
+    return typeof systemPrompt === "string" ? systemPrompt : undefined;
+  } catch (error) {
+    logPermissionForwardingWarning("Failed to read context system prompt for forwarded permission metadata", error);
+    return undefined;
+  }
 }
 
 function formatMissingToolNameReason(): string {
@@ -784,7 +800,7 @@ async function waitForForwardedPermissionApproval(
   }
 
   const requestId = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}-${process.pid}`;
-  const requesterAgentName = getActiveAgentName(ctx) || getActiveAgentNameFromSystemPrompt(ctx.getSystemPrompt()) || "unknown";
+  const requesterAgentName = getActiveAgentName(ctx) || getActiveAgentNameFromSystemPrompt(getContextSystemPrompt(ctx)) || "unknown";
   const request: ForwardedPermissionRequest = {
     id: requestId,
     createdAt: Date.now(),
@@ -1060,6 +1076,7 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
 
   setLoggingWarningReporter(notifyWarning);
   refreshExtensionConfig();
+  registerModelOptionCompatibilityGuard(pi);
 
   registerPermissionSystemCommand(pi, {
     getConfig: () => extensionConfig,

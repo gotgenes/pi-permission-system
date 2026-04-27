@@ -15,6 +15,8 @@ import {
   createPermissionForwardingLocation,
   isForwardedPermissionRequestForSession,
   resolvePermissionForwardingTargetSessionId,
+  SUBAGENT_ENV_HINT_KEYS,
+  SUBAGENT_PARENT_SESSION_ENV_KEY,
 } from "../src/permission-forwarding.js";
 import piPermissionSystemExtension from "../src/index.js";
 import { PermissionManager } from "../src/permission-manager.js";
@@ -85,6 +87,31 @@ type ExtensionHarnessOptions = {
   inputResponse?: string;
 };
 
+const INHERITED_SUBAGENT_ENV_KEYS = [
+  ...SUBAGENT_ENV_HINT_KEYS,
+  SUBAGENT_PARENT_SESSION_ENV_KEY,
+] as const;
+
+async function withIsolatedSubagentEnv<T>(operation: () => Promise<T>): Promise<T> {
+  const originalValues = new Map<string, string | undefined>();
+  for (const key of INHERITED_SUBAGENT_ENV_KEYS) {
+    originalValues.set(key, process.env[key]);
+    delete process.env[key];
+  }
+
+  try {
+    return await operation();
+  } finally {
+    for (const [key, value] of originalValues.entries()) {
+      if (value === undefined) {
+        delete process.env[key];
+      } else {
+        process.env[key] = value;
+      }
+    }
+  }
+}
+
 function createToolCallHarness(
   config: GlobalPermissionConfig,
   toolNames: readonly string[],
@@ -111,6 +138,7 @@ function createToolCallHarness(
       registerCommand: (): void => {},
       getAllTools: (): Array<{ name: string }> => toolNames.map((name) => ({ name })),
       setActiveTools: (): void => {},
+      registerProvider: (): void => {},
       events: {
         emit: (): void => {},
       },
@@ -175,7 +203,9 @@ async function runToolCall(
   const handler = harness.handlers.tool_call;
   assert.equal(typeof handler, "function");
 
-  const result = await Promise.resolve(handler(event, createMockContext(harness.cwd, harness.prompts, options)));
+  const result = await withIsolatedSubagentEnv(async () => Promise.resolve(
+    handler(event, createMockContext(harness.cwd, harness.prompts, options)),
+  ));
   return (result ?? {}) as Record<string, unknown>;
 }
 

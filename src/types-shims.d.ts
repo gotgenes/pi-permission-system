@@ -106,6 +106,7 @@ declare module "@mariozechner/pi-coding-agent" {
     on(event: string, handler: (...args: any[]) => any): void;
     getAllTools(): any[];
     setActiveTools(toolNames: string[]): void;
+    registerProvider?(...args: any[]): void;
     registerCommand(
       name: string,
       definition: {
@@ -122,6 +123,25 @@ declare module "@mariozechner/pi-coding-agent" {
   export function getAgentDir(): string;
   export function getSettingsListTheme(...args: any[]): any;
   export function isToolCallEventType(toolName: string, event: unknown): boolean;
+}
+
+declare module "@mariozechner/pi-ai" {
+  export type Api = string;
+  export type AssistantMessageEventStream = any;
+  export type Context = any;
+  export type SimpleStreamOptions = {
+    temperature?: number;
+    onPayload?: (payload: unknown, model: Model<Api>) => unknown | Promise<unknown | undefined> | undefined;
+    [key: string]: any;
+  };
+  export interface Model<TApi extends Api> {
+    id: string;
+    api: TApi;
+    provider: string;
+    reasoning: boolean;
+    [key: string]: any;
+  }
+  export function getApiProvider(api: Api): { streamSimple: (...args: any[]) => AssistantMessageEventStream } | undefined;
 }
 
 declare module "@mariozechner/pi-tui" {
