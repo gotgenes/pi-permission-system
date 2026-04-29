@@ -1,8 +1,11 @@
-# 🔐 pi-permission-system
+# 🔐 @gotgenes/pi-permission-system
 
-[![npm version](https://img.shields.io/npm/v/pi-permission-system?style=flat-square)](https://www.npmjs.com/package/pi-permission-system) [![License](https://img.shields.io/github/license/MasuRii/pi-permission-system?style=flat-square)](LICENSE)
+[![Version](https://img.shields.io/badge/version-0.4.6-blue.svg)](package.json)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Permission enforcement extension for the Pi coding agent that provides centralized, deterministic permission gates for tool, bash, MCP, skill, and special operations.
+
+> **Fork notice:** This package is a friendly fork of [MasuRii/pi-permission-system](https://github.com/MasuRii/pi-permission-system), published to npm as `@gotgenes/pi-permission-system`. The extension's on-disk identity (config directory, log filenames, `/permission-system` slash command, and event channel names) is intentionally preserved so this fork and upstream share runtime state and remain drop-in interchangeable.
 
 ## Features
 
@@ -31,10 +34,10 @@ pi install npm:pi-permission-system
 
 Place this folder in one of the following locations:
 
-| Scope   | Path |
-|---------|------|
+| Scope          | Path                                                                           |
+| -------------- | ------------------------------------------------------------------------------ |
 | Global default | `~/.pi/agent/extensions/pi-permission-system` (respects `PI_CODING_AGENT_DIR`) |
-| Project | `.pi/extensions/pi-permission-system` |
+| Project        | `.pi/extensions/pi-permission-system`                                          |
 
 Pi auto-discovers extensions in these paths.
 
@@ -53,12 +56,12 @@ Pi auto-discovers extensions in these paths.
     "bash": "ask",
     "mcp": "ask",
     "skills": "ask",
-    "special": "ask"
+    "special": "ask",
   },
   "tools": {
     "read": "allow",
-    "write": "deny"
-  }
+    "write": "deny",
+  },
 }
 ```
 
@@ -68,21 +71,21 @@ Pi auto-discovers extensions in these paths.
 
 All permissions use one of three states:
 
-| State   | Behavior                                    |
-|---------|---------------------------------------------|
-| `allow` | Permits the action silently                 |
-| `deny`  | Blocks the action with an error message     |
-| `ask`   | Prompts the user for confirmation via UI    |
+| State   | Behavior                                 |
+| ------- | ---------------------------------------- |
+| `allow` | Permits the action silently              |
+| `deny`  | Blocks the action with an error message  |
+| `ask`   | Prompts the user for confirmation via UI |
 
 ### Pi Integration Hooks
 
 The extension integrates via Pi's lifecycle hooks:
 
-| Hook                 | Behavior                                                                                  |
-|----------------------|-------------------------------------------------------------------------------------------|
+| Hook                 | Behavior                                                                                          |
+| -------------------- | ------------------------------------------------------------------------------------------------- |
 | `before_agent_start` | Filters active tools, removes denied tool entries from the system prompt, and hides denied skills |
-| `tool_call`          | Enforces permissions for every tool invocation                                            |
-| `input`              | Intercepts `/skill:<name>` requests and enforces skill policy                             |
+| `tool_call`          | Enforces permissions for every tool invocation                                                    |
+| `input`              | Intercepts `/skill:<name>` requests and enforces skill policy                                     |
 
 **Additional behaviors:**
 
@@ -110,11 +113,11 @@ The extension creates this file automatically when it is missing. It controls on
 }
 ```
 
-| Key | Default | Description |
-|-----|---------|-------------|
-| `debugLog` | `false` | Enables verbose diagnostic logging to `logs/pi-permission-system-debug.jsonl` |
-| `permissionReviewLog` | `true` | Enables the permission request/denial review log at `logs/pi-permission-system-permission-review.jsonl` |
-| `yoloMode` | `false` | Auto-approves `ask` results instead of prompting when yolo mode is enabled |
+| Key                   | Default | Description                                                                                             |
+| --------------------- | ------- | ------------------------------------------------------------------------------------------------------- |
+| `debugLog`            | `false` | Enables verbose diagnostic logging to `logs/pi-permission-system-debug.jsonl`                           |
+| `permissionReviewLog` | `true`  | Enables the permission request/denial review log at `logs/pi-permission-system-permission-review.jsonl` |
+| `yoloMode`            | `false` | Auto-approves `ask` results instead of prompting when yolo mode is enabled                              |
 
 Both logs write to files only under the extension directory. No debug output is printed to the terminal.
 
@@ -124,14 +127,14 @@ Both logs write to files only under the extension directory. No debug output is 
 
 The policy file is a JSON object with these sections:
 
-| Section         | Description                                         |
-|-----------------|-----------------------------------------------------|
-| `defaultPolicy` | Fallback permissions per category                   |
-| `tools`         | Exact-name tool permissions for registered tools    |
-| `bash`          | Command pattern permissions                         |
+| Section         | Description                                                                  |
+| --------------- | ---------------------------------------------------------------------------- |
+| `defaultPolicy` | Fallback permissions per category                                            |
+| `tools`         | Exact-name tool permissions for registered tools                             |
+| `bash`          | Command pattern permissions                                                  |
 | `mcp`           | MCP server/tool permissions for calls routed through a registered `mcp` tool |
-| `skills`        | Skill name pattern permissions                      |
-| `special`       | Reserved permission checks such as external directory access |
+| `skills`        | Skill name pattern permissions                                               |
+| `special`       | Reserved permission checks such as external directory access                 |
 
 > **Note:** Trailing commas are **not** supported. If parsing fails, the extension falls back to `ask` for all categories.
 
@@ -166,10 +169,10 @@ permission:
 
 The extension can also layer project-local permission files relative to the active session working directory:
 
-| Scope | Path |
-|-------|------|
-| Project policy | `<cwd>/.pi/agent/pi-permissions.jsonc` |
-| Project agent override | `<cwd>/.pi/agent/agents/<agent>.md` |
+| Scope                  | Path                                   |
+| ---------------------- | -------------------------------------- |
+| Project policy         | `<cwd>/.pi/agent/pi-permissions.jsonc` |
+| Project agent override | `<cwd>/.pi/agent/agents/<agent>.md`    |
 
 Project-local files use the same formats as the global policy file and global agent frontmatter. These project files are resolved from Pi's current session `cwd`, so they are workspace-specific and do **not** move under `PI_CODING_AGENT_DIR`.
 
@@ -197,8 +200,8 @@ Sets fallback permissions when no specific rule matches:
     "bash": "ask",
     "mcp": "ask",
     "skills": "ask",
-    "special": "ask"
-  }
+    "special": "ask",
+  },
 }
 ```
 
@@ -206,13 +209,13 @@ Sets fallback permissions when no specific rule matches:
 
 Controls tools by exact registered name (no wildcards). This is the recommended standalone format for **all** tool entries, including Pi built-ins and arbitrary third-party extension tools.
 
-| Tool name example     | Description |
-|-----------------------|-------------|
-| `bash`                | Shell command execution (tool-level fallback before `bash` pattern rules) |
-| `read` / `write`      | Canonical Pi built-in file tools |
-| `mcp`                 | Registered MCP proxy tool entry/fallback when available |
-| `task`                | Delegation tool handled like any other registered extension tool |
-| `third_party_tool`    | Arbitrary registered extension tool |
+| Tool name example  | Description                                                               |
+| ------------------ | ------------------------------------------------------------------------- |
+| `bash`             | Shell command execution (tool-level fallback before `bash` pattern rules) |
+| `read` / `write`   | Canonical Pi built-in file tools                                          |
+| `mcp`              | Registered MCP proxy tool entry/fallback when available                   |
+| `task`             | Delegation tool handled like any other registered extension tool          |
+| `third_party_tool` | Arbitrary registered extension tool                                       |
 
 ```jsonc
 {
@@ -220,14 +223,14 @@ Controls tools by exact registered name (no wildcards). This is the recommended 
     "read": "allow",
     "write": "deny",
     "mcp": "allow",
-    "third_party_tool": "ask"
-  }
+    "third_party_tool": "ask",
+  },
 }
 ```
 
 Unknown or absent tools are not required in the config. If another extension is not installed, its tool simply will not be registered at runtime, and this extension will block attempts to call that missing tool before permission checks run.
 
-> **Note:** Setting `tools.bash` affects the *default* for bash commands, but `bash` patterns can provide command-level overrides.
+> **Note:** Setting `tools.bash` affects the _default_ for bash commands, but `bash` patterns can provide command-level overrides.
 >
 > **Note:** Setting `tools.mcp` controls coarse access to a registered `mcp` tool when one is available. Specific `mcp` rules still override it when a target pattern matches.
 >
@@ -242,8 +245,8 @@ Command patterns use `*` wildcards and match against the full command string. If
   "bash": {
     "git *": "ask",
     "git status": "allow",
-    "rm -rf *": "deny"
-  }
+    "rm -rf *": "deny",
+  },
 }
 ```
 
@@ -251,12 +254,12 @@ Command patterns use `*` wildcards and match against the full command string. If
 
 MCP permissions match against derived targets from tool input. These rules are more specific than `tools.mcp` and override that fallback when a pattern matches:
 
-| Target Type       | Examples                                    |
-|-------------------|---------------------------------------------|
+| Target Type       | Examples                                                              |
+| ----------------- | --------------------------------------------------------------------- |
 | Baseline ops      | `mcp_status`, `mcp_list`, `mcp_search`, `mcp_describe`, `mcp_connect` |
-| Server name       | `myServer`                                  |
-| Server/tool combo | `myServer:search`, `myServer_search`        |
-| Generic           | `mcp_call`                                  |
+| Server name       | `myServer`                                                            |
+| Server/tool combo | `myServer:search`, `myServer_search`                                  |
+| Generic           | `mcp_call`                                                            |
 
 ```jsonc
 {
@@ -264,8 +267,8 @@ MCP permissions match against derived targets from tool input. These rules are m
     "mcp_status": "allow",
     "mcp_list": "allow",
     "myServer:*": "ask",
-    "dangerousServer": "deny"
-  }
+    "dangerousServer": "deny",
+  },
 }
 ```
 
@@ -278,8 +281,8 @@ A registered `mcp` tool can use `tools.mcp` as an entry permission point. This p
 ```jsonc
 {
   "tools": {
-    "mcp": "allow"
-  }
+    "mcp": "allow",
+  },
 }
 ```
 
@@ -309,8 +312,8 @@ Skill name patterns use `*` wildcards:
 {
   "skills": {
     "*": "ask",
-    "dangerous-*": "deny"
-  }
+    "dangerous-*": "deny",
+  },
 }
 ```
 
@@ -318,18 +321,18 @@ Skill name patterns use `*` wildcards:
 
 Reserved permission checks:
 
-| Key                  | Description                              |
-|----------------------|------------------------------------------|
-| `doom_loop`          | Controls doom loop detection behavior    |
+| Key                  | Description                                                                                                                                                                   |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `doom_loop`          | Controls doom loop detection behavior                                                                                                                                         |
 | `external_directory` | Enforces ask/allow/deny decisions for path-bearing built-in tools (`read`, `write`, `edit`, `find`, `grep`, `ls`) when they target paths outside the active working directory |
-| `tool_call_limit`    | *(schema only, not enforced yet)*        |
+| `tool_call_limit`    | _(schema only, not enforced yet)_                                                                                                                                             |
 
 ```jsonc
 {
   "special": {
     "doom_loop": "deny",
-    "external_directory": "ask"
-  }
+    "external_directory": "ask",
+  },
 }
 ```
 
@@ -343,15 +346,21 @@ Reserved permission checks:
 
 ```jsonc
 {
-  "defaultPolicy": { "tools": "ask", "bash": "ask", "mcp": "ask", "skills": "ask", "special": "ask" },
+  "defaultPolicy": {
+    "tools": "ask",
+    "bash": "ask",
+    "mcp": "ask",
+    "skills": "ask",
+    "special": "ask",
+  },
   "tools": {
     "read": "allow",
     "grep": "allow",
     "find": "allow",
     "ls": "allow",
     "write": "deny",
-    "edit": "deny"
-  }
+    "edit": "deny",
+  },
 }
 ```
 
@@ -359,13 +368,19 @@ Reserved permission checks:
 
 ```jsonc
 {
-  "defaultPolicy": { "tools": "ask", "bash": "deny", "mcp": "ask", "skills": "ask", "special": "ask" },
+  "defaultPolicy": {
+    "tools": "ask",
+    "bash": "deny",
+    "mcp": "ask",
+    "skills": "ask",
+    "special": "ask",
+  },
   "bash": {
     "git status": "allow",
     "git diff": "allow",
     "git log *": "allow",
-    "git *": "ask"
-  }
+    "git *": "ask",
+  },
 }
 ```
 
@@ -373,14 +388,20 @@ Reserved permission checks:
 
 ```jsonc
 {
-  "defaultPolicy": { "tools": "ask", "bash": "ask", "mcp": "ask", "skills": "ask", "special": "ask" },
+  "defaultPolicy": {
+    "tools": "ask",
+    "bash": "ask",
+    "mcp": "ask",
+    "skills": "ask",
+    "special": "ask",
+  },
   "mcp": {
     "mcp_status": "allow",
     "mcp_list": "allow",
     "mcp_search": "allow",
     "mcp_describe": "allow",
-    "*": "ask"
-  }
+    "*": "ask",
+  },
 }
 ```
 
@@ -465,13 +486,13 @@ config/
 
 The extension uses a modular architecture with shared utilities:
 
-| Module | Purpose |
-|--------|---------|
-| `common.ts` | Shared utilities: `toRecord()`, `getNonEmptyString()`, `isPermissionState()`, `parseSimpleYamlMap()`, `extractFrontmatter()` |
-| `wildcard-matcher.ts` | Compile-once wildcard patterns with specificity sorting: `compileWildcardPatterns()`, `findCompiledWildcardMatch()` |
-| `permission-manager.ts` | Policy resolution with file stamp caching for performance |
-| `bash-filter.ts` | Uses shared wildcard matcher for bash command patterns |
-| `skill-prompt-sanitizer.ts` | Parses all available skill prompt blocks, removes denied skills, and tracks visible skill paths for read protection |
+| Module                      | Purpose                                                                                                                      |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `common.ts`                 | Shared utilities: `toRecord()`, `getNonEmptyString()`, `isPermissionState()`, `parseSimpleYamlMap()`, `extractFrontmatter()` |
+| `wildcard-matcher.ts`       | Compile-once wildcard patterns with specificity sorting: `compileWildcardPatterns()`, `findCompiledWildcardMatch()`          |
+| `permission-manager.ts`     | Policy resolution with file stamp caching for performance                                                                    |
+| `bash-filter.ts`            | Uses shared wildcard matcher for bash command patterns                                                                       |
+| `skill-prompt-sanitizer.ts` | Parses all available skill prompt blocks, removes denied skills, and tracks visible skill paths for read protection          |
 
 #### Performance Optimizations
 
@@ -511,14 +532,14 @@ npx --yes ajv-cli@5 validate \
 
 ## Troubleshooting
 
-| Problem | Cause | Solution |
-|---------|-------|----------|
-| Config not applied (everything asks) | File not found or parse error | Verify the global Pi policy file (default: `~/.pi/agent/pi-permissions.jsonc`, respects `PI_CODING_AGENT_DIR`); check for trailing commas |
-| Per-agent override not applied | Frontmatter parsing issue | Ensure `---` delimiters at file top; keep YAML simple; restart session |
-| Tool blocked as unregistered | Unknown tool name | Use a registered `mcp` tool for server tools: `{ "tool": "server:tool" }` |
-| `/skill:<name>` blocked | Deny policy or confirmation unavailable | Check merged `skills` policy (global/project/agent layers). Active agent context is optional in the main session; `ask` still requires UI or forwarded confirmation. |
-| External file path blocked | `special.external_directory` is `ask` without UI or `deny` | Allow/ask the special permission or keep file tools inside the active working directory. |
-| Permission prompt is too verbose | Generic extension tool input is large | Built-in file tools are summarized automatically; third-party tools are capped to a bounded one-line JSON preview. |
+| Problem                              | Cause                                                      | Solution                                                                                                                                                             |
+| ------------------------------------ | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Config not applied (everything asks) | File not found or parse error                              | Verify the global Pi policy file (default: `~/.pi/agent/pi-permissions.jsonc`, respects `PI_CODING_AGENT_DIR`); check for trailing commas                            |
+| Per-agent override not applied       | Frontmatter parsing issue                                  | Ensure `---` delimiters at file top; keep YAML simple; restart session                                                                                               |
+| Tool blocked as unregistered         | Unknown tool name                                          | Use a registered `mcp` tool for server tools: `{ "tool": "server:tool" }`                                                                                            |
+| `/skill:<name>` blocked              | Deny policy or confirmation unavailable                    | Check merged `skills` policy (global/project/agent layers). Active agent context is optional in the main session; `ask` still requires UI or forwarded confirmation. |
+| External file path blocked           | `special.external_directory` is `ask` without UI or `deny` | Allow/ask the special permission or keep file tools inside the active working directory.                                                                             |
+| Permission prompt is too verbose     | Generic extension tool input is large                      | Built-in file tools are summarized automatically; third-party tools are capped to a bounded one-line JSON preview.                                                   |
 
 ---
 
