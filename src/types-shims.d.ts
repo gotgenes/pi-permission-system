@@ -32,7 +32,9 @@ declare function setInterval(
   timeout?: number,
   ...args: any[]
 ): NodeJS.Timeout;
-declare function clearInterval(timeoutId: NodeJS.Timeout | null | undefined): void;
+declare function clearInterval(
+  timeoutId: NodeJS.Timeout | null | undefined,
+): void;
 
 declare module "node:assert/strict" {
   const assert: any;
@@ -81,9 +83,17 @@ declare module "@mariozechner/pi-coding-agent" {
   export type Theme = any;
 
   export interface ExtensionUIContext {
-    select(title: string, options: string[], opts?: any): Promise<string | undefined>;
+    select(
+      title: string,
+      options: string[],
+      opts?: any,
+    ): Promise<string | undefined>;
     confirm(title: string, message: string, opts?: any): Promise<boolean>;
-    input(title: string, placeholder?: string, opts?: any): Promise<string | undefined>;
+    input(
+      title: string,
+      placeholder?: string,
+      opts?: any,
+    ): Promise<string | undefined>;
     notify(message: string, type?: "info" | "warning" | "error"): void;
     setStatus(key: string, value: string | undefined): void;
     custom<T>(renderer: (...args: any[]) => any, options?: any): Promise<T>;
@@ -111,8 +121,15 @@ declare module "@mariozechner/pi-coding-agent" {
       name: string,
       definition: {
         description: string;
-        getArgumentCompletions?: (argumentPrefix: string) => Array<{ value: string; label: string; description?: string }> | null;
-        handler: (args: string, ctx: ExtensionCommandContext) => Promise<void> | void;
+        getArgumentCompletions?: (argumentPrefix: string) => Array<{
+          value: string;
+          label: string;
+          description?: string;
+        }> | null;
+        handler: (
+          args: string,
+          ctx: ExtensionCommandContext,
+        ) => Promise<void> | void;
       },
     ): void;
     events: {
@@ -122,7 +139,10 @@ declare module "@mariozechner/pi-coding-agent" {
 
   export function getAgentDir(): string;
   export function getSettingsListTheme(...args: any[]): any;
-  export function isToolCallEventType(toolName: string, event: unknown): boolean;
+  export function isToolCallEventType(
+    toolName: string,
+    event: unknown,
+  ): boolean;
 }
 
 declare module "@mariozechner/pi-ai" {
@@ -131,7 +151,10 @@ declare module "@mariozechner/pi-ai" {
   export type Context = any;
   export type SimpleStreamOptions = {
     temperature?: number;
-    onPayload?: (payload: unknown, model: Model<Api>) => unknown | Promise<unknown | undefined> | undefined;
+    onPayload?: (
+      payload: unknown,
+      model: Model<Api>,
+    ) => unknown | Promise<unknown | undefined> | undefined;
     [key: string]: any;
   };
   export interface Model<TApi extends Api> {
@@ -141,7 +164,11 @@ declare module "@mariozechner/pi-ai" {
     reasoning: boolean;
     [key: string]: any;
   }
-  export function getApiProvider(api: Api): { streamSimple: (...args: any[]) => AssistantMessageEventStream } | undefined;
+  export function getApiProvider(
+    api: Api,
+  ):
+    | { streamSimple: (...args: any[]) => AssistantMessageEventStream }
+    | undefined;
 }
 
 declare module "@mariozechner/pi-tui" {
@@ -183,6 +210,11 @@ declare module "@mariozechner/pi-tui" {
     constructor(...args: any[]);
   }
 
-  export function truncateToWidth(text: string, width: number, filler?: string, preferEnd?: boolean): string;
+  export function truncateToWidth(
+    text: string,
+    width: number,
+    filler?: string,
+    preferEnd?: boolean,
+  ): string;
   export function visibleWidth(text: string): number;
 }

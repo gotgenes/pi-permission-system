@@ -14,7 +14,10 @@ function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-export function compileWildcardPattern<TState>(pattern: string, state: TState): CompiledWildcardPattern<TState> {
+export function compileWildcardPattern<TState>(
+  pattern: string,
+  state: TState,
+): CompiledWildcardPattern<TState> {
   const escaped = pattern
     .split("*")
     .map((part) => escapeRegExp(part))
@@ -30,7 +33,9 @@ export function compileWildcardPattern<TState>(pattern: string, state: TState): 
 export function compileWildcardPatternEntries<TState>(
   entries: Iterable<readonly [string, TState]>,
 ): CompiledWildcardPattern<TState>[] {
-  return Array.from(entries, ([pattern, state]) => compileWildcardPattern(pattern, state));
+  return Array.from(entries, ([pattern, state]) =>
+    compileWildcardPattern(pattern, state),
+  );
 }
 
 export function compileWildcardPatterns<TState>(
@@ -61,7 +66,9 @@ export function findCompiledWildcardMatchForNames<TState>(
   patterns: readonly CompiledWildcardPattern<TState>[],
   names: readonly string[],
 ): WildcardPatternMatch<TState> | null {
-  const normalizedNames = names.map((value) => value.trim()).filter((value) => value.length > 0);
+  const normalizedNames = names
+    .map((value) => value.trim())
+    .filter((value) => value.length > 0);
   if (normalizedNames.length === 0) {
     return null;
   }

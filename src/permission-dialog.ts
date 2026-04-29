@@ -1,4 +1,7 @@
-export type PermissionDecisionState = "approved" | "denied" | "denied_with_reason";
+export type PermissionDecisionState =
+  | "approved"
+  | "denied"
+  | "denied_with_reason";
 
 export type PermissionPromptDecision = {
   approved: boolean;
@@ -20,7 +23,9 @@ const PERMISSION_DECISION_OPTIONS = [
   DENY_WITH_REASON_OPTION,
 ] as const;
 
-export function normalizePermissionDenialReason(value: unknown): string | undefined {
+export function normalizePermissionDenialReason(
+  value: unknown,
+): string | undefined {
   if (typeof value !== "string") {
     return undefined;
   }
@@ -35,20 +40,22 @@ export function createDeniedPermissionDecision(
   const normalizedReason = normalizePermissionDenialReason(denialReason);
   return normalizedReason
     ? {
-      approved: false,
-      state: "denied_with_reason",
-      denialReason: normalizedReason,
-    }
+        approved: false,
+        state: "denied_with_reason",
+        denialReason: normalizedReason,
+      }
     : {
-      approved: false,
-      state: "denied",
-    };
+        approved: false,
+        state: "denied",
+      };
 }
 
 export function isPermissionDecisionState(
   value: unknown,
 ): value is PermissionDecisionState {
-  return value === "approved" || value === "denied" || value === "denied_with_reason";
+  return (
+    value === "approved" || value === "denied" || value === "denied_with_reason"
+  );
 }
 
 export async function requestPermissionDecisionFromUi(
@@ -56,10 +63,9 @@ export async function requestPermissionDecisionFromUi(
   title: string,
   message: string,
 ): Promise<PermissionPromptDecision> {
-  const selected = await ui.select(
-    `${title}\n${message}`,
-    [...PERMISSION_DECISION_OPTIONS],
-  );
+  const selected = await ui.select(`${title}\n${message}`, [
+    ...PERMISSION_DECISION_OPTIONS,
+  ]);
 
   if (selected === APPROVE_OPTION) {
     return {

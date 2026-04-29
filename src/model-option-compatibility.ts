@@ -1,7 +1,7 @@
 import {
-  getApiProvider,
   type Api,
   type AssistantMessageEventStream,
+  getApiProvider,
   type Context as LlmContext,
   type Model,
   type SimpleStreamOptions,
@@ -17,12 +17,8 @@ const OPENAI_RESPONSES_APIS = new Set<Api>([
   "openai-responses",
   "azure-openai-responses",
 ]);
-const TEMPERATURE_UNSUPPORTED_APIS = new Set<Api>([
-  "openai-codex-responses",
-]);
-const TEMPERATURE_UNSUPPORTED_PROVIDERS = new Set<string>([
-  "openai-codex",
-]);
+const TEMPERATURE_UNSUPPORTED_APIS = new Set<Api>(["openai-codex-responses"]);
+const TEMPERATURE_UNSUPPORTED_PROVIDERS = new Set<string>(["openai-codex"]);
 
 export type ApiStreamSimpleDelegate = (
   model: Model<Api>,
@@ -31,14 +27,20 @@ export type ApiStreamSimpleDelegate = (
 ) => AssistantMessageEventStream;
 
 type GlobalWithPermissionSystemProviderGuard = typeof globalThis & {
-  __piPermissionSystemModelOptionBaseStreams?: Map<string, ApiStreamSimpleDelegate>;
+  __piPermissionSystemModelOptionBaseStreams?: Map<
+    string,
+    ApiStreamSimpleDelegate
+  >;
   __piPermissionSystemModelOptionGuardedApis?: Set<string>;
 };
 
 function getBaseApiStreams(): Map<string, ApiStreamSimpleDelegate> {
   const globalScope = globalThis as GlobalWithPermissionSystemProviderGuard;
   if (!globalScope.__piPermissionSystemModelOptionBaseStreams) {
-    globalScope.__piPermissionSystemModelOptionBaseStreams = new Map<string, ApiStreamSimpleDelegate>();
+    globalScope.__piPermissionSystemModelOptionBaseStreams = new Map<
+      string,
+      ApiStreamSimpleDelegate
+    >();
   }
   return globalScope.__piPermissionSystemModelOptionBaseStreams;
 }
@@ -56,7 +58,9 @@ function normalizeIdentifier(value: string | undefined): string {
 }
 
 function hasModelToken(modelId: string, token: string): boolean {
-  return normalizeIdentifier(modelId).split(/[^a-z0-9]+/).includes(token);
+  return normalizeIdentifier(modelId)
+    .split(/[^a-z0-9]+/)
+    .includes(token);
 }
 
 export function getUnsupportedTemperatureReason(
@@ -71,7 +75,10 @@ export function getUnsupportedTemperatureReason(
     return `provider '${model.provider}' does not support temperature`;
   }
 
-  if (OPENAI_RESPONSES_APIS.has(model.api) && hasModelToken(model.id, "codex")) {
+  if (
+    OPENAI_RESPONSES_APIS.has(model.api) &&
+    hasModelToken(model.id, "codex")
+  ) {
     return `model '${model.id}' does not support temperature`;
   }
 
@@ -86,7 +93,9 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-export function stripUnsupportedTemperatureFromPayload(payload: unknown): unknown {
+export function stripUnsupportedTemperatureFromPayload(
+  payload: unknown,
+): unknown {
   if (!isRecord(payload) || !("temperature" in payload)) {
     return payload;
   }
@@ -117,7 +126,9 @@ function composeTemperatureSanitizer(
     const transformedPayload = existingOnPayload
       ? await existingOnPayload(payload, payloadModel)
       : undefined;
-    return stripUnsupportedTemperatureFromPayload(transformedPayload ?? payload);
+    return stripUnsupportedTemperatureFromPayload(
+      transformedPayload ?? payload,
+    );
   };
 
   return nextOptions;
@@ -147,10 +158,16 @@ function ensureModelOptionGuardForApi(pi: ExtensionAPI, api: Api): boolean {
       const typedModel = model as Model<Api>;
       const delegate = baseStreams.get(typedModel.api);
       if (!delegate) {
-        throw new Error(`No base stream provider available for api '${typedModel.api}'.`);
+        throw new Error(
+          `No base stream provider available for api '${typedModel.api}'.`,
+        );
       }
 
-      return delegate(typedModel, context, composeTemperatureSanitizer(options, typedModel));
+      return delegate(
+        typedModel,
+        context,
+        composeTemperatureSanitizer(options, typedModel),
+      );
     },
   });
 

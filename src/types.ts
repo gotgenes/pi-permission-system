@@ -1,6 +1,13 @@
 export type PermissionState = "allow" | "deny" | "ask";
 
-export type BuiltInToolName = "bash" | "read" | "write" | "edit" | "grep" | "find" | "ls";
+export type BuiltInToolName =
+  | "bash"
+  | "read"
+  | "write"
+  | "edit"
+  | "grep"
+  | "find"
+  | "ls";
 
 export type ToolPermissions = Record<string, PermissionState>;
 
