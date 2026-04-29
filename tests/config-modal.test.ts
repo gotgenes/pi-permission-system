@@ -3,14 +3,13 @@ import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test, vi } from "vitest";
-
+import { registerPermissionSystemCommand } from "../src/config-modal.js";
 import {
   DEFAULT_EXTENSION_CONFIG,
   loadPermissionSystemConfig,
-  savePermissionSystemConfig,
   type PermissionSystemExtensionConfig,
+  savePermissionSystemConfig,
 } from "../src/extension-config.js";
-import { registerPermissionSystemCommand } from "../src/config-modal.js";
 
 vi.mock("@mariozechner/pi-coding-agent", () => ({
   getSettingsListTheme: () => ({}),
@@ -45,13 +44,18 @@ type CommandContextStub = {
   hasUI: boolean;
   ui: {
     notify(message: string, level: "info" | "warning" | "error"): void;
-    custom<T>(renderer: (...args: unknown[]) => unknown, options?: unknown): Promise<T>;
+    custom<T>(
+      renderer: (...args: unknown[]) => unknown,
+      options?: unknown,
+    ): Promise<T>;
   };
 };
 
-function createCommandContext(
-  hasUI: boolean,
-): { ctx: CommandContextStub; notifications: Notification[]; getCustomCalls(): number } {
+function createCommandContext(hasUI: boolean): {
+  ctx: CommandContextStub;
+  notifications: Notification[];
+  getCustomCalls(): number;
+} {
   const notifications: Notification[] = [];
   let customCalls = 0;
 
@@ -62,7 +66,10 @@ function createCommandContext(
         notify(message: string, level: "info" | "warning" | "error") {
           notifications.push({ message, level });
         },
-        async custom<T>(_renderer: (...args: unknown[]) => unknown, _options?: unknown): Promise<T> {
+        async custom<T>(
+          _renderer: (...args: unknown[]) => unknown,
+          _options?: unknown,
+        ): Promise<T> {
           customCalls += 1;
           return undefined as T;
         },
@@ -78,7 +85,9 @@ function lastNotification(notifications: Notification[]): Notification {
 }
 
 test("permission-system command completions expose top-level config actions", () => {
-  const baseDir = mkdtempSync(join(tmpdir(), "pi-permission-system-command-completions-"));
+  const baseDir = mkdtempSync(
+    join(tmpdir(), "pi-permission-system-command-completions-"),
+  );
   const configPath = join(baseDir, "config.json");
   let config: PermissionSystemExtensionConfig = { ...DEFAULT_EXTENSION_CONFIG };
 
@@ -93,7 +102,9 @@ test("permission-system command completions expose top-level config actions", ()
 
     let definition: {
       description: string;
-      getArgumentCompletions?: (argumentPrefix: string) => Array<{ value: string; label: string; description?: string }> | null;
+      getArgumentCompletions?: (
+        argumentPrefix: string,
+      ) => Array<{ value: string; label: string; description?: string }> | null;
       handler: (args: string, ctx: CommandContextStub) => Promise<void>;
     } | null = null;
 
@@ -115,7 +126,10 @@ test("permission-system command completions expose top-level config actions", ()
     assert.ok(topLevel?.some((item) => item.value === "reset"));
 
     const filtered = definition?.getArgumentCompletions?.("pa");
-    assert.deepEqual(filtered?.map((item) => item.value), ["path"]);
+    assert.deepEqual(
+      filtered?.map((item) => item.value),
+      ["path"],
+    );
     assert.equal(definition?.getArgumentCompletions?.("path extra"), null);
     assert.equal(definition?.getArgumentCompletions?.("zzz"), null);
   } finally {
@@ -151,7 +165,9 @@ test("permission-system command handlers manage config summary, persistence, and
     let registeredName = "";
     let definition: {
       description: string;
-      getArgumentCompletions?: (argumentPrefix: string) => Array<{ value: string; label: string; description?: string }> | null;
+      getArgumentCompletions?: (
+        argumentPrefix: string,
+      ) => Array<{ value: string; label: string; description?: string }> | null;
       handler: (args: string, ctx: CommandContextStub) => Promise<void>;
     } | null = null;
 
@@ -167,33 +183,61 @@ test("permission-system command handlers manage config summary, persistence, and
 
     assert.equal(registeredName, "permission-system");
     assert.ok(definition !== null);
-    assert.ok((definition?.description ?? "").includes("Configure pi-permission-system"));
+    assert.ok(
+      (definition?.description ?? "").includes(
+        "Configure pi-permission-system",
+      ),
+    );
 
     const infoCtx = createCommandContext(true);
     await definition?.handler("show", infoCtx.ctx);
-    assert.ok(lastNotification(infoCtx.notifications).message.includes("yoloMode=on"));
-    assert.ok(lastNotification(infoCtx.notifications).message.includes("debugLog=on"));
+    assert.ok(
+      lastNotification(infoCtx.notifications).message.includes("yoloMode=on"),
+    );
+    assert.ok(
+      lastNotification(infoCtx.notifications).message.includes("debugLog=on"),
+    );
 
     await definition?.handler("path", infoCtx.ctx);
-    assert.equal(lastNotification(infoCtx.notifications).message, `permission-system config: ${configPath}`);
+    assert.equal(
+      lastNotification(infoCtx.notifications).message,
+      `permission-system config: ${configPath}`,
+    );
 
     await definition?.handler("help", infoCtx.ctx);
-    assert.ok(lastNotification(infoCtx.notifications).message.includes("Usage: /permission-system"));
+    assert.ok(
+      lastNotification(infoCtx.notifications).message.includes(
+        "Usage: /permission-system",
+      ),
+    );
 
     await definition?.handler("reset", infoCtx.ctx);
     assert.deepEqual(config, DEFAULT_EXTENSION_CONFIG);
-    assert.equal(lastNotification(infoCtx.notifications).message, "Permission system settings reset to defaults.");
+    assert.equal(
+      lastNotification(infoCtx.notifications).message,
+      "Permission system settings reset to defaults.",
+    );
 
-    const persisted = JSON.parse(readFileSync(configPath, "utf8")) as Record<string, unknown>;
+    const persisted = JSON.parse(readFileSync(configPath, "utf8")) as Record<
+      string,
+      unknown
+    >;
     assert.deepEqual(persisted, DEFAULT_EXTENSION_CONFIG);
 
     await definition?.handler("unknown", infoCtx.ctx);
     assert.equal(lastNotification(infoCtx.notifications).level, "warning");
-    assert.ok(lastNotification(infoCtx.notifications).message.includes("Usage: /permission-system"));
+    assert.ok(
+      lastNotification(infoCtx.notifications).message.includes(
+        "Usage: /permission-system",
+      ),
+    );
 
     const headlessCtx = createCommandContext(false);
     await definition?.handler("", headlessCtx.ctx);
-    assert.equal(lastNotification(headlessCtx.notifications).message, "/permission-system requires interactive TUI mode.");
+    assert.equal(
+      lastNotification(headlessCtx.notifications).message,
+      "/permission-system requires interactive TUI mode.",
+    );
 
     const modalCtx = createCommandContext(true);
     await definition?.handler("", modalCtx.ctx);
@@ -202,4 +246,3 @@ test("permission-system command handlers manage config summary, persistence, and
     rmSync(baseDir, { recursive: true, force: true });
   }
 });
-

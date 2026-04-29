@@ -1,12 +1,21 @@
-import type { ExtensionAPI, ExtensionCommandContext } from "@mariozechner/pi-coding-agent";
+import type {
+  ExtensionAPI,
+  ExtensionCommandContext,
+} from "@mariozechner/pi-coding-agent";
 import type { SettingItem } from "@mariozechner/pi-tui";
 
-import { DEFAULT_EXTENSION_CONFIG, type PermissionSystemExtensionConfig } from "./extension-config.js";
+import {
+  DEFAULT_EXTENSION_CONFIG,
+  type PermissionSystemExtensionConfig,
+} from "./extension-config.js";
 import { ZellijModal, ZellijSettingsModal } from "./zellij-modal.js";
 
 interface PermissionSystemConfigController {
   getConfig(): PermissionSystemExtensionConfig;
-  setConfig(next: PermissionSystemExtensionConfig, ctx: ExtensionCommandContext): void;
+  setConfig(
+    next: PermissionSystemExtensionConfig,
+    ctx: ExtensionCommandContext,
+  ): void;
   getConfigPath(): string;
 }
 
@@ -37,7 +46,8 @@ const COMMAND_ARGUMENTS = [
     description: "Display command usage",
   },
 ] as const;
-const USAGE_TEXT = "Usage: /permission-system [show|path|reset|help] (or run /permission-system with no args to open settings modal)";
+const USAGE_TEXT =
+  "Usage: /permission-system [show|path|reset|help] (or run /permission-system with no args to open settings modal)";
 
 function cloneDefaultConfig(): PermissionSystemExtensionConfig {
   return {
@@ -59,26 +69,31 @@ function summarizeConfig(config: PermissionSystemExtensionConfig): string {
   ].join(", ");
 }
 
-function buildSettingItems(config: PermissionSystemExtensionConfig): SettingItem[] {
+function buildSettingItems(
+  config: PermissionSystemExtensionConfig,
+): SettingItem[] {
   return [
     {
       id: "yoloMode",
       label: "YOLO mode",
-      description: "Auto-approve ask-state permission checks, including subagent approval forwarding",
+      description:
+        "Auto-approve ask-state permission checks, including subagent approval forwarding",
       currentValue: toOnOff(config.yoloMode),
       values: ON_OFF,
     },
     {
       id: "permissionReviewLog",
       label: "Permission review log",
-      description: "Write permission request and decision audit events to the extension logs directory",
+      description:
+        "Write permission request and decision audit events to the extension logs directory",
       currentValue: toOnOff(config.permissionReviewLog),
       values: ON_OFF,
     },
     {
       id: "debugLog",
       label: "Debug logging",
-      description: "Write verbose permission-system diagnostics to the extension logs directory",
+      description:
+        "Write verbose permission-system diagnostics to the extension logs directory",
       currentValue: toOnOff(config.debugLog),
       values: ON_OFF,
     },
@@ -102,24 +117,42 @@ function applySetting(
   }
 }
 
-function syncSettingValues(settingsList: SettingValueSyncTarget, config: PermissionSystemExtensionConfig): void {
+function syncSettingValues(
+  settingsList: SettingValueSyncTarget,
+  config: PermissionSystemExtensionConfig,
+): void {
   settingsList.updateValue("yoloMode", toOnOff(config.yoloMode));
-  settingsList.updateValue("permissionReviewLog", toOnOff(config.permissionReviewLog));
+  settingsList.updateValue(
+    "permissionReviewLog",
+    toOnOff(config.permissionReviewLog),
+  );
   settingsList.updateValue("debugLog", toOnOff(config.debugLog));
 }
 
-function getArgumentCompletions(argumentPrefix: string): Array<{ value: string; label: string; description: string }> | null {
+function getArgumentCompletions(
+  argumentPrefix: string,
+): Array<{ value: string; label: string; description: string }> | null {
   const normalized = argumentPrefix.trim().toLowerCase();
   if (normalized.includes(" ")) {
     return null;
   }
 
-  const filtered = COMMAND_ARGUMENTS.filter((item) => item.value.startsWith(normalized));
+  const filtered = COMMAND_ARGUMENTS.filter((item) =>
+    item.value.startsWith(normalized),
+  );
   return filtered.length > 0 ? [...filtered] : null;
 }
 
-async function openSettingsModal(ctx: ExtensionCommandContext, controller: PermissionSystemConfigController): Promise<void> {
-  const overlayOptions = { anchor: "center" as const, width: 82, maxHeight: "85%" as const, margin: 1 };
+async function openSettingsModal(
+  ctx: ExtensionCommandContext,
+  controller: PermissionSystemConfigController,
+): Promise<void> {
+  const overlayOptions = {
+    anchor: "center" as const,
+    width: 82,
+    maxHeight: "85%" as const,
+    margin: 1,
+  };
 
   await ctx.ui.custom<void>(
     (tui, theme, _keybindings, done) => {
@@ -129,7 +162,8 @@ async function openSettingsModal(ctx: ExtensionCommandContext, controller: Permi
       settingsModal = new ZellijSettingsModal(
         {
           title: "Permission System Settings",
-          description: "Local extension options for permission logging and auto-approval behavior",
+          description:
+            "Local extension options for permission logging and auto-approval behavior",
           settings: buildSettingItems(current),
           onChange: (id, newValue) => {
             current = applySetting(current, id, newValue);
@@ -180,19 +214,29 @@ async function openSettingsModal(ctx: ExtensionCommandContext, controller: Permi
   );
 }
 
-function handleArgs(args: string, ctx: ExtensionCommandContext, controller: PermissionSystemConfigController): boolean {
+function handleArgs(
+  args: string,
+  ctx: ExtensionCommandContext,
+  controller: PermissionSystemConfigController,
+): boolean {
   const normalized = args.trim().toLowerCase();
   if (!normalized) {
     return false;
   }
 
   if (normalized === "show") {
-    ctx.ui.notify(`permission-system: ${summarizeConfig(controller.getConfig())}`, "info");
+    ctx.ui.notify(
+      `permission-system: ${summarizeConfig(controller.getConfig())}`,
+      "info",
+    );
     return true;
   }
 
   if (normalized === "path") {
-    ctx.ui.notify(`permission-system config: ${controller.getConfigPath()}`, "info");
+    ctx.ui.notify(
+      `permission-system config: ${controller.getConfigPath()}`,
+      "info",
+    );
     return true;
   }
 
@@ -211,9 +255,13 @@ function handleArgs(args: string, ctx: ExtensionCommandContext, controller: Perm
   return true;
 }
 
-export function registerPermissionSystemCommand(pi: ExtensionAPI, controller: PermissionSystemConfigController): void {
+export function registerPermissionSystemCommand(
+  pi: ExtensionAPI,
+  controller: PermissionSystemConfigController,
+): void {
   pi.registerCommand("permission-system", {
-    description: "Configure pi-permission-system logging and yolo-mode behavior",
+    description:
+      "Configure pi-permission-system logging and yolo-mode behavior",
     getArgumentCompletions,
     handler: async (args, ctx) => {
       if (handleArgs(args, ctx, controller)) {
@@ -221,7 +269,10 @@ export function registerPermissionSystemCommand(pi: ExtensionAPI, controller: Pe
       }
 
       if (!ctx.hasUI) {
-        ctx.ui.notify("/permission-system requires interactive TUI mode.", "warning");
+        ctx.ui.notify(
+          "/permission-system requires interactive TUI mode.",
+          "warning",
+        );
         return;
       }
 

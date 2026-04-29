@@ -18,11 +18,15 @@ function createCacheKey(parts: readonly unknown[]): string {
   return JSON.stringify(parts);
 }
 
-export function createActiveToolsCacheKey(allowedToolNames: readonly string[]): string {
+export function createActiveToolsCacheKey(
+  allowedToolNames: readonly string[],
+): string {
   return createCacheKey(allowedToolNames);
 }
 
-export function createBeforeAgentStartPromptStateKey(input: BeforeAgentStartPromptStateInput): string {
+export function createBeforeAgentStartPromptStateKey(
+  input: BeforeAgentStartPromptStateInput,
+): string {
   return createCacheKey([
     normalizeAgentName(input.agentName),
     input.cwd,
@@ -32,6 +36,9 @@ export function createBeforeAgentStartPromptStateKey(input: BeforeAgentStartProm
   ]);
 }
 
-export function shouldApplyCachedAgentStartState(previousKey: string | null, nextKey: string): boolean {
+export function shouldApplyCachedAgentStartState(
+  previousKey: string | null,
+  nextKey: string,
+): boolean {
   return previousKey !== nextKey;
 }

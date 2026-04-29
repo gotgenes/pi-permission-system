@@ -16,11 +16,16 @@ export type ToolRegistrationCheckResult =
       availableToolNames: string[];
     };
 
-function normalizeToolName(toolName: string, aliases: Record<string, string>): string {
+function normalizeToolName(
+  toolName: string,
+  aliases: Record<string, string>,
+): string {
   return aliases[toolName] || toolName;
 }
 
-function buildReverseAliases(aliases: Record<string, string>): Map<string, string[]> {
+function buildReverseAliases(
+  aliases: Record<string, string>,
+): Map<string, string[]> {
   const reverse = new Map<string, string[]>();
 
   for (const [alias, canonical] of Object.entries(aliases)) {
@@ -112,7 +117,8 @@ export function checkRequestedToolRegistration(
     addToolNameVariants(name, registeredLookup, aliases, reverseAliases);
   }
 
-  const isRegistered = registeredLookup.has(requested) || registeredLookup.has(normalizedToolName);
+  const isRegistered =
+    registeredLookup.has(requested) || registeredLookup.has(normalizedToolName);
 
   if (isRegistered) {
     return {
@@ -126,6 +132,8 @@ export function checkRequestedToolRegistration(
     status: "unregistered",
     requestedToolName: requested,
     normalizedToolName,
-    availableToolNames: [...availableToolNames].sort((a, b) => a.localeCompare(b)),
+    availableToolNames: [...availableToolNames].sort((a, b) =>
+      a.localeCompare(b),
+    ),
   };
 }

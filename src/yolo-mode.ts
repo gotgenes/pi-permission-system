@@ -7,7 +7,9 @@ export interface AskPermissionResolutionOptions {
   isSubagent: boolean;
 }
 
-export function isYoloModeEnabled(config: PermissionSystemExtensionConfig): boolean {
+export function isYoloModeEnabled(
+  config: PermissionSystemExtensionConfig,
+): boolean {
   return config.yoloMode === true;
 }
 
@@ -18,6 +20,10 @@ export function shouldAutoApprovePermissionState(
   return state === "ask" && isYoloModeEnabled(config);
 }
 
-export function canResolveAskPermissionRequest(options: AskPermissionResolutionOptions): boolean {
-  return options.hasUI || options.isSubagent || isYoloModeEnabled(options.config);
+export function canResolveAskPermissionRequest(
+  options: AskPermissionResolutionOptions,
+): boolean {
+  return (
+    options.hasUI || options.isSubagent || isYoloModeEnabled(options.config)
+  );
 }
