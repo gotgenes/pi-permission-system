@@ -61,6 +61,49 @@ function createDefaultConfigContent(): string {
   return `${JSON.stringify(DEFAULT_EXTENSION_CONFIG, null, 2)}\n`;
 }
 
+const PERMISSION_RULE_KEYS = [
+  "defaultPolicy",
+  "tools",
+  "bash",
+  "mcp",
+  "skills",
+  "special",
+  "external_directory",
+  "doom_loop",
+] as const;
+
+const KNOWN_EXTENSION_CONFIG_KEYS = new Set([
+  "debugLog",
+  "permissionReviewLog",
+  "yoloMode",
+]);
+
+export function detectMisplacedPermissionKeys(raw: unknown): string[] {
+  const record = toRecord(raw);
+  const present: string[] = [];
+  for (const key of PERMISSION_RULE_KEYS) {
+    if (
+      Object.prototype.hasOwnProperty.call(record, key) &&
+      !KNOWN_EXTENSION_CONFIG_KEYS.has(key)
+    ) {
+      present.push(key);
+    }
+  }
+  return present;
+}
+
+export function buildMisplacedKeysWarning(
+  configPath: string,
+  keys: readonly string[],
+): string {
+  const formatted = keys.map((key) => `'${key}'`).join(", ");
+  return (
+    `pi-permission-system: '${configPath}' contains permission-rule keys that this file does not honor: ${formatted}. ` +
+    "This file only configures extension settings (debugLog, permissionReviewLog, yoloMode). " +
+    "Move permission rules to '~/.pi/agent/pi-permissions.jsonc' (global), '<project>/.pi/agent/pi-permissions.jsonc' (project), or an agent's frontmatter."
+  );
+}
+
 export function normalizePermissionSystemConfig(
   raw: unknown,
 ): PermissionSystemExtensionConfig {
@@ -106,10 +149,15 @@ export function loadPermissionSystemConfig(
     const raw = readFileSync(configPath, "utf-8");
     const parsed = JSON.parse(raw) as unknown;
     const config = normalizePermissionSystemConfig(parsed);
+    const misplaced = detectMisplacedPermissionKeys(parsed);
+    const misplacedWarning =
+      misplaced.length > 0
+        ? buildMisplacedKeysWarning(configPath, misplaced)
+        : undefined;
     return {
       config,
       created: ensureResult.created,
-      warning: ensureResult.warning,
+      warning: ensureResult.warning ?? misplacedWarning,
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
