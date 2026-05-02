@@ -23,8 +23,10 @@ import {
   shouldApplyCachedAgentStartState,
 } from "./before-agent-start-cache.js";
 import { getNonEmptyString, toRecord } from "./common.js";
+import { buildResolvedConfigLogEntry } from "./config-reporter.js";
 import { registerPermissionSystemCommand } from "./config-modal.js";
 import {
+  CONFIG_PATH,
   DEFAULT_EXTENSION_CONFIG,
   getPermissionSystemConfigPath,
   loadPermissionSystemConfig,
@@ -1544,6 +1546,17 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
     return toolPermission !== "deny";
   };
 
+  const logResolvedConfigPaths = (): void => {
+    const policyPaths = permissionManager.getResolvedPolicyPaths();
+    const entry = buildResolvedConfigLogEntry(
+      CONFIG_PATH,
+      existsSync(CONFIG_PATH),
+      policyPaths,
+    );
+    writeReviewLog("config.resolved", entry as unknown as Record<string, unknown>);
+    writeDebugLog("config.resolved", entry as unknown as Record<string, unknown>);
+  };
+
   pi.on("session_start", async (event, ctx) => {
     runtimeContext = ctx;
     refreshExtensionConfig(ctx);
@@ -1551,6 +1564,7 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
     invalidateAgentStartCache();
     lastKnownActiveAgentName = getActiveAgentName(ctx);
     startForwardedPermissionPolling(ctx);
+    logResolvedConfigPaths();
 
     if (event.reason === "reload") {
       writeDebugLog("lifecycle.reload", {
@@ -1568,6 +1582,7 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
     invalidateAgentStartCache();
     lastKnownActiveAgentName = getActiveAgentName(ctx);
     startForwardedPermissionPolling(ctx);
+    logResolvedConfigPaths();
   });
 
   pi.on("resources_discover", async (event, _ctx) => {
