@@ -213,8 +213,8 @@ function isPathOutsideWorkingDirectory(
   const normalizedPath = normalizePathForComparison(pathValue, cwd);
   return Boolean(
     normalizedCwd &&
-    normalizedPath &&
-    !isPathWithinDirectory(normalizedPath, normalizedCwd),
+      normalizedPath &&
+      !isPathWithinDirectory(normalizedPath, normalizedCwd),
   );
 }
 
@@ -720,9 +720,9 @@ function formatUnknownErrorMessage(error: unknown): string {
 function isErrnoCode(error: unknown, code: string): boolean {
   return Boolean(
     error &&
-    typeof error === "object" &&
-    "code" in error &&
-    (error as { code?: string }).code === code,
+      typeof error === "object" &&
+      "code" in error &&
+      (error as { code?: string }).code === code,
   );
 }
 
@@ -1579,16 +1579,6 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
         cwd: ctx.cwd,
       });
     }
-  });
-
-  pi.on("session_start", async (_event, ctx) => {
-    runtimeContext = ctx;
-    refreshExtensionConfig(ctx);
-    permissionManager = createPermissionManagerForCwd(ctx.cwd);
-    invalidateAgentStartCache();
-    lastKnownActiveAgentName = getActiveAgentName(ctx);
-    startForwardedPermissionPolling(ctx);
-    logResolvedConfigPaths();
   });
 
   pi.on("resources_discover", async (event, _ctx) => {
