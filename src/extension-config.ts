@@ -61,6 +61,23 @@ function createDefaultConfigContent(): string {
   return `${JSON.stringify(DEFAULT_EXTENSION_CONFIG, null, 2)}\n`;
 }
 
+const PERMISSION_POLICY_KEYS: ReadonlySet<string> = new Set([
+  "defaultPolicy",
+  "tools",
+  "bash",
+  "mcp",
+  "skills",
+  "special",
+  "external_directory",
+  "doom_loop",
+]);
+
+export function detectMisplacedPermissionKeys(
+  raw: Record<string, unknown>,
+): string[] {
+  return Object.keys(raw).filter((key) => PERMISSION_POLICY_KEYS.has(key));
+}
+
 export function normalizePermissionSystemConfig(
   raw: unknown,
 ): PermissionSystemExtensionConfig {
