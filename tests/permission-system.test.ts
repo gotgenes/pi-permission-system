@@ -338,6 +338,72 @@ test("Permission-system extension config normalizes invalid persisted values bac
   }
 });
 
+test("Permission-system extension config warns when permission-rule keys are placed in extension config.json", () => {
+  const baseDir = mkdtempSync(
+    join(tmpdir(), "pi-permission-system-config-misplaced-"),
+  );
+  const configPath = join(baseDir, "config.json");
+
+  try {
+    writeFileSync(
+      configPath,
+      `${JSON.stringify(
+        {
+          debugLog: false,
+          permissionReviewLog: true,
+          yoloMode: false,
+          defaultPolicy: { bash: "ask" },
+          tools: { read: "allow" },
+          bash: { "git status": "allow" },
+        },
+        null,
+        2,
+      )}\n`,
+      "utf8",
+    );
+
+    const result = loadPermissionSystemConfig(configPath);
+    assert.equal(result.created, false);
+    assert.deepEqual(result.config, DEFAULT_EXTENSION_CONFIG);
+    assert.notEqual(result.warning, undefined);
+    const warning = result.warning ?? "";
+    assert.match(warning, /'defaultPolicy'/);
+    assert.match(warning, /'tools'/);
+    assert.match(warning, /'bash'/);
+    assert.match(warning, /pi-permissions\.jsonc/);
+  } finally {
+    rmSync(baseDir, { recursive: true, force: true });
+  }
+});
+
+test("Permission-system extension config does not warn when only known keys are present", () => {
+  const baseDir = mkdtempSync(
+    join(tmpdir(), "pi-permission-system-config-clean-"),
+  );
+  const configPath = join(baseDir, "config.json");
+
+  try {
+    writeFileSync(
+      configPath,
+      `${JSON.stringify(
+        {
+          debugLog: true,
+          permissionReviewLog: true,
+          yoloMode: false,
+        },
+        null,
+        2,
+      )}\n`,
+      "utf8",
+    );
+
+    const result = loadPermissionSystemConfig(configPath);
+    assert.equal(result.warning, undefined);
+  } finally {
+    rmSync(baseDir, { recursive: true, force: true });
+  }
+});
+
 test("Permission-system extension config save persists normalized config", () => {
   const baseDir = mkdtempSync(
     join(tmpdir(), "pi-permission-system-config-save-"),
