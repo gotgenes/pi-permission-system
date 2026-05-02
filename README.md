@@ -475,7 +475,7 @@ This makes it easy to verify which files the extension actually loaded:
   "agentsDir": "/…/.pi/agent/agents",
   "agentsDirExists": true,
   "projectAgentsDir": "/…/my-project/.pi/agent/agents",
-  "projectAgentsDirExists": false
+  "projectAgentsDirExists": false,
 }
 ```
 
