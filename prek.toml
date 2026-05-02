@@ -1,0 +1,21 @@
+# Pre-commit hooks managed by prek (https://prek.j178.dev).
+# Install once: prek install
+# Skip in emergencies: git commit --no-verify
+#:schema https://www.schemastore.org/prek.json
+
+[[repos]]
+repo = "local"
+
+[[repos.hooks]]
+id = "biome"
+name = "biome check"
+language = "system"
+entry = "npx biome check --no-errors-on-unmatched"
+files = '\.([jt]sx?|json|jsonc)$'
+
+[[repos.hooks]]
+id = "markdownlint"
+name = "markdownlint"
+language = "system"
+entry = "npx markdownlint-cli2"
+files = '\.md$'

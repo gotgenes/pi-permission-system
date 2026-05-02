@@ -579,6 +579,19 @@ npm run test        # Run tests from ./tests
 npm run check       # build + lint:all + test
 ```
 
+### Pre-commit hooks
+
+This project uses [prek](https://prek.j178.dev/) to run Biome and markdownlint on staged files before each commit.
+This catches lint and formatting issues locally instead of waiting for CI.
+
+1. Install prek ([installation guide](https://prek.j178.dev/installation/)).
+2. Run `npm install` — the `prepare` script calls `prek install` automatically.
+   If prek is not installed, the script prints a warning and continues.
+3. Hooks run automatically on `git commit`.
+   To skip in emergencies: `git commit --no-verify`.
+
+The hook configuration lives in `prek.toml` at the repo root.
+
 ---
 
 ## Related Pi Extensions

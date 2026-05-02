@@ -18,6 +18,7 @@
     "LICENSE"
   ],
   "scripts": {
+    "prepare": "command -v prek >/dev/null 2>&1 && prek install || echo 'prek not found — skipping hook install (see README)'",
     "build": "tsc -p tsconfig.json",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
