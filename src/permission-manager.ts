@@ -1,4 +1,4 @@
-import { readFileSync, statSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { getAgentDir } from "@mariozechner/pi-coding-agent";
 
@@ -755,6 +755,38 @@ export class PermissionManager {
 
     this.resolvedPermissionsCache.set(cacheKey, { stamp, value });
     return value;
+  }
+
+  getResolvedConfigPaths(): {
+    globalConfigPath: string;
+    globalConfigExists: boolean;
+    projectGlobalConfigPath: string | null;
+    projectGlobalConfigExists: boolean;
+    agentsDir: string;
+    agentsDirExists: boolean;
+    projectAgentsDir: string | null;
+    projectAgentsDirExists: boolean;
+    legacyGlobalSettingsPath: string;
+    legacyGlobalSettingsExists: boolean;
+    globalMcpConfigPath: string;
+    globalMcpConfigExists: boolean;
+  } {
+    const exists = (path: string | null): boolean =>
+      path !== null && existsSync(path);
+    return {
+      globalConfigPath: this.globalConfigPath,
+      globalConfigExists: exists(this.globalConfigPath),
+      projectGlobalConfigPath: this.projectGlobalConfigPath,
+      projectGlobalConfigExists: exists(this.projectGlobalConfigPath),
+      agentsDir: this.agentsDir,
+      agentsDirExists: exists(this.agentsDir),
+      projectAgentsDir: this.projectAgentsDir,
+      projectAgentsDirExists: exists(this.projectAgentsDir),
+      legacyGlobalSettingsPath: this.legacyGlobalSettingsPath,
+      legacyGlobalSettingsExists: exists(this.legacyGlobalSettingsPath),
+      globalMcpConfigPath: this.globalMcpConfigPath,
+      globalMcpConfigExists: exists(this.globalMcpConfigPath),
+    };
   }
 
   getBashPermissions(agentName?: string): BashPermissions {

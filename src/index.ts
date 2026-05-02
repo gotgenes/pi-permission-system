@@ -1544,6 +1544,17 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
     return toolPermission !== "deny";
   };
 
+  const reportResolvedConfigPaths = (cwd: string | null | undefined): void => {
+    const paths = permissionManager.getResolvedConfigPaths();
+    const details: Record<string, unknown> = {
+      cwd: cwd ?? null,
+      extensionConfigPath: getPermissionSystemConfigPath(),
+      ...paths,
+    };
+    writeReviewLog("config.resolved", details);
+    writeDebugLog("config.resolved", details);
+  };
+
   pi.on("session_start", async (event, ctx) => {
     runtimeContext = ctx;
     refreshExtensionConfig(ctx);
@@ -1551,6 +1562,7 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
     invalidateAgentStartCache();
     lastKnownActiveAgentName = getActiveAgentName(ctx);
     startForwardedPermissionPolling(ctx);
+    reportResolvedConfigPaths(ctx.cwd);
 
     if (event.reason === "reload") {
       writeDebugLog("lifecycle.reload", {
@@ -1568,6 +1580,7 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
     invalidateAgentStartCache();
     lastKnownActiveAgentName = getActiveAgentName(ctx);
     startForwardedPermissionPolling(ctx);
+    reportResolvedConfigPaths(ctx.cwd);
   });
 
   pi.on("resources_discover", async (event, _ctx) => {
