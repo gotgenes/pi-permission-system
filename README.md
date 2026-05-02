@@ -460,12 +460,32 @@ Actual global logs directory: $PI_CODING_AGENT_DIR/extensions/pi-permission-syst
 - `pi-permission-system-permission-review.jsonl` — enabled by default for permission review/audit history, including bounded `toolInputPreview` values for non-bash/non-MCP tool calls
 - `pi-permission-system-debug.jsonl` — disabled by default and intended for troubleshooting
 
+On every session start, the extension emits a `config.resolved` entry to both logs listing the resolved config paths and whether each exists.
+This makes it easy to verify which files the extension actually loaded:
+
+```jsonc
+{
+  "event": "config.resolved",
+  "extensionConfigPath": "/…/pi-permission-system/config.json",
+  "extensionConfigExists": true,
+  "globalConfigPath": "/…/.pi/agent/pi-permissions.jsonc",
+  "globalConfigExists": false,
+  "projectConfigPath": "/…/my-project/.pi/agent/pi-permissions.jsonc",
+  "projectConfigExists": true,
+  "agentsDir": "/…/.pi/agent/agents",
+  "agentsDirExists": true,
+  "projectAgentsDir": "/…/my-project/.pi/agent/agents",
+  "projectAgentsDirExists": false
+}
+```
+
 ### Architecture
 
 ```text
 index.ts                    → Root Pi entrypoint shim
 src/
 ├── index.ts                → Extension bootstrap, permission checks, readable prompts, review logging, reload handling, and subagent forwarding
+├── config-reporter.ts      → Resolved config path reporting for diagnostic logs
 ├── extension-config.ts     → Extension-local config loading and default creation
 ├── logging.ts              → File-only debug/review logging helpers
 ├── permission-manager.ts   → Global/project policy loading, merging, and resolution with caching
