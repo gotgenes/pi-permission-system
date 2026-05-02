@@ -1788,6 +1788,61 @@ test("PermissionManager reads config from PI_CODING_AGENT_DIR when set", () => {
   }
 });
 
+test("PermissionManager.getResolvedConfigPaths reports each resolved path and whether it exists", () => {
+  const baseDir = mkdtempSync(
+    join(tmpdir(), "pi-permission-system-resolved-paths-"),
+  );
+  const projectRoot = join(baseDir, "project", ".pi", "agent");
+  const agentsDir = join(baseDir, "agents");
+  const projectAgentsDir = join(projectRoot, "agents");
+  const globalConfigPath = join(baseDir, "pi-permissions.jsonc");
+  const projectConfigPath = join(projectRoot, "pi-permissions.jsonc");
+  const legacyPath = join(baseDir, "settings.json");
+  const mcpPath = join(baseDir, "mcp.json");
+
+  mkdirSync(agentsDir, { recursive: true });
+  mkdirSync(projectAgentsDir, { recursive: true });
+  writeFileSync(globalConfigPath, "{}", "utf8");
+  // Intentionally do not create the project config file or legacy/mcp files
+  // so the existence flags are mixed.
+
+  try {
+    const manager = new PermissionManager({
+      globalConfigPath,
+      agentsDir,
+      projectGlobalConfigPath: projectConfigPath,
+      projectAgentsDir,
+      legacyGlobalSettingsPath: legacyPath,
+      globalMcpConfigPath: mcpPath,
+    });
+
+    const paths = manager.getResolvedConfigPaths();
+    assert.equal(paths.globalConfigPath, globalConfigPath);
+    assert.equal(paths.globalConfigExists, true);
+    assert.equal(paths.projectGlobalConfigPath, projectConfigPath);
+    assert.equal(paths.projectGlobalConfigExists, false);
+    assert.equal(paths.agentsDir, agentsDir);
+    assert.equal(paths.agentsDirExists, true);
+    assert.equal(paths.projectAgentsDir, projectAgentsDir);
+    assert.equal(paths.projectAgentsDirExists, true);
+    assert.equal(paths.legacyGlobalSettingsPath, legacyPath);
+    assert.equal(paths.legacyGlobalSettingsExists, false);
+    assert.equal(paths.globalMcpConfigPath, mcpPath);
+    assert.equal(paths.globalMcpConfigExists, false);
+  } finally {
+    rmSync(baseDir, { recursive: true, force: true });
+  }
+});
+
+test("PermissionManager.getResolvedConfigPaths reports null project paths when none provided", () => {
+  const manager = new PermissionManager();
+  const paths = manager.getResolvedConfigPaths();
+  assert.equal(paths.projectGlobalConfigPath, null);
+  assert.equal(paths.projectGlobalConfigExists, false);
+  assert.equal(paths.projectAgentsDir, null);
+  assert.equal(paths.projectAgentsDirExists, false);
+});
+
 // ---------------------------------------------------------------------------
 // Skill prompt sanitization - multi-block regression tests
 // ---------------------------------------------------------------------------
