@@ -1,21 +1,24 @@
-# Pre-commit hooks managed by prek (https://prek.j178.dev).
-# Install once: prek install
-# Skip in emergencies: git commit --no-verify
+# Configuration file for `prek`, a git hook framework written in Rust.
+# See https://prek.j178.dev for more information.
 #:schema https://www.schemastore.org/prek.json
 
 [[repos]]
+repo = "builtin"
+hooks = [
+    { id = "trailing-whitespace" },
+    { id = "end-of-file-fixer" },
+    { id = "check-added-large-files" },
+]
+
+[[repos]]
 repo = "local"
+hooks = [
+    { id = "biome", name = "biome", entry = "npx biome check --write --files-ignore-unknown=true", language = "system", types_or = ["javascript", "jsx", "ts", "tsx", "json"] },
+]
 
-[[repos.hooks]]
-id = "biome"
-name = "biome check"
-language = "system"
-entry = "npx biome check --no-errors-on-unmatched"
-files = '\.([jt]sx?|json|jsonc)$'
-
-[[repos.hooks]]
-id = "markdownlint"
-name = "markdownlint"
-language = "system"
-entry = "npx markdownlint-cli2"
-files = '\.md$'
+[[repos]]
+repo = "https://github.com/DavidAnson/markdownlint-cli2"
+rev = "v0.22.1"
+hooks = [
+    { id = "markdownlint-cli2", args = ["--fix"] },
+]
