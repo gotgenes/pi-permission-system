@@ -213,8 +213,8 @@ function isPathOutsideWorkingDirectory(
   const normalizedPath = normalizePathForComparison(pathValue, cwd);
   return Boolean(
     normalizedCwd &&
-      normalizedPath &&
-      !isPathWithinDirectory(normalizedPath, normalizedCwd),
+    normalizedPath &&
+    !isPathWithinDirectory(normalizedPath, normalizedCwd),
   );
 }
 
@@ -720,9 +720,9 @@ function formatUnknownErrorMessage(error: unknown): string {
 function isErrnoCode(error: unknown, code: string): boolean {
   return Boolean(
     error &&
-      typeof error === "object" &&
-      "code" in error &&
-      (error as { code?: string }).code === code,
+    typeof error === "object" &&
+    "code" in error &&
+    (error as { code?: string }).code === code,
   );
 }
 
