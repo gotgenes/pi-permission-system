@@ -123,10 +123,27 @@ export function loadPermissionSystemConfig(
     const raw = readFileSync(configPath, "utf-8");
     const parsed = JSON.parse(raw) as unknown;
     const config = normalizePermissionSystemConfig(parsed);
+    const misplacedKeys = detectMisplacedPermissionKeys(
+      toRecord(parsed),
+    );
+
+    const warnings: string[] = [];
+    if (ensureResult.warning) {
+      warnings.push(ensureResult.warning);
+    }
+    if (misplacedKeys.length > 0) {
+      warnings.push(
+        `config.json contains permission-rule keys that are ignored here: ${misplacedKeys.join(", ")}.\n` +
+          "Permission rules belong in ~/.pi/agent/pi-permissions.jsonc, " +
+          "<project>/.pi/agent/pi-permissions.jsonc, or per-agent frontmatter.\n" +
+          "See config/config.example.json for the keys config.json supports.",
+      );
+    }
+
     return {
       config,
       created: ensureResult.created,
-      warning: ensureResult.warning,
+      warning: warnings.length > 0 ? warnings.join("\n") : undefined,
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
