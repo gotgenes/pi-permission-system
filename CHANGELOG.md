@@ -5,6 +5,76 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0](https://github.com/gotgenes/pi-permission-system/compare/v0.4.6...v0.5.0) (2026-05-02)
+
+
+### Features
+
+* add extension config, logging system, and permission request events ([6252d9e](https://github.com/gotgenes/pi-permission-system/commit/6252d9e44ae0611dd399208f66da685dec5d4dbf))
+* add getToolPermission for tool-level permission checks ([fe3ab17](https://github.com/gotgenes/pi-permission-system/commit/fe3ab179501ef57e2786dc6815ec2255eba77bc5))
+* add guidelines sanitization to system prompt sanitizer ([5689e4a](https://github.com/gotgenes/pi-permission-system/commit/5689e4a3bb028517b09ba4f1d2999936316acb33))
+* add yolo mode and permission forwarding ([b36e113](https://github.com/gotgenes/pi-permission-system/commit/b36e113266669b30065ccc45fcc9ed3a37ebf18d))
+* **caching:** add before-agent-start cache for active tools and prompt state ([b0f1c85](https://github.com/gotgenes/pi-permission-system/commit/b0f1c85e35f61cb1b05a2ab3f92a670fdfc45f02))
+* detect misplaced permission keys in config.json ([#4](https://github.com/gotgenes/pi-permission-system/issues/4)) ([5be5eda](https://github.com/gotgenes/pi-permission-system/commit/5be5eda17a473b8cd3ed0fecc4d166a8339fae7b))
+* loadPermissionSystemConfig warns on misplaced permission keys ([#4](https://github.com/gotgenes/pi-permission-system/issues/4)) ([4f0e173](https://github.com/gotgenes/pi-permission-system/commit/4f0e173e62037fef57fe724fd21f3327213f4570))
+* **permission-system:** expose tool input params in logs and ask prompts ([e334964](https://github.com/gotgenes/pi-permission-system/commit/e334964a9a673d17acb29c8e6d82c539827aca6a))
+* **permission:** add layered policy reload handling ([ad0a4da](https://github.com/gotgenes/pi-permission-system/commit/ad0a4dac4fc274736e8f20ad08145316b30d61cb))
+* **permission:** add state and denial reason to permission prompts ([d499b94](https://github.com/gotgenes/pi-permission-system/commit/d499b94985b396006598b7011877cc9885efefd3))
+* **permission:** forward subagent approval requests ([bb9086e](https://github.com/gotgenes/pi-permission-system/commit/bb9086e0e1b99a665fc5ddbcc1665f6421e8ccf7))
+* **permission:** log sanitized tool input previews ([192b66c](https://github.com/gotgenes/pi-permission-system/commit/192b66ce7720a20d63910bdfc95f075130a43773))
+* **special:** enforce external_directory CWD boundary in tool_call handler ([6c59781](https://github.com/gotgenes/pi-permission-system/commit/6c59781a6d69e33eb297ecfb60e6d5b21c3f88b6))
+* **status:** add permission system status sync for yolo mode ([0b77943](https://github.com/gotgenes/pi-permission-system/commit/0b77943adbc8a87de2161fd8037d2d80505fbfd1))
+
+
+### Bug Fixes
+
+* **events:** listen on session_start instead of nonexistent session_switch ([2bbbaba](https://github.com/gotgenes/pi-permission-system/commit/2bbbaba9d0b31fe08c19e0819f11b4c1c705aa97))
+* **package:** stop publishing config.json ([af1b531](https://github.com/gotgenes/pi-permission-system/commit/af1b5311112046f32e153332bb8e0fb996b6882e))
+* **permission:** add model option compatibility guard ([d9dd506](https://github.com/gotgenes/pi-permission-system/commit/d9dd5063edd1c6a7410105a92c6c45fa9c195699))
+* **permission:** harden prompt and external directory enforcement ([48c3af1](https://github.com/gotgenes/pi-permission-system/commit/48c3af165a6f2c1a4c689c436d8c6c4112ec6aae))
+* **permission:** summarize file tool approval prompts ([3775894](https://github.com/gotgenes/pi-permission-system/commit/3775894f23756ad0ed06ae17961d547b0cb5bc47))
+* **prompt:** remove denied tools from available tools section ([f22bccc](https://github.com/gotgenes/pi-permission-system/commit/f22bcccdca7f9ce9df066973e4735cd2e0427280))
+
+
+### Documentation
+
+* add AGENTS.md and .pi/prompts workflow templates ([bebc197](https://github.com/gotgenes/pi-permission-system/commit/bebc197f59ada2dfff24f6fc1ef3cf46b2415675))
+* add readme and changelog ([07e29c5](https://github.com/gotgenes/pi-permission-system/commit/07e29c57a9fcb7731ec62531e7c9f1ef5883c0d1))
+* add Related Pi Extensions cross-linking section ([facdf3f](https://github.com/gotgenes/pi-permission-system/commit/facdf3fda8a5ec2486a818ada2836ef7be039f40))
+* clarify config.json vs permission-policy file ([#4](https://github.com/gotgenes/pi-permission-system/issues/4)) ([464e1d1](https://github.com/gotgenes/pi-permission-system/commit/464e1d19b637807bb754d95397db9cf59d446673))
+* fix recipe ordering and clarify last-match-wins precedence ([70427f6](https://github.com/gotgenes/pi-permission-system/commit/70427f662b16b655fd23867c6960cfae0923b821))
+* plan warn on misplaced permission keys in config.json ([#4](https://github.com/gotgenes/pi-permission-system/issues/4)) ([ffcef67](https://github.com/gotgenes/pi-permission-system/commit/ffcef6787b7ac1bb44acc958266eed9e1b5fbf9a))
+* **release:** finalize 0.4.2 notes ([ea1c587](https://github.com/gotgenes/pi-permission-system/commit/ea1c58761e468dade823b3618e43b8909b6c4aee))
+* **release:** prepare 0.4.3 notes ([73a255c](https://github.com/gotgenes/pi-permission-system/commit/73a255c991c7a14d10711f99973991a68ab50c1b))
+* **release:** prepare 0.4.4 notes ([78f5c48](https://github.com/gotgenes/pi-permission-system/commit/78f5c48aab6a94c7bb7356af4db1798340522848))
+* **release:** prepare v0.4.5 ([e5a713b](https://github.com/gotgenes/pi-permission-system/commit/e5a713b0e3a0149e2728b81c4ca85188ebe668eb))
+* **release:** update CHANGELOG for 0.4.2 ([47084d6](https://github.com/gotgenes/pi-permission-system/commit/47084d6af8fb4b515dad4519c3487f9f6b11d287))
+* update README for [@gotgenes](https://github.com/gotgenes) fork ([f6ff1dd](https://github.com/gotgenes/pi-permission-system/commit/f6ff1dd687e73722e3a1cc8b1f457e6dcc2227ff))
+
+
+### Miscellaneous Chores
+
+* add biome and markdownlint-cli2 tooling ([3140f32](https://github.com/gotgenes/pi-permission-system/commit/3140f32c4bc4be13f06e1ec337ce525317f565bf))
+* add license, ignores, and assets ([f59ce79](https://github.com/gotgenes/pi-permission-system/commit/f59ce79a6a3c9b48994b9c4a15e5e81d853a7b2b))
+* align npm keywords for discoverability ([fabbb4d](https://github.com/gotgenes/pi-permission-system/commit/fabbb4d024d41ac4c4d01e9218d0d4cc8538ae6b))
+* bootstrap extension project ([4b3e7d5](https://github.com/gotgenes/pi-permission-system/commit/4b3e7d51c5b94ec580bd06943c427a5272ad2be2))
+* bump version to 0.2.0 ([4df5864](https://github.com/gotgenes/pi-permission-system/commit/4df5864414cb5a252eb757b060034ca86e5c96eb))
+* **deps:** update pi peer dependencies ([bf3d7e6](https://github.com/gotgenes/pi-permission-system/commit/bf3d7e6f3610ab69f2988a6748af5c6a6a1193eb))
+* exclude docs folder from version control ([3fa6a49](https://github.com/gotgenes/pi-permission-system/commit/3fa6a496f4c28e65bbcb6787a3e9b5c636706ed3))
+* pin typescript as devDependency ([2ff692f](https://github.com/gotgenes/pi-permission-system/commit/2ff692f36a1061df222364ebe4f44465423d7586))
+* release v0.3.0 ([36a3d7e](https://github.com/gotgenes/pi-permission-system/commit/36a3d7ee2794b9350bdac5de029d9f074a2c63ad))
+* release v0.4.1 ([da22e18](https://github.com/gotgenes/pi-permission-system/commit/da22e1879aaf0bf5d0673eefddd9df29f7f4e256))
+* **release:** cut v0.1.1 ([5d8739b](https://github.com/gotgenes/pi-permission-system/commit/5d8739ba5ceabcbd940ebb61b8ffbbf05a962579))
+* **release:** cut v0.1.2 ([f4f0fe7](https://github.com/gotgenes/pi-permission-system/commit/f4f0fe769f274d3cd1355015620b5636d934095f))
+* **release:** cut v0.1.3 ([88667f2](https://github.com/gotgenes/pi-permission-system/commit/88667f2aa9c1c8de84ad6a9b798635b155a90b65))
+* **release:** cut v0.1.4 ([6c9804b](https://github.com/gotgenes/pi-permission-system/commit/6c9804b4434681248edfde07cff75d32e50240c6))
+* **release:** cut v0.1.5 ([cdaca30](https://github.com/gotgenes/pi-permission-system/commit/cdaca303c1e49bcbe542037204ed77e98f78d02e))
+* **release:** cut v0.1.6 ([644660e](https://github.com/gotgenes/pi-permission-system/commit/644660e37e287b0121c7b5433095e536cd46ee92))
+* **release:** cut v0.1.7 ([1e73124](https://github.com/gotgenes/pi-permission-system/commit/1e731249bc2fdaf5f2e37efdaa1fa58475cd75f9))
+* **release:** cut v0.1.8 ([164a6e3](https://github.com/gotgenes/pi-permission-system/commit/164a6e3434a19b817725edb3ec9db9dd51856393))
+* rename package and update metadata for [@gotgenes](https://github.com/gotgenes) fork ([cd9bc5f](https://github.com/gotgenes/pi-permission-system/commit/cd9bc5f4844210f6a547ce99a8efdef985be8c7f))
+* **types:** replace types-shims.d.ts with real type packages ([3809612](https://github.com/gotgenes/pi-permission-system/commit/380961271ae5bc0f4e68becb42e00335e5e5c1c4))
+
 ## [Unreleased]
 
 ## [0.4.6] - 2026-04-28
