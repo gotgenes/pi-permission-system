@@ -123,9 +123,7 @@ export function loadPermissionSystemConfig(
     const raw = readFileSync(configPath, "utf-8");
     const parsed = JSON.parse(raw) as unknown;
     const config = normalizePermissionSystemConfig(parsed);
-    const misplacedKeys = detectMisplacedPermissionKeys(
-      toRecord(parsed),
-    );
+    const misplacedKeys = detectMisplacedPermissionKeys(toRecord(parsed));
 
     const warnings: string[] = [];
     if (ensureResult.warning) {

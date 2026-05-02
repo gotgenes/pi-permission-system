@@ -1,8 +1,7 @@
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { mkdtempSync, rmSync } from "node:fs";
-import { tmpdir } from "node:os";
 
 import {
   detectMisplacedPermissionKeys,
@@ -81,7 +80,11 @@ describe("loadPermissionSystemConfig", () => {
   it("returns no warning for a clean config", () => {
     writeFileSync(
       configPath,
-      JSON.stringify({ debugLog: false, permissionReviewLog: true, yoloMode: false }),
+      JSON.stringify({
+        debugLog: false,
+        permissionReviewLog: true,
+        yoloMode: false,
+      }),
     );
     const result = loadPermissionSystemConfig(configPath);
     expect(result.warning).toBeUndefined();
