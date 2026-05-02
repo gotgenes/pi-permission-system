@@ -121,6 +121,9 @@ The extension creates this file automatically when it is missing. It controls on
 
 Both logs write to files only under the extension directory. No debug output is printed to the terminal.
 
+> **Note:** Permission-rule keys (`defaultPolicy`, `tools`, `bash`, `mcp`, `skills`, `special`, `external_directory`, `doom_loop`) placed in `config.json` are silently ignored — they belong in the policy file below.
+> The extension warns at startup when it detects misplaced keys.
+
 ### Global Policy File
 
 **Location:** global Pi policy file (default: `~/.pi/agent/pi-permissions.jsonc`, respects `PI_CODING_AGENT_DIR`)
