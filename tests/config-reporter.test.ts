@@ -11,8 +11,8 @@ import { join } from "node:path";
 import { test } from "vitest";
 import { buildResolvedConfigLogEntry } from "../src/config-reporter.js";
 import { createPermissionSystemLogger } from "../src/logging.js";
-import { PermissionManager } from "../src/permission-manager.js";
 import type { ResolvedPolicyPaths } from "../src/permission-manager.js";
+import { PermissionManager } from "../src/permission-manager.js";
 
 test("buildResolvedConfigLogEntry merges extension config path with policy paths", () => {
   const policyPaths: ResolvedPolicyPaths = {
@@ -32,11 +32,20 @@ test("buildResolvedConfigLogEntry merges extension config path with policy paths
     policyPaths,
   );
 
-  assert.equal(result.extensionConfigPath, "/ext/pi-permission-system/config.json");
+  assert.equal(
+    result.extensionConfigPath,
+    "/ext/pi-permission-system/config.json",
+  );
   assert.equal(result.extensionConfigExists, true);
-  assert.equal(result.globalConfigPath, "/home/user/.pi/agent/pi-permissions.jsonc");
+  assert.equal(
+    result.globalConfigPath,
+    "/home/user/.pi/agent/pi-permissions.jsonc",
+  );
   assert.equal(result.globalConfigExists, true);
-  assert.equal(result.projectConfigPath, "/projects/my-app/.pi/agent/pi-permissions.jsonc");
+  assert.equal(
+    result.projectConfigPath,
+    "/projects/my-app/.pi/agent/pi-permissions.jsonc",
+  );
   assert.equal(result.projectConfigExists, false);
   assert.equal(result.agentsDir, "/home/user/.pi/agent/agents");
   assert.equal(result.agentsDirExists, true);
@@ -105,7 +114,10 @@ test("config.resolved entry appears in review log via logger", () => {
       true,
       policyPaths,
     );
-    logger.review("config.resolved", entry as unknown as Record<string, unknown>);
+    logger.review(
+      "config.resolved",
+      entry as unknown as Record<string, unknown>,
+    );
 
     const logContent = readFileSync(reviewLogPath, "utf-8").trim();
     const parsed = JSON.parse(logContent) as Record<string, unknown>;

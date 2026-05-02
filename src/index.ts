@@ -23,8 +23,8 @@ import {
   shouldApplyCachedAgentStartState,
 } from "./before-agent-start-cache.js";
 import { getNonEmptyString, toRecord } from "./common.js";
-import { buildResolvedConfigLogEntry } from "./config-reporter.js";
 import { registerPermissionSystemCommand } from "./config-modal.js";
+import { buildResolvedConfigLogEntry } from "./config-reporter.js";
 import {
   CONFIG_PATH,
   DEFAULT_EXTENSION_CONFIG,
@@ -1553,8 +1553,14 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
       existsSync(CONFIG_PATH),
       policyPaths,
     );
-    writeReviewLog("config.resolved", entry as unknown as Record<string, unknown>);
-    writeDebugLog("config.resolved", entry as unknown as Record<string, unknown>);
+    writeReviewLog(
+      "config.resolved",
+      entry as unknown as Record<string, unknown>,
+    );
+    writeDebugLog(
+      "config.resolved",
+      entry as unknown as Record<string, unknown>,
+    );
   };
 
   pi.on("session_start", async (event, ctx) => {
