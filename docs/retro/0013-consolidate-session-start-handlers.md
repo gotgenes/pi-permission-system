@@ -3,7 +3,7 @@ issue: 13
 issue_title: "Consolidate duplicate session_start handlers in index.ts"
 ---
 
-# Retro: #13 — Consolidate duplicate session\_start handlers in index.ts
+# Retro: #13 — Consolidate duplicate session_start handlers in index.ts
 
 ## Final Retrospective (2026-05-02T18:45:00Z)
 

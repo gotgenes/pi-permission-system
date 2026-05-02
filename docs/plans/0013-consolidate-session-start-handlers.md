@@ -3,7 +3,7 @@ issue: 13
 issue_title: "Consolidate duplicate session_start handlers in index.ts"
 ---
 
-# Consolidate duplicate session\_start handlers
+# Consolidate duplicate session_start handlers
 
 ## Problem Statement
 
@@ -64,10 +64,10 @@ No types, schemas, or config surfaces change.
 
 ## Module-Level Changes
 
-| File | Change |
-| --- | --- |
-| `src/index.ts` | Remove the second `session_start` handler (currently lines ~1584–1592). |
-| `AGENTS.md` | Remove the "Runtime Caveats" section that documents the dual-handler workaround. |
+| File           | Change                                                                           |
+| -------------- | -------------------------------------------------------------------------------- |
+| `src/index.ts` | Remove the second `session_start` handler (currently lines ~1584–1592).          |
+| `AGENTS.md`    | Remove the "Runtime Caveats" section that documents the dual-handler workaround. |
 
 ## TDD Order
 
@@ -83,11 +83,11 @@ No types, schemas, or config surfaces change.
 
 ## Risks and Mitigations
 
-| Risk | Mitigation |
-| --- | --- |
-| Could this silently weaken a permission? | No — no permission decisions are made in the `session_start` handler; it only initialises the `PermissionManager` and caches. Running setup once is strictly more correct than running it twice. |
-| Removing the wrong handler loses the reload log | The plan explicitly keeps handler 1 (which contains the reload branch) and deletes handler 2 (which is a strict subset). Review the diff to confirm. |
-| Future contributors re-introduce a second handler | The `AGENTS.md` caveat removal eliminates the "keep both in sync" instruction, so there is no longer guidance that implies two handlers are expected. |
+| Risk                                              | Mitigation                                                                                                                                                                                       |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Could this silently weaken a permission?          | No — no permission decisions are made in the `session_start` handler; it only initialises the `PermissionManager` and caches. Running setup once is strictly more correct than running it twice. |
+| Removing the wrong handler loses the reload log   | The plan explicitly keeps handler 1 (which contains the reload branch) and deletes handler 2 (which is a strict subset). Review the diff to confirm.                                             |
+| Future contributors re-introduce a second handler | The `AGENTS.md` caveat removal eliminates the "keep both in sync" instruction, so there is no longer guidance that implies two handlers are expected.                                            |
 
 ## Open Questions
 
