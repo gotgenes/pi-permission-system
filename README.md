@@ -183,7 +183,7 @@ Project-local files use the same formats as the global policy file and global ag
 3. Global agent frontmatter
 4. Project agent frontmatter
 
-Later layers override earlier layers within the same permission category. For wildcard-based sections like `bash`, `mcp`, `skills`, and `special`, matching still follows the extension's existing **last matching rule wins** behavior after the layers are combined.
+Later layers override earlier layers within the same permission category. For wildcard-based sections like `bash`, `mcp`, `skills`, and `special`, matching still follows the extension's existing **last matching rule wins** behavior after the layers are combined. The recommended convention — also used by [OpenCode's permission model](https://opencode.ai/docs/permissions/#granular-rules-object-syntax) — is to put the broad catch-all rule first and specific overrides after it.
 
 ---
 
@@ -238,7 +238,7 @@ Unknown or absent tools are not required in the config. If another extension is 
 
 ### `bash`
 
-Command patterns use `*` wildcards and match against the full command string. If multiple patterns match, the **last matching rule wins**.
+Command patterns use `*` wildcards and match against the full command string. If multiple patterns match, the **last matching rule wins**, so put broad fallback rules first and specific overrides after them.
 
 ```jsonc
 {
@@ -376,10 +376,10 @@ Reserved permission checks:
     "special": "ask",
   },
   "bash": {
+    "git *": "ask",
     "git status": "allow",
     "git diff": "allow",
     "git log *": "allow",
-    "git *": "ask",
   },
 }
 ```
@@ -396,11 +396,11 @@ Reserved permission checks:
     "special": "ask",
   },
   "mcp": {
+    "*": "ask",
     "mcp_status": "allow",
     "mcp_list": "allow",
     "mcp_search": "allow",
     "mcp_describe": "allow",
-    "*": "ask",
   },
 }
 ```
@@ -489,7 +489,7 @@ The extension uses a modular architecture with shared utilities:
 | Module                      | Purpose                                                                                                                      |
 | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | `common.ts`                 | Shared utilities: `toRecord()`, `getNonEmptyString()`, `isPermissionState()`, `parseSimpleYamlMap()`, `extractFrontmatter()` |
-| `wildcard-matcher.ts`       | Compile-once wildcard patterns with specificity sorting: `compileWildcardPatterns()`, `findCompiledWildcardMatch()`          |
+| `wildcard-matcher.ts`       | Compile-once wildcard patterns with last-match-wins evaluation: `compileWildcardPatterns()`, `findCompiledWildcardMatch()`   |
 | `permission-manager.ts`     | Policy resolution with file stamp caching for performance                                                                    |
 | `bash-filter.ts`            | Uses shared wildcard matcher for bash command patterns                                                                       |
 | `skill-prompt-sanitizer.ts` | Parses all available skill prompt blocks, removes denied skills, and tracks visible skill paths for read protection          |
