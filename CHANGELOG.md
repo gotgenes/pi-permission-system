@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0](https://github.com/gotgenes/pi-permission-system/compare/v0.5.0...v0.6.0) (2026-05-02)
+
+
+### Features
+
+* add getResolvedPolicyPaths to PermissionManager ([#6](https://github.com/gotgenes/pi-permission-system/issues/6)) ([663b892](https://github.com/gotgenes/pi-permission-system/commit/663b892fbcaa092c9ac139283ed2e7bdd7e42b43))
+* emit config.resolved review-log entry at startup ([#6](https://github.com/gotgenes/pi-permission-system/issues/6)) ([6968171](https://github.com/gotgenes/pi-permission-system/commit/6968171aca2e86c60a104c09df7d58d5bb1e59aa))
+
+
+### Documentation
+
+* document config.resolved diagnostic log entry ([#6](https://github.com/gotgenes/pi-permission-system/issues/6)) ([332fe41](https://github.com/gotgenes/pi-permission-system/commit/332fe413457a6913021ffc4cb8d6e80a7cd7fff2))
+* plan config.resolved diagnostic log entry ([#6](https://github.com/gotgenes/pi-permission-system/issues/6)) ([8d51ff3](https://github.com/gotgenes/pi-permission-system/commit/8d51ff3a4464866ba9604e3bd6b52ab9bfb8f258))
+
 ## [0.5.0](https://github.com/gotgenes/pi-permission-system/compare/v0.4.6...v0.5.0) (2026-05-02)
 
 
