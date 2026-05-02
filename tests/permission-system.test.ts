@@ -2292,3 +2292,65 @@ test("generic ask prompts include serialized tool input for informed approval", 
     await harness.cleanup();
   }
 });
+
+test("getResolvedPolicyPaths returns correct paths and existence when files exist", () => {
+  const tempDir = mkdtempSync(join(tmpdir(), "policy-paths-exist-"));
+  try {
+    const globalConfigPath = join(tempDir, "pi-permissions.jsonc");
+    const agentsDir = join(tempDir, "agents");
+    const projectConfigPath = join(tempDir, "project", "pi-permissions.jsonc");
+    const projectAgentsDir = join(tempDir, "project", "agents");
+
+    writeFileSync(globalConfigPath, "{}", "utf-8");
+    mkdirSync(agentsDir, { recursive: true });
+    mkdirSync(join(tempDir, "project"), { recursive: true });
+    writeFileSync(projectConfigPath, "{}", "utf-8");
+    mkdirSync(projectAgentsDir, { recursive: true });
+
+    const pm = new PermissionManager({
+      globalConfigPath,
+      agentsDir,
+      projectGlobalConfigPath: projectConfigPath,
+      projectAgentsDir,
+    });
+
+    const result = pm.getResolvedPolicyPaths();
+
+    assert.equal(result.globalConfigPath, globalConfigPath);
+    assert.equal(result.globalConfigExists, true);
+    assert.equal(result.projectConfigPath, projectConfigPath);
+    assert.equal(result.projectConfigExists, true);
+    assert.equal(result.agentsDir, agentsDir);
+    assert.equal(result.agentsDirExists, true);
+    assert.equal(result.projectAgentsDir, projectAgentsDir);
+    assert.equal(result.projectAgentsDirExists, true);
+  } finally {
+    rmSync(tempDir, { recursive: true, force: true });
+  }
+});
+
+test("getResolvedPolicyPaths returns false for missing files and null for absent project paths", () => {
+  const tempDir = mkdtempSync(join(tmpdir(), "policy-paths-missing-"));
+  try {
+    const globalConfigPath = join(tempDir, "does-not-exist.jsonc");
+    const agentsDir = join(tempDir, "no-agents");
+
+    const pm = new PermissionManager({
+      globalConfigPath,
+      agentsDir,
+    });
+
+    const result = pm.getResolvedPolicyPaths();
+
+    assert.equal(result.globalConfigPath, globalConfigPath);
+    assert.equal(result.globalConfigExists, false);
+    assert.equal(result.projectConfigPath, null);
+    assert.equal(result.projectConfigExists, false);
+    assert.equal(result.agentsDir, agentsDir);
+    assert.equal(result.agentsDirExists, false);
+    assert.equal(result.projectAgentsDir, null);
+    assert.equal(result.projectAgentsDirExists, false);
+  } finally {
+    rmSync(tempDir, { recursive: true, force: true });
+  }
+});

@@ -1,4 +1,4 @@
-import { readFileSync, statSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { getAgentDir } from "@mariozechner/pi-coding-agent";
 
@@ -417,6 +417,17 @@ function createMcpPermissionTargets(
 type CompiledPermissionPatterns =
   readonly CompiledWildcardPattern<PermissionState>[];
 
+export interface ResolvedPolicyPaths {
+  globalConfigPath: string;
+  globalConfigExists: boolean;
+  projectConfigPath: string | null;
+  projectConfigExists: boolean;
+  agentsDir: string;
+  agentsDirExists: boolean;
+  projectAgentsDir: string | null;
+  projectAgentsDirExists: boolean;
+}
+
 type ResolvedPermissions = {
   globalConfig: GlobalPermissionConfig;
   agentConfig: AgentPermissions;
@@ -673,6 +684,23 @@ export class PermissionManager {
         ...(globalConfig.special || {}),
         ...(agentConfig.special || {}),
       },
+    };
+  }
+
+  getResolvedPolicyPaths(): ResolvedPolicyPaths {
+    return {
+      globalConfigPath: this.globalConfigPath,
+      globalConfigExists: existsSync(this.globalConfigPath),
+      projectConfigPath: this.projectGlobalConfigPath,
+      projectConfigExists: this.projectGlobalConfigPath
+        ? existsSync(this.projectGlobalConfigPath)
+        : false,
+      agentsDir: this.agentsDir,
+      agentsDirExists: existsSync(this.agentsDir),
+      projectAgentsDir: this.projectAgentsDir,
+      projectAgentsDirExists: this.projectAgentsDir
+        ? existsSync(this.projectAgentsDir)
+        : false,
     };
   }
 
