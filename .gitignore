@@ -5,5 +5,4 @@ dist/
 coverage/
 logs/
 *.tmp
-docs/
 config.json

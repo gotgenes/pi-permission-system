@@ -108,6 +108,12 @@ issue_title: "Per-agent permission frontmatter overrides" # required
   - `test: cover MCP tool-level deny precedence`
   - `docs: refine permission-system policy schema`
 
+## Runtime Caveats
+
+- `src/index.ts` registers two `session_start` handlers that perform identical setup.
+  Both must be kept in sync until they are consolidated.
+  Any new startup side effect must be added to both handlers or extracted to a shared helper.
+
 ## Notes for Agents
 
 Before implementing, understand:
