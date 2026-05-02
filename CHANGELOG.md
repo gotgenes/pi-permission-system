@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0](https://github.com/gotgenes/pi-permission-system/compare/v0.6.1...v0.7.0) (2026-05-02)
+
+
+### Features
+
+* add prek pre-commit hooks for Biome and markdownlint ([#14](https://github.com/gotgenes/pi-permission-system/issues/14)) ([1093e87](https://github.com/gotgenes/pi-permission-system/commit/1093e8774145517f4b65f1e489a86143d7c54fb0))
+* align prek config with pi-autoformat conventions ([#14](https://github.com/gotgenes/pi-permission-system/issues/14)) ([a9b72aa](https://github.com/gotgenes/pi-permission-system/commit/a9b72aaecaa8c5d7fc5feac588ef2da2c4e5372d))
+
+
+### Bug Fixes
+
+* use check-only mode for pre-commit hooks ([#14](https://github.com/gotgenes/pi-permission-system/issues/14)) ([fc37f1f](https://github.com/gotgenes/pi-permission-system/commit/fc37f1f1aa6d3aed9a8b8c9c88a98bf021250996))
+
+
+### Documentation
+
+* plan prek pre-commit linting setup ([#14](https://github.com/gotgenes/pi-permission-system/issues/14)) ([5debd98](https://github.com/gotgenes/pi-permission-system/commit/5debd986bd24621105d1138daacb17fa4fb3ab8e))
+* **retro:** add retro notes for issue [#13](https://github.com/gotgenes/pi-permission-system/issues/13) ([a0b889d](https://github.com/gotgenes/pi-permission-system/commit/a0b889d176ed607e5fcf3af793318ab35c871ac3))
+
 ## [0.6.1](https://github.com/gotgenes/pi-permission-system/compare/v0.6.0...v0.6.1) (2026-05-02)
 
 
