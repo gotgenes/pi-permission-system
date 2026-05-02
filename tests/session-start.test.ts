@@ -13,7 +13,6 @@ import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import {
   CONFIG_PATH,
   DEFAULT_EXTENSION_CONFIG,
-  loadPermissionSystemConfig,
 } from "../src/extension-config.js";
 import piPermissionSystemExtension from "../src/index.js";
 import type { GlobalPermissionConfig } from "../src/types.js";
@@ -21,7 +20,10 @@ import type { GlobalPermissionConfig } from "../src/types.js";
 type MockHandler = (
   event: Record<string, unknown>,
   ctx: Record<string, unknown>,
-) => Promise<Record<string, unknown> | void> | Record<string, unknown> | void;
+) =>
+  | Promise<Record<string, unknown> | undefined>
+  | Record<string, unknown>
+  | undefined;
 
 describe("session_start handler consolidation", () => {
   let baseDir: string;
