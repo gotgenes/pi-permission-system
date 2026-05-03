@@ -32,7 +32,7 @@ describe("sanitizeAvailableToolsSection — Available tools section", () => {
 
   // Bug #33: findSection extends to lines.length when no subsequent recognised
   // header follows, so content after the last section is silently deleted.
-  test.fails("preserves content that follows the Available tools section (bug #33)", () => {
+  test("preserves content that follows the Available tools section (bug #33)", () => {
     const input = prompt(
       availableToolsSection(["bash", "read"]),
       "Other content",
