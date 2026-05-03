@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 import type { PermissionState } from "../src/types.js";
 
@@ -20,10 +20,15 @@ import {
   findCompiledWildcardMatch,
 } from "../src/wildcard-matcher.js";
 
+const mockedCompilePatterns = vi.mocked(compileWildcardPatterns);
 const mockedFindMatch = vi.mocked(findCompiledWildcardMatch);
 
+beforeEach(() => {
+  mockedCompilePatterns.mockClear();
+  mockedFindMatch.mockReset();
+});
+
 afterEach(() => {
-  vi.clearAllMocks();
   vi.restoreAllMocks();
 });
 
