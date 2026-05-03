@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.3.0](https://github.com/gotgenes/pi-permission-system/compare/v3.2.0...v3.3.0) (2026-05-03)
+
+
+### Features
+
+* add permission-gate module ([507a1b6](https://github.com/gotgenes/pi-permission-system/commit/507a1b6155513562958bb277cd7c38ed8d44c215)), closes [#41](https://github.com/gotgenes/pi-permission-system/issues/41)
+
+
+### Documentation
+
+* plan extract reusable permission-gate function ([#41](https://github.com/gotgenes/pi-permission-system/issues/41)) ([2458bf2](https://github.com/gotgenes/pi-permission-system/commit/2458bf28f6c698db78c7a65cfdb6afa488e5b6ee))
+* **retro:** add retro notes for issue [#44](https://github.com/gotgenes/pi-permission-system/issues/44) ([963bb1b](https://github.com/gotgenes/pi-permission-system/commit/963bb1ba78d7e305a80732a55e385266e5222b82))
+
 ## [3.2.0](https://github.com/gotgenes/pi-permission-system/compare/v3.1.0...v3.2.0) (2026-05-03)
 
 
