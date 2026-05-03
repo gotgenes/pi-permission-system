@@ -75,6 +75,7 @@ import {
   PERMISSION_SYSTEM_STATUS_KEY,
   syncPermissionSystemStatus,
 } from "./status.js";
+import { isSubagentExecutionContext } from "./subagent-context.js";
 import { sanitizeAvailableToolsSection } from "./system-prompt-sanitizer.js";
 import {
   checkRequestedToolRegistration,
@@ -613,13 +614,6 @@ function sleep(ms: number): Promise<void> {
   });
 }
 
-function normalizeFilesystemPath(pathValue: string): string {
-  const normalizedPath = normalize(pathValue);
-  return process.platform === "win32"
-    ? normalizedPath.toLowerCase()
-    : normalizedPath;
-}
-
 function getSessionId(ctx: ExtensionContext): string {
   try {
     const sessionId = ctx.sessionManager.getSessionId();
@@ -631,29 +625,11 @@ function getSessionId(ctx: ExtensionContext): string {
   return "unknown";
 }
 
-function isSubagentExecutionContext(ctx: ExtensionContext): boolean {
-  for (const key of SUBAGENT_ENV_HINT_KEYS) {
-    const value = process.env[key];
-    if (typeof value === "string" && value.trim()) {
-      return true;
-    }
-  }
-
-  const sessionDir = ctx.sessionManager.getSessionDir();
-  if (!sessionDir) {
-    return false;
-  }
-
-  const normalizedSessionDir = normalizeFilesystemPath(sessionDir);
-  const normalizedSubagentRoot = normalizeFilesystemPath(SUBAGENT_SESSIONS_DIR);
-  return isPathWithinDirectory(normalizedSessionDir, normalizedSubagentRoot);
-}
-
 function canRequestPermissionConfirmation(ctx: ExtensionContext): boolean {
   return canResolveAskPermissionRequest({
     config: extensionConfig,
     hasUI: ctx.hasUI,
-    isSubagent: isSubagentExecutionContext(ctx),
+    isSubagent: isSubagentExecutionContext(ctx, SUBAGENT_SESSIONS_DIR),
   });
 }
 
@@ -937,7 +913,7 @@ async function waitForForwardedPermissionApproval(
   const requesterSessionId = getSessionId(ctx);
   const targetSessionId = resolvePermissionForwardingTargetSessionId({
     hasUI: ctx.hasUI,
-    isSubagent: isSubagentExecutionContext(ctx),
+    isSubagent: isSubagentExecutionContext(ctx, SUBAGENT_SESSIONS_DIR),
     currentSessionId: requesterSessionId,
     env: process.env,
   });
@@ -1169,7 +1145,7 @@ async function confirmPermission(
     );
   }
 
-  if (!isSubagentExecutionContext(ctx)) {
+  if (!isSubagentExecutionContext(ctx, SUBAGENT_SESSIONS_DIR)) {
     return { approved: false, state: "denied" };
   }
 
@@ -1408,7 +1384,7 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
   };
 
   const startForwardedPermissionPolling = (ctx: ExtensionContext): void => {
-    if (!ctx.hasUI || isSubagentExecutionContext(ctx)) {
+    if (!ctx.hasUI || isSubagentExecutionContext(ctx, SUBAGENT_SESSIONS_DIR)) {
       stopForwardedPermissionPolling();
       return;
     }
