@@ -1,0 +1,16 @@
+{
+  "$schema": "https://raw.githubusercontent.com/gotgenes/pi-autoformat/main/schemas/pi-autoformat.schema.json",
+  "formatters": {
+    "biome": {
+      "command": ["npx", "biome", "check", "--write", "--files-ignore-unknown=true"]
+    },
+    "markdownlint-cli2": {
+      "command": ["npx", "markdownlint-cli2", "--fix"]
+    }
+  },
+  "chains": {
+    ".ts": ["biome"],
+    ".json": ["biome"],
+    ".md": ["markdownlint-cli2"]
+  }
+}
