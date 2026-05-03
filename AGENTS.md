@@ -46,7 +46,8 @@ Read `docs/plans/` before making architectural changes (created by `/plan-issue`
 - Use sequential numbering (`1.` `2.` `3.`) in ordered lists, restarting at `1.` under each new heading — markdownlint's MD029 rejects continued numbering across section boundaries.
 - Do not use bold text (`**...**`) as a substitute for headings — use proper Markdown heading syntax (`##`, `###`, `####`); markdownlint's MD036 rejects emphasis used as headings.
 - When embedding markdown content that itself contains fenced code blocks, use a 4-backtick outer fence (` ````markdown `) so inner 3-backtick fences render correctly.
-- In tables, match separator widths to their column headers — markdownlint's MD060 requires aligned columns and is not auto-fixable (e.g., `| Risk | Mitigation |` needs `| ---- | ---------- |`, not `| --- | --- |`).
+- Use compact table style with no cell padding — markdownlint's MD060 enforces consistent column style and is not auto-fixable.
+  Write `| Risk | Mitigation |` with `| ---- | ---------- |`, not padded `| Risk··· | Mitigation··· |`.
 
 ## Configuration
 
