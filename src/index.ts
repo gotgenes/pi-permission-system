@@ -1470,11 +1470,7 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
 
   const logResolvedConfigPaths = (): void => {
     const policyPaths = permissionManager.getResolvedPolicyPaths();
-    const entry = buildResolvedConfigLogEntry(
-      CONFIG_PATH,
-      existsSync(CONFIG_PATH),
-      policyPaths,
-    );
+    const entry = buildResolvedConfigLogEntry({ policyPaths });
     writeReviewLog(
       "config.resolved",
       entry as unknown as Record<string, unknown>,

@@ -1,8 +1,6 @@
 import type { ResolvedPolicyPaths } from "./permission-manager.js";
 
 export interface ResolvedConfigLogEntry {
-  extensionConfigPath: string;
-  extensionConfigExists: boolean;
   globalConfigPath: string;
   globalConfigExists: boolean;
   projectConfigPath: string | null;
@@ -11,16 +9,26 @@ export interface ResolvedConfigLogEntry {
   agentsDirExists: boolean;
   projectAgentsDir: string | null;
   projectAgentsDirExists: boolean;
+  legacyGlobalPolicyDetected: boolean;
+  legacyProjectPolicyDetected: boolean;
+  legacyExtensionConfigDetected: boolean;
+}
+
+export interface BuildResolvedConfigLogEntryOptions {
+  policyPaths: ResolvedPolicyPaths;
+  legacyGlobalPolicyDetected?: boolean;
+  legacyProjectPolicyDetected?: boolean;
+  legacyExtensionConfigDetected?: boolean;
 }
 
 export function buildResolvedConfigLogEntry(
-  extensionConfigPath: string,
-  extensionConfigExists: boolean,
-  policyPaths: ResolvedPolicyPaths,
+  options: BuildResolvedConfigLogEntryOptions,
 ): ResolvedConfigLogEntry {
   return {
-    extensionConfigPath,
-    extensionConfigExists,
-    ...policyPaths,
+    ...options.policyPaths,
+    legacyGlobalPolicyDetected: options.legacyGlobalPolicyDetected ?? false,
+    legacyProjectPolicyDetected: options.legacyProjectPolicyDetected ?? false,
+    legacyExtensionConfigDetected:
+      options.legacyExtensionConfigDetected ?? false,
   };
 }
