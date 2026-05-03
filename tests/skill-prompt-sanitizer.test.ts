@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
-import type { PermissionManager } from "../src/permission-manager.js";
+import type { PermissionManager } from "../src/permission-manager";
 import {
   findSkillPathMatch,
   resolveSkillPromptEntries,
-} from "../src/skill-prompt-sanitizer.js";
-import type { PermissionCheckResult } from "../src/types.js";
+} from "../src/skill-prompt-sanitizer";
+import type { PermissionCheckResult } from "../src/types";
 
 afterEach(() => {
   vi.restoreAllMocks();

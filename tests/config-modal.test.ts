@@ -3,13 +3,13 @@ import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test, vi } from "vitest";
-import { registerPermissionSystemCommand } from "../src/config-modal.js";
+import { registerPermissionSystemCommand } from "../src/config-modal";
 import {
   DEFAULT_EXTENSION_CONFIG,
   loadPermissionSystemConfig,
   type PermissionSystemExtensionConfig,
   savePermissionSystemConfig,
-} from "../src/extension-config.js";
+} from "../src/extension-config";
 
 vi.mock("@mariozechner/pi-coding-agent", () => ({
   getSettingsListTheme: () => ({}),

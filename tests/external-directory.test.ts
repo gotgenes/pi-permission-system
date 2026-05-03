@@ -20,7 +20,7 @@ import {
   isPathWithinDirectory,
   normalizePathForComparison,
   PATH_BEARING_TOOLS,
-} from "../src/external-directory.js";
+} from "../src/external-directory";
 
 afterEach(() => {
   vi.restoreAllMocks();

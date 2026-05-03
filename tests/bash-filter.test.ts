@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
-import type { PermissionState } from "../src/types.js";
+import type { PermissionState } from "../src/types";
 
 // Mock wildcard-matcher before importing the module under test.
 vi.mock("../src/wildcard-matcher.js", () => ({
@@ -14,11 +14,11 @@ vi.mock("../src/wildcard-matcher.js", () => ({
   findCompiledWildcardMatch: vi.fn(),
 }));
 
-import { BashFilter } from "../src/bash-filter.js";
+import { BashFilter } from "../src/bash-filter";
 import {
   compileWildcardPatterns,
   findCompiledWildcardMatch,
-} from "../src/wildcard-matcher.js";
+} from "../src/wildcard-matcher";
 
 const mockedCompilePatterns = vi.mocked(compileWildcardPatterns);
 const mockedFindMatch = vi.mocked(findCompiledWildcardMatch);

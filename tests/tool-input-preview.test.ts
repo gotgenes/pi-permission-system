@@ -5,7 +5,7 @@ vi.mock("../src/logging.js", () => ({
   safeJsonStringify: vi.fn((value: unknown) => JSON.stringify(value)),
 }));
 
-import { safeJsonStringify } from "../src/logging.js";
+import { safeJsonStringify } from "../src/logging";
 import {
   countTextLines,
   formatCount,
@@ -24,8 +24,8 @@ import {
   TOOL_INPUT_PREVIEW_MAX_LENGTH,
   TOOL_TEXT_SUMMARY_MAX_LENGTH,
   truncateInlineText,
-} from "../src/tool-input-preview.js";
-import type { PermissionCheckResult } from "../src/types.js";
+} from "../src/tool-input-preview";
+import type { PermissionCheckResult } from "../src/types";
 
 const mockedStringify = vi.mocked(safeJsonStringify);
 

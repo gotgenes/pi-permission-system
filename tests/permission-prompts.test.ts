@@ -15,10 +15,10 @@ import {
   formatSkillPathDenyReason,
   formatUnknownToolReason,
   formatUserDeniedReason,
-} from "../src/permission-prompts.js";
-import type { SkillPromptEntry } from "../src/skill-prompt-sanitizer.js";
-import { formatToolInputForPrompt } from "../src/tool-input-preview.js";
-import type { PermissionCheckResult } from "../src/types.js";
+} from "../src/permission-prompts";
+import type { SkillPromptEntry } from "../src/skill-prompt-sanitizer";
+import { formatToolInputForPrompt } from "../src/tool-input-preview";
+import type { PermissionCheckResult } from "../src/types";
 
 const mockedFormatToolInput = vi.mocked(formatToolInputForPrompt);
 

@@ -2,10 +2,10 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
-import { getGlobalConfigPath } from "../src/config-paths.js";
-import { DEFAULT_EXTENSION_CONFIG } from "../src/extension-config.js";
-import piPermissionSystemExtension from "../src/index.js";
-import type { GlobalPermissionConfig } from "../src/types.js";
+import { getGlobalConfigPath } from "../src/config-paths";
+import { DEFAULT_EXTENSION_CONFIG } from "../src/extension-config";
+import piPermissionSystemExtension from "../src/index";
+import type { GlobalPermissionConfig } from "../src/types";
 
 type MockHandler = (
   event: Record<string, unknown>,

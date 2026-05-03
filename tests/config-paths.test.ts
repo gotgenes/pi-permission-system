@@ -11,7 +11,7 @@ import {
   getLegacyProjectPolicyPath,
   getProjectConfigPath,
   REVIEW_LOG_FILENAME,
-} from "../src/config-paths.js";
+} from "../src/config-paths";
 
 describe("config-paths", () => {
   const agentDir = "/home/user/.pi/agent";

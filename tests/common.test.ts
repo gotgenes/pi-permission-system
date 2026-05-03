@@ -6,7 +6,7 @@ import {
   isPermissionState,
   parseSimpleYamlMap,
   toRecord,
-} from "../src/common.js";
+} from "../src/common";
 
 afterEach(() => {
   vi.restoreAllMocks();

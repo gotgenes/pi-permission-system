@@ -7,7 +7,7 @@ import {
   loadAndMergeConfigs,
   loadUnifiedConfig,
   mergeUnifiedConfigs,
-} from "../src/config-loader.js";
+} from "../src/config-loader";
 
 describe("loadUnifiedConfig", () => {
   let tempDir: string;

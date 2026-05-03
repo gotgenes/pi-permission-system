@@ -5,7 +5,7 @@ import {
   getActiveAgentName,
   getActiveAgentNameFromSystemPrompt,
   normalizeAgentName,
-} from "../src/active-agent.js";
+} from "../src/active-agent";
 
 afterEach(() => {
   vi.restoreAllMocks();

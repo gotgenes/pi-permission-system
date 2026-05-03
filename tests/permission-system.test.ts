@@ -10,51 +10,51 @@ import {
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { test } from "vitest";
-import { BashFilter } from "../src/bash-filter.js";
+import { BashFilter } from "../src/bash-filter";
 import {
   createActiveToolsCacheKey,
   createBeforeAgentStartPromptStateKey,
   shouldApplyCachedAgentStartState,
-} from "../src/before-agent-start-cache.js";
-import { getGlobalConfigPath } from "../src/config-paths.js";
+} from "../src/before-agent-start-cache";
+import { getGlobalConfigPath } from "../src/config-paths";
 import {
   DEFAULT_EXTENSION_CONFIG,
   loadPermissionSystemConfig,
   savePermissionSystemConfig,
-} from "../src/extension-config.js";
-import piPermissionSystemExtension from "../src/index.js";
-import { createPermissionSystemLogger } from "../src/logging.js";
+} from "../src/extension-config";
+import piPermissionSystemExtension from "../src/index";
+import { createPermissionSystemLogger } from "../src/logging";
 import {
   createPermissionForwardingLocation,
   isForwardedPermissionRequestForSession,
   resolvePermissionForwardingTargetSessionId,
   SUBAGENT_ENV_HINT_KEYS,
   SUBAGENT_PARENT_SESSION_ENV_KEY,
-} from "../src/permission-forwarding.js";
+} from "../src/permission-forwarding";
 import {
   normalizeRawPermission,
   PermissionManager,
-} from "../src/permission-manager.js";
+} from "../src/permission-manager";
 import {
   findSkillPathMatch,
   parseAllSkillPromptSections,
   resolveSkillPromptEntries,
-} from "../src/skill-prompt-sanitizer.js";
-import { getPermissionSystemStatus } from "../src/status.js";
-import { sanitizeAvailableToolsSection } from "../src/system-prompt-sanitizer.js";
+} from "../src/skill-prompt-sanitizer";
+import { getPermissionSystemStatus } from "../src/status";
+import { sanitizeAvailableToolsSection } from "../src/system-prompt-sanitizer";
 import {
   checkRequestedToolRegistration,
   getToolNameFromValue,
-} from "../src/tool-registry.js";
+} from "../src/tool-registry";
 import type {
   AgentPermissions,
   GlobalPermissionConfig,
   PermissionState,
-} from "../src/types.js";
+} from "../src/types";
 import {
   canResolveAskPermissionRequest,
   shouldAutoApprovePermissionState,
-} from "../src/yolo-mode.js";
+} from "../src/yolo-mode";
 
 type CreateManagerOptions = {
   mcpServerNames?: readonly string[];

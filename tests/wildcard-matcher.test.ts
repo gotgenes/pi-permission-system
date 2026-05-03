@@ -5,7 +5,7 @@ import {
   compileWildcardPatternEntries,
   findCompiledWildcardMatch,
   findCompiledWildcardMatchForNames,
-} from "../src/wildcard-matcher.js";
+} from "../src/wildcard-matcher";
 
 afterEach(() => {
   vi.restoreAllMocks();

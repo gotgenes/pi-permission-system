@@ -9,10 +9,10 @@ import {
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "vitest";
-import { buildResolvedConfigLogEntry } from "../src/config-reporter.js";
-import { createPermissionSystemLogger } from "../src/logging.js";
-import type { ResolvedPolicyPaths } from "../src/permission-manager.js";
-import { PermissionManager } from "../src/permission-manager.js";
+import { buildResolvedConfigLogEntry } from "../src/config-reporter";
+import { createPermissionSystemLogger } from "../src/logging";
+import type { ResolvedPolicyPaths } from "../src/permission-manager";
+import { PermissionManager } from "../src/permission-manager";
 
 test("buildResolvedConfigLogEntry includes policy paths and legacy detection flags", () => {
   const policyPaths: ResolvedPolicyPaths = {

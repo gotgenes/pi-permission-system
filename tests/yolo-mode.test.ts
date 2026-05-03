@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
-import type { PermissionSystemExtensionConfig } from "../src/extension-config.js";
+import type { PermissionSystemExtensionConfig } from "../src/extension-config";
 import {
   canResolveAskPermissionRequest,
   shouldAutoApprovePermissionState,
-} from "../src/yolo-mode.js";
+} from "../src/yolo-mode";
 
 afterEach(() => {
   vi.restoreAllMocks();

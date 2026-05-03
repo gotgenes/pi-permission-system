@@ -3,7 +3,7 @@ import { afterEach, describe, expect, test, vi } from "vitest";
 import {
   checkRequestedToolRegistration,
   getToolNameFromValue,
-} from "../src/tool-registry.js";
+} from "../src/tool-registry";
 
 afterEach(() => {
   vi.restoreAllMocks();

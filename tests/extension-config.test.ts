@@ -7,7 +7,7 @@ import {
   detectMisplacedPermissionKeys,
   loadPermissionSystemConfig,
   normalizePermissionSystemConfig,
-} from "../src/extension-config.js";
+} from "../src/extension-config";
 
 describe("detectMisplacedPermissionKeys", () => {
   it("returns an empty array for a record with only valid extension keys", () => {
