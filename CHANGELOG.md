@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.5.0](https://github.com/gotgenes/pi-permission-system/compare/v3.4.0...v3.5.0) (2026-05-03)
+
+
+### Features
+
+* deprecate doom_loop special permission key ([68e70e7](https://github.com/gotgenes/pi-permission-system/commit/68e70e71b68e5a76a071ef4613da356a91080158))
+* remove doom_loop from type union and config-loader ([bf2f288](https://github.com/gotgenes/pi-permission-system/commit/bf2f2886a800187337e82954e812e6d05e9bd451))
+
+
+### Documentation
+
+* add architecture documents for current and target permission model ([aab1ac5](https://github.com/gotgenes/pi-permission-system/commit/aab1ac50c4478d2e393c2a796bf6fcc4ec606f79))
+* plan doom_loop deprecation ([#54](https://github.com/gotgenes/pi-permission-system/issues/54)) ([2e730f5](https://github.com/gotgenes/pi-permission-system/commit/2e730f52189dd2996ebbe90dd5d2b3206a45d1f6))
+* plan handler extraction from piPermissionSystemExtension ([#42](https://github.com/gotgenes/pi-permission-system/issues/42)) ([6ecd419](https://github.com/gotgenes/pi-permission-system/commit/6ecd4190fb9a60009eb695b4998ab8a1d1419139))
+* remove doom_loop from schema, example, and README ([7f422e0](https://github.com/gotgenes/pi-permission-system/commit/7f422e086f0052e0d9449dbd0122c57b923b053d))
+* **retro:** add retro notes for issue [#45](https://github.com/gotgenes/pi-permission-system/issues/45) ([14c5559](https://github.com/gotgenes/pi-permission-system/commit/14c55595c5abfaa51f8ec83369452db5f457836c))
+
 ## [3.4.0](https://github.com/gotgenes/pi-permission-system/compare/v3.3.0...v3.4.0) (2026-05-03)
 
 
