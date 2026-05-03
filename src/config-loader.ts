@@ -1,6 +1,14 @@
 import { existsSync, readFileSync } from "node:fs";
+import { normalize } from "node:path";
 
 import { isPermissionState, toRecord } from "./common.js";
+import {
+  getGlobalConfigPath,
+  getLegacyExtensionConfigPath,
+  getLegacyGlobalPolicyPath,
+  getLegacyProjectPolicyPath,
+  getProjectConfigPath,
+} from "./config-paths.js";
 import type { PermissionDefaultPolicy, PermissionState } from "./types.js";
 
 /**
@@ -269,6 +277,101 @@ export function mergeUnifiedConfigs(
   }
 
   return merged;
+}
+
+export interface MergedConfigResult {
+  global: UnifiedPermissionConfig;
+  project: UnifiedPermissionConfig;
+  merged: UnifiedPermissionConfig;
+  issues: string[];
+}
+
+/**
+ * Load global and project configs from the new layout, detect legacy files,
+ * merge everything, and collect issues.
+ *
+ * Merge order:
+ * 1. Legacy global policy (if present) — lowest precedence
+ * 2. Legacy extension runtime config (if present and path differs from new global)
+ * 3. New global config
+ * 4. Legacy project policy (if present)
+ * 5. New project config — highest precedence
+ */
+export function loadAndMergeConfigs(
+  agentDir: string,
+  cwd: string,
+  extensionRoot: string,
+): MergedConfigResult {
+  const allIssues: string[] = [];
+
+  const newGlobalPath = getGlobalConfigPath(agentDir);
+  const newProjectPath = getProjectConfigPath(cwd);
+  const legacyGlobalPolicyPath = getLegacyGlobalPolicyPath(agentDir);
+  const legacyProjectPolicyPath = getLegacyProjectPolicyPath(cwd);
+  const legacyExtConfigPath = getLegacyExtensionConfigPath(extensionRoot);
+
+  // Start with empty
+  let merged: UnifiedPermissionConfig = {};
+
+  // 1. Legacy global policy
+  if (existsSync(legacyGlobalPolicyPath)) {
+    const legacy = loadUnifiedConfig(legacyGlobalPolicyPath);
+    allIssues.push(
+      `Legacy global policy found at '${legacyGlobalPolicyPath}'. ` +
+        `Move it to '${newGlobalPath}':\n` +
+        `  mv '${legacyGlobalPolicyPath}' '${newGlobalPath}'`,
+    );
+    allIssues.push(...legacy.issues);
+    merged = mergeUnifiedConfigs(merged, legacy.config);
+  }
+
+  // 2. Legacy extension runtime config (only if different from new global path)
+  const normalizedLegacyExt = normalize(legacyExtConfigPath);
+  const normalizedNewGlobal = normalize(newGlobalPath);
+  if (
+    normalizedLegacyExt !== normalizedNewGlobal &&
+    existsSync(legacyExtConfigPath)
+  ) {
+    const legacy = loadUnifiedConfig(legacyExtConfigPath);
+    allIssues.push(
+      `Legacy extension config found at '${legacyExtConfigPath}'. ` +
+        `Move runtime settings to '${newGlobalPath}':\n` +
+        `  mv '${legacyExtConfigPath}' '${newGlobalPath}'`,
+    );
+    allIssues.push(...legacy.issues);
+    merged = mergeUnifiedConfigs(merged, legacy.config);
+  }
+
+  // 3. New global config
+  const globalResult = loadUnifiedConfig(newGlobalPath);
+  allIssues.push(...globalResult.issues);
+  const globalConfig = globalResult.config;
+  merged = mergeUnifiedConfigs(merged, globalConfig);
+
+  // 4. Legacy project policy
+  if (existsSync(legacyProjectPolicyPath)) {
+    const legacy = loadUnifiedConfig(legacyProjectPolicyPath);
+    allIssues.push(
+      `Legacy project policy found at '${legacyProjectPolicyPath}'. ` +
+        `Move it to '${newProjectPath}':\n` +
+        `  mv '${legacyProjectPolicyPath}' '${newProjectPath}'`,
+    );
+    allIssues.push(...legacy.issues);
+    merged = mergeUnifiedConfigs(merged, legacy.config);
+  }
+
+  // 5. New project config
+  const projectResult = loadUnifiedConfig(newProjectPath);
+  allIssues.push(...projectResult.issues);
+  const projectConfig = projectResult.config;
+  merged = mergeUnifiedConfigs(merged, projectConfig);
+
+  return {
+    global: globalConfig,
+    project: projectConfig,
+    merged,
+    issues: allIssues,
+  };
 }
 
 /**

@@ -1,9 +1,10 @@
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import {
+  loadAndMergeConfigs,
   loadUnifiedConfig,
   mergeUnifiedConfigs,
 } from "../src/config-loader.js";
@@ -214,5 +215,150 @@ describe("mergeUnifiedConfigs", () => {
     expect(merged).not.toHaveProperty("permissionReviewLog");
     expect(merged).not.toHaveProperty("defaultPolicy");
     expect(merged).not.toHaveProperty("tools");
+  });
+});
+
+describe("loadAndMergeConfigs", () => {
+  let tempDir: string;
+  let agentDir: string;
+  let cwd: string;
+  let extensionRoot: string;
+
+  beforeEach(() => {
+    tempDir = mkdtempSync(join(tmpdir(), "config-merge-test-"));
+    agentDir = join(tempDir, "agent");
+    cwd = join(tempDir, "project");
+    extensionRoot = join(tempDir, "ext");
+  });
+
+  afterEach(() => {
+    rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  function writeGlobal(content: Record<string, unknown>): void {
+    const dir = join(agentDir, "extensions", "pi-permission-system");
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, "config.json"), JSON.stringify(content));
+  }
+
+  function writeProject(content: Record<string, unknown>): void {
+    const dir = join(cwd, ".pi", "extensions", "pi-permission-system");
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, "config.json"), JSON.stringify(content));
+  }
+
+  function writeLegacyGlobalPolicy(content: Record<string, unknown>): void {
+    mkdirSync(agentDir, { recursive: true });
+    writeFileSync(
+      join(agentDir, "pi-permissions.jsonc"),
+      JSON.stringify(content),
+    );
+  }
+
+  function writeLegacyProjectPolicy(content: Record<string, unknown>): void {
+    const dir = join(cwd, ".pi", "agent");
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, "pi-permissions.jsonc"), JSON.stringify(content));
+  }
+
+  function writeLegacyExtensionConfig(content: Record<string, unknown>): void {
+    mkdirSync(extensionRoot, { recursive: true });
+    writeFileSync(join(extensionRoot, "config.json"), JSON.stringify(content));
+  }
+
+  it("merges global and project new-layout configs", () => {
+    writeGlobal({
+      debugLog: true,
+      defaultPolicy: { tools: "ask", bash: "deny" },
+      tools: { read: "allow" },
+    });
+    writeProject({
+      defaultPolicy: { tools: "allow" },
+      tools: { write: "deny" },
+    });
+
+    const result = loadAndMergeConfigs(agentDir, cwd, extensionRoot);
+    expect(result.issues).toEqual([]);
+    expect(result.merged.debugLog).toBe(true);
+    expect(result.merged.defaultPolicy).toEqual({
+      tools: "allow",
+      bash: "deny",
+    });
+    expect(result.merged.tools).toEqual({ read: "allow", write: "deny" });
+  });
+
+  it("detects legacy global policy and emits migration issue", () => {
+    writeLegacyGlobalPolicy({
+      defaultPolicy: { tools: "allow" },
+      tools: { read: "allow" },
+    });
+
+    const result = loadAndMergeConfigs(agentDir, cwd, extensionRoot);
+    expect(result.issues).toHaveLength(1);
+    expect(result.issues[0]).toContain("pi-permissions.jsonc");
+    expect(result.issues[0]).toContain("extensions/pi-permission-system");
+    // Legacy values are merged
+    expect(result.merged.defaultPolicy).toEqual({ tools: "allow" });
+    expect(result.merged.tools).toEqual({ read: "allow" });
+  });
+
+  it("detects legacy project policy and emits migration issue", () => {
+    writeLegacyProjectPolicy({
+      bash: { "git status": "allow" },
+    });
+
+    const result = loadAndMergeConfigs(agentDir, cwd, extensionRoot);
+    expect(result.issues).toHaveLength(1);
+    expect(result.issues[0]).toContain(".pi/agent/pi-permissions.jsonc");
+    expect(result.issues[0]).toContain(".pi/extensions/pi-permission-system");
+    expect(result.merged.bash).toEqual({ "git status": "allow" });
+  });
+
+  it("detects legacy extension runtime config and emits migration issue", () => {
+    writeLegacyExtensionConfig({
+      debugLog: true,
+      yoloMode: true,
+    });
+
+    const result = loadAndMergeConfigs(agentDir, cwd, extensionRoot);
+    expect(result.issues).toHaveLength(1);
+    expect(result.issues[0]).toContain(extensionRoot);
+    expect(result.merged.debugLog).toBe(true);
+    expect(result.merged.yoloMode).toBe(true);
+  });
+
+  it("does not emit legacy extension config issue when path equals new global path", () => {
+    // If the extension happens to be installed at the new path, no warning
+    const newGlobalDir = join(agentDir, "extensions", "pi-permission-system");
+    mkdirSync(newGlobalDir, { recursive: true });
+    writeFileSync(
+      join(newGlobalDir, "config.json"),
+      JSON.stringify({ debugLog: true }),
+    );
+
+    const result = loadAndMergeConfigs(agentDir, cwd, newGlobalDir);
+    expect(result.issues.filter((i) => i.includes("legacy"))).toHaveLength(0);
+  });
+
+  it("emits no issues when no legacy files exist and no new files exist", () => {
+    const result = loadAndMergeConfigs(agentDir, cwd, extensionRoot);
+    expect(result.issues).toEqual([]);
+  });
+
+  it("new-layout config takes precedence over legacy config at same scope", () => {
+    writeGlobal({
+      defaultPolicy: { tools: "deny" },
+    });
+    writeLegacyGlobalPolicy({
+      defaultPolicy: { tools: "allow" },
+    });
+
+    const result = loadAndMergeConfigs(agentDir, cwd, extensionRoot);
+    // New layout wins
+    expect(result.merged.defaultPolicy).toEqual({ tools: "deny" });
+    // But legacy still emits a migration warning
+    expect(result.issues.some((i) => i.includes("pi-permissions.jsonc"))).toBe(
+      true,
+    );
   });
 });
