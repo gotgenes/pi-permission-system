@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.2.0](https://github.com/gotgenes/pi-permission-system/compare/v3.1.0...v3.2.0) (2026-05-03)
+
+
+### Features
+
+* add SAFE_SYSTEM_PATHS allowlist and isSafeSystemPath helper ([#44](https://github.com/gotgenes/pi-permission-system/issues/44)) ([331b53f](https://github.com/gotgenes/pi-permission-system/commit/331b53f1a6425c7ee641127cbc82b5aada1e7018))
+* filter safe system paths from bash external path extraction ([#44](https://github.com/gotgenes/pi-permission-system/issues/44)) ([a0a907f](https://github.com/gotgenes/pi-permission-system/commit/a0a907f020cbf08722ea47be11d3f67fc95ef448))
+* skip safe system paths in isPathOutsideWorkingDirectory ([#44](https://github.com/gotgenes/pi-permission-system/issues/44)) ([360594c](https://github.com/gotgenes/pi-permission-system/commit/360594c8ddfd6f7f45abe04352a514de292df357))
+
+
+### Documentation
+
+* clarify /dev/null redirect risks in plan [#44](https://github.com/gotgenes/pi-permission-system/issues/44) ([00c61e7](https://github.com/gotgenes/pi-permission-system/commit/00c61e75eb5bf3cd9d5fc3297024ef9642655b86))
+* note safe system path allowlist in external-directory section ([#44](https://github.com/gotgenes/pi-permission-system/issues/44)) ([eaec9ae](https://github.com/gotgenes/pi-permission-system/commit/eaec9ae4ad88155bf2630bba9607920cbbdc8583))
+* plan auto-allow /dev/null in external directory checks ([#44](https://github.com/gotgenes/pi-permission-system/issues/44)) ([90b94f4](https://github.com/gotgenes/pi-permission-system/commit/90b94f4e0ae01b3a9f9dc90c5426720742a652e2))
+
 ## [3.1.0](https://github.com/gotgenes/pi-permission-system/compare/v3.0.5...v3.1.0) (2026-05-03)
 
 
