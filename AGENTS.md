@@ -104,6 +104,9 @@ issue_title: "Per-agent permission frontmatter overrides" # required
 - Test system-prompt sanitization (denied tools removed, allowed tools preserved, multi-block skill prompts).
 - Test the external-directory guard for path-bearing file tools.
 - Test config loading, validation issues, and tolerance of deprecated keys.
+- When using `vi.mock()`, extract each `vi.fn()` stub to a module-scope variable and call `.mockReset()` (or `.mockClear()`) on it in `beforeEach` — `vi.restoreAllMocks()` only operates on `vi.spyOn()` spies, not on `vi.fn()` instances.
+- When mocking `node:*` built-in modules with `vi.mock()`, include a `default` key mirroring the named exports — omitting it causes "No default export defined on the mock" errors when any import uses the default.
+- When a test reveals a pre-existing bug rather than a wrong assumption, use `test.fails` to document the expected behavior and file a GitHub issue. Do not adjust the test to match the buggy behavior.
 - Vitest uses esbuild and does not typecheck. Run `npm run build` (`tsc -p tsconfig.json`) for type-only changes.
 - Do not insert no-op statements (`void 0;`, unused locals) in tests just to make an `Edit` tool's `oldText` unique — widen `oldText` with surrounding context instead.
 
