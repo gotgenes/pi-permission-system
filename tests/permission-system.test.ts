@@ -911,6 +911,68 @@ test("MCP proxy tool infers server-prefixed aliases from configured server names
   }
 });
 
+test("MCP server names in settings.json are not used — only mcp.json is consulted", () => {
+  const baseDir = mkdtempSync(join(tmpdir(), "pi-permission-system-test-"));
+  const globalConfigPath = join(baseDir, "pi-permissions.jsonc");
+  const mcpConfigPath = join(baseDir, "mcp.json");
+  const settingsJsonPath = join(baseDir, "settings.json");
+  const agentsDir = join(baseDir, "agents");
+  mkdirSync(agentsDir, { recursive: true });
+
+  // Policy: allow any target prefixed with legacy-server, default mcp is ask.
+  // If legacy-server were known as a configured server name, a tool named
+  // "some_tool_legacy-server" would derive "legacy-server_some_tool_legacy-server"
+  // which matches this rule and returns "allow".
+  // After the fix, settings.json is ignored, so no server name is derived and the
+  // result falls through to the default mcp policy ("ask").
+  const config: GlobalPermissionConfig = {
+    defaultPolicy: {
+      tools: "ask",
+      bash: "ask",
+      mcp: "ask",
+      skills: "ask",
+      special: "ask",
+    },
+    tools: {},
+    bash: {},
+    mcp: { "legacy-server_*": "allow" },
+    skills: {},
+    special: {},
+  };
+
+  writeFileSync(
+    globalConfigPath,
+    `${JSON.stringify(config, null, 2)}\n`,
+    "utf8",
+  );
+  // mcp.json does not know about legacy-server.
+  writeFileSync(mcpConfigPath, JSON.stringify({ mcpServers: {} }), "utf8");
+  // settings.json has legacy-server — the legacy source that must now be ignored.
+  writeFileSync(
+    settingsJsonPath,
+    JSON.stringify({ mcpServers: { "legacy-server": {} } }),
+    "utf8",
+  );
+
+  const manager = new PermissionManager({
+    globalConfigPath,
+    agentsDir,
+    globalMcpConfigPath: mcpConfigPath,
+    legacyGlobalSettingsPath: settingsJsonPath,
+  });
+
+  try {
+    // "legacy-server" must not be derived from settings.json.
+    // The bare tool name falls through to the default mcp policy → "ask".
+    const result = manager.checkPermission("mcp", {
+      tool: "some_tool_legacy-server",
+    });
+    assert.equal(result.state, "ask");
+  } finally {
+    rmSync(baseDir, { recursive: true, force: true });
+  }
+});
+
 test("MCP describe mode normalizes qualified tool names without duplicating server prefixes", () => {
   const { manager, cleanup } = createManager(
     {
