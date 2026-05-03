@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0](https://github.com/gotgenes/pi-permission-system/compare/v0.8.0...v1.0.0) (2026-05-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* The bundled temperature-stripping shim for OpenAI Responses-style APIs (openai-codex-responses, openai-responses, azure-openai-responses) has been removed. This module monkey-patched the provider stack at the process level and had no connection to permission enforcement. Users who need the shim can extract it into a standalone extension.
+
+### Features
+
+* remove out-of-scope model-option-compatibility provider shim ([#17](https://github.com/gotgenes/pi-permission-system/issues/17)) ([b390896](https://github.com/gotgenes/pi-permission-system/commit/b39089611fe565f81dacf7fa0bff3af36d50f7ce))
+
+
+### Documentation
+
+* plan removal of out-of-scope model-option-compatibility shim ([#17](https://github.com/gotgenes/pi-permission-system/issues/17)) ([a48f2ef](https://github.com/gotgenes/pi-permission-system/commit/a48f2ef025cbe970d21071b94552fcb9a4f7de89))
+* **retro:** add retro notes for issue [#16](https://github.com/gotgenes/pi-permission-system/issues/16) ([ee710cb](https://github.com/gotgenes/pi-permission-system/commit/ee710cba9b1fe92a39016c61348d2a0eb2895d1f))
+
 ## [0.8.0](https://github.com/gotgenes/pi-permission-system/compare/v0.7.0...v0.8.0) (2026-05-03)
 
 
