@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 // Mock tool-input-preview collaborator before importing the module under test.
 vi.mock("../src/tool-input-preview.js", () => ({
@@ -22,8 +22,11 @@ import type { PermissionCheckResult } from "../src/types.js";
 
 const mockedFormatToolInput = vi.mocked(formatToolInputForPrompt);
 
+beforeEach(() => {
+  mockedFormatToolInput.mockReset();
+});
+
 afterEach(() => {
-  vi.clearAllMocks();
   vi.restoreAllMocks();
 });
 
