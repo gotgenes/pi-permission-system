@@ -52,33 +52,18 @@ import {
   normalizePathForComparison,
   PATH_BEARING_TOOLS,
 } from "./external-directory.js";
+import { setForwardedPermissionLogger } from "./forwarded-permissions/io.js";
 import {
-  cleanupPermissionForwardingLocationIfEmpty,
-  ensurePermissionForwardingLocation,
-  getExistingPermissionForwardingLocation,
-  listRequestFiles,
-  logPermissionForwardingError,
-  logPermissionForwardingWarning,
-  readForwardedPermissionRequest,
-  readForwardedPermissionResponse,
-  safeDeleteFile,
-  setForwardedPermissionLogger,
-  sleep,
-  writeJsonFileAtomic,
-} from "./forwarded-permissions/io.js";
+  confirmPermission,
+  type PermissionForwardingDeps,
+  processForwardedPermissionRequests,
+} from "./forwarded-permissions/polling.js";
 import { createPermissionSystemLogger } from "./logging.js";
 import {
   type PermissionPromptDecision,
   requestPermissionDecisionFromUi,
 } from "./permission-dialog.js";
-import {
-  type ForwardedPermissionRequest,
-  type ForwardedPermissionResponse,
-  isForwardedPermissionRequestForSession,
-  PERMISSION_FORWARDING_POLL_INTERVAL_MS,
-  PERMISSION_FORWARDING_TIMEOUT_MS,
-  resolvePermissionForwardingTargetSessionId,
-} from "./permission-forwarding.js";
+import { PERMISSION_FORWARDING_POLL_INTERVAL_MS } from "./permission-forwarding.js";
 import { PermissionManager } from "./permission-manager.js";
 import {
   formatAskPrompt,
@@ -106,7 +91,6 @@ import {
   checkRequestedToolRegistration,
   getToolNameFromValue,
 } from "./tool-registry.js";
-import type { PermissionCheckResult } from "./types.js";
 import {
   canResolveAskPermissionRequest,
   shouldAutoApprovePermissionState,
@@ -208,298 +192,12 @@ function getEventInput(event: unknown): unknown {
   return {};
 }
 
-function getContextSystemPrompt(ctx: ExtensionContext): string | undefined {
-  const getSystemPrompt = toRecord(ctx).getSystemPrompt;
-  if (typeof getSystemPrompt !== "function") {
-    return undefined;
-  }
-
-  try {
-    const systemPrompt = getSystemPrompt.call(ctx);
-    return typeof systemPrompt === "string" ? systemPrompt : undefined;
-  } catch (error) {
-    logPermissionForwardingWarning(
-      "Failed to read context system prompt for forwarded permission metadata",
-      error,
-    );
-    return undefined;
-  }
-}
-
-function getSessionId(ctx: ExtensionContext): string {
-  try {
-    const sessionId = ctx.sessionManager.getSessionId();
-    if (typeof sessionId === "string" && sessionId.trim()) {
-      return sessionId.trim();
-    }
-  } catch {}
-
-  return "unknown";
-}
-
 function canRequestPermissionConfirmation(ctx: ExtensionContext): boolean {
   return canResolveAskPermissionRequest({
     config: extensionConfig,
     hasUI: ctx.hasUI,
     isSubagent: isSubagentExecutionContext(ctx, SUBAGENT_SESSIONS_DIR),
   });
-}
-
-function formatForwardedPermissionPrompt(
-  request: ForwardedPermissionRequest,
-): string {
-  const agentName = request.requesterAgentName || "unknown";
-  const sessionId = request.requesterSessionId || "unknown";
-  return [
-    `Subagent '${agentName}' requested permission.`,
-    `Session ID: ${sessionId}`,
-    "",
-    request.message,
-  ].join("\n");
-}
-
-async function waitForForwardedPermissionApproval(
-  ctx: ExtensionContext,
-  message: string,
-): Promise<PermissionPromptDecision> {
-  const requesterSessionId = getSessionId(ctx);
-  const targetSessionId = resolvePermissionForwardingTargetSessionId({
-    hasUI: ctx.hasUI,
-    isSubagent: isSubagentExecutionContext(ctx, SUBAGENT_SESSIONS_DIR),
-    currentSessionId: requesterSessionId,
-    env: process.env,
-  });
-
-  if (!targetSessionId) {
-    logPermissionForwardingError(
-      "Permission forwarding target session could not be resolved from subagent runtime metadata (expected PI_AGENT_ROUTER_PARENT_SESSION_ID)",
-    );
-    return { approved: false, state: "denied" };
-  }
-
-  const location = ensurePermissionForwardingLocation(
-    PERMISSION_FORWARDING_DIR,
-    targetSessionId,
-  );
-  if (!location) {
-    logPermissionForwardingError(
-      `Permission forwarding is unavailable because session-scoped directories could not be prepared for '${targetSessionId}'`,
-    );
-    return { approved: false, state: "denied" };
-  }
-
-  const requestId = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}-${process.pid}`;
-  const requesterAgentName =
-    getActiveAgentName(ctx) ||
-    getActiveAgentNameFromSystemPrompt(getContextSystemPrompt(ctx)) ||
-    "unknown";
-  const request: ForwardedPermissionRequest = {
-    id: requestId,
-    createdAt: Date.now(),
-    requesterSessionId,
-    targetSessionId,
-    requesterAgentName,
-    message,
-  };
-
-  const requestPath = join(location.requestsDir, `${requestId}.json`);
-  const responsePath = join(location.responsesDir, `${requestId}.json`);
-
-  writeReviewLog("forwarded_permission.request_created", {
-    requestId,
-    requesterAgentName,
-    requesterSessionId: request.requesterSessionId,
-    targetSessionId,
-    requestPath,
-    responsePath,
-  });
-
-  try {
-    writeJsonFileAtomic(requestPath, request);
-  } catch (error) {
-    logPermissionForwardingError(
-      `Failed to write forwarded permission request '${requestPath}'`,
-      error,
-    );
-    return { approved: false, state: "denied" };
-  }
-
-  const deadline = Date.now() + PERMISSION_FORWARDING_TIMEOUT_MS;
-  while (Date.now() < deadline) {
-    if (existsSync(responsePath)) {
-      const response = readForwardedPermissionResponse(responsePath);
-      writeReviewLog("forwarded_permission.response_received", {
-        requestId,
-        approved: response?.approved ?? null,
-        state: response?.state ?? null,
-        denialReason: response?.denialReason ?? null,
-        responderSessionId: response?.responderSessionId ?? null,
-        targetSessionId,
-        responsePath,
-      });
-      safeDeleteFile(responsePath, "forwarded permission response");
-      safeDeleteFile(requestPath, "forwarded permission request");
-      cleanupPermissionForwardingLocationIfEmpty(location);
-      return response ?? { approved: false, state: "denied" };
-    }
-
-    await sleep(PERMISSION_FORWARDING_POLL_INTERVAL_MS);
-  }
-
-  logPermissionForwardingWarning(
-    `Timed out waiting for forwarded permission response '${responsePath}'`,
-  );
-  writeReviewLog("forwarded_permission.response_timed_out", {
-    requestId,
-    requesterAgentName,
-    targetSessionId,
-    responsePath,
-  });
-  safeDeleteFile(requestPath, "forwarded permission request");
-  cleanupPermissionForwardingLocationIfEmpty(location);
-  return { approved: false, state: "denied" };
-}
-
-async function processForwardedPermissionRequests(
-  ctx: ExtensionContext,
-): Promise<void> {
-  if (!ctx.hasUI) {
-    return;
-  }
-
-  const currentSessionId = getSessionId(ctx);
-  const location = getExistingPermissionForwardingLocation(
-    PERMISSION_FORWARDING_DIR,
-    currentSessionId,
-  );
-  if (!location) {
-    return;
-  }
-
-  const requestFiles = listRequestFiles(location.requestsDir);
-  if (requestFiles.length === 0) {
-    return;
-  }
-
-  for (const fileName of requestFiles) {
-    const requestPath = join(location.requestsDir, fileName);
-    const request = readForwardedPermissionRequest(requestPath);
-    if (!request) {
-      safeDeleteFile(
-        requestPath,
-        `${location.label} forwarded permission request`,
-      );
-      continue;
-    }
-
-    if (!isForwardedPermissionRequestForSession(request, currentSessionId)) {
-      logPermissionForwardingWarning(
-        `Ignoring forwarded permission request '${request.id}' because it targets session '${request.targetSessionId}' instead of '${currentSessionId}'`,
-      );
-      safeDeleteFile(
-        requestPath,
-        `${location.label} forwarded permission request`,
-      );
-      continue;
-    }
-
-    const forwardedPermissionLogDetails = {
-      requestId: request.id,
-      source: location.label,
-      requesterAgentName: request.requesterAgentName,
-      requesterSessionId: request.requesterSessionId,
-      targetSessionId: request.targetSessionId,
-      requestPath,
-    };
-
-    let decision: PermissionPromptDecision = {
-      approved: false,
-      state: "denied",
-    };
-    if (shouldAutoApprovePermissionState("ask", extensionConfig)) {
-      writeReviewLog(
-        "forwarded_permission.auto_approved",
-        forwardedPermissionLogDetails,
-      );
-      decision = { approved: true, state: "approved" };
-    } else {
-      writeReviewLog(
-        "forwarded_permission.prompted",
-        forwardedPermissionLogDetails,
-      );
-      try {
-        decision = await requestPermissionDecisionFromUi(
-          ctx.ui,
-          "Permission Required (Subagent)",
-          formatForwardedPermissionPrompt(request),
-        );
-      } catch (error) {
-        logPermissionForwardingError(
-          "Failed to show forwarded permission confirmation dialog",
-          error,
-        );
-        decision = { approved: false, state: "denied" };
-      }
-    }
-
-    const responsePath = join(location.responsesDir, `${request.id}.json`);
-    writeReviewLog(
-      decision.approved
-        ? "forwarded_permission.approved"
-        : "forwarded_permission.denied",
-      {
-        requestId: request.id,
-        source: location.label,
-        requesterAgentName: request.requesterAgentName,
-        requesterSessionId: request.requesterSessionId,
-        targetSessionId: request.targetSessionId,
-        responsePath,
-        resolution: decision.state,
-        denialReason: decision.denialReason ?? null,
-      },
-    );
-    try {
-      writeJsonFileAtomic(responsePath, {
-        approved: decision.approved,
-        state: decision.state,
-        denialReason: decision.denialReason,
-        responderSessionId: currentSessionId,
-        respondedAt: Date.now(),
-      } satisfies ForwardedPermissionResponse);
-    } catch (error) {
-      logPermissionForwardingError(
-        `Failed to write ${location.label} forwarded permission response '${responsePath}'`,
-        error,
-      );
-      continue;
-    }
-
-    safeDeleteFile(
-      requestPath,
-      `${location.label} forwarded permission request`,
-    );
-  }
-
-  cleanupPermissionForwardingLocationIfEmpty(location);
-}
-
-async function confirmPermission(
-  ctx: ExtensionContext,
-  message: string,
-): Promise<PermissionPromptDecision> {
-  if (ctx.hasUI) {
-    return requestPermissionDecisionFromUi(
-      ctx.ui,
-      "Permission Required",
-      message,
-    );
-  }
-
-  if (!isSubagentExecutionContext(ctx, SUBAGENT_SESSIONS_DIR)) {
-    return { approved: false, state: "denied" };
-  }
-
-  return waitForForwardedPermissionApproval(ctx, message);
 }
 
 function derivePiProjectPaths(cwd: string | undefined | null): {
@@ -641,6 +339,16 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
 
   setLoggingWarningReporter(notifyWarning);
   setForwardedPermissionLogger({ writeReviewLog, writeDebugLog });
+
+  const forwardingDeps: PermissionForwardingDeps = {
+    forwardingDir: PERMISSION_FORWARDING_DIR,
+    subagentSessionsDir: SUBAGENT_SESSIONS_DIR,
+    writeReviewLog,
+    requestPermissionDecisionFromUi,
+    shouldAutoApprove: () =>
+      shouldAutoApprovePermissionState("ask", extensionConfig),
+  };
+
   refreshExtensionConfig();
   registerPermissionSystemCommand(pi, {
     getConfig: () => extensionConfig,
@@ -710,7 +418,11 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
 
     reviewPermissionDecision("permission_request.waiting", details);
 
-    const decision = await confirmPermission(ctx, details.message);
+    const decision = await confirmPermission(
+      ctx,
+      details.message,
+      forwardingDeps,
+    );
     reviewPermissionDecision(
       decision.approved
         ? "permission_request.approved"
@@ -753,6 +465,7 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
       isProcessingForwardedRequests = true;
       void processForwardedPermissionRequests(
         permissionForwardingContext,
+        forwardingDeps,
       ).finally(() => {
         isProcessingForwardedRequests = false;
       });
