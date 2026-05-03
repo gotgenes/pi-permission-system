@@ -22,7 +22,7 @@ import {
   createBeforeAgentStartPromptStateKey,
   shouldApplyCachedAgentStartState,
 } from "./before-agent-start-cache";
-import { toRecord } from "./common";
+import { getNonEmptyString, toRecord } from "./common";
 import { loadAndMergeConfigs, loadUnifiedConfig } from "./config-loader";
 import { registerPermissionSystemCommand } from "./config-modal";
 import {
@@ -44,8 +44,12 @@ import {
   type PermissionSystemExtensionConfig,
 } from "./extension-config";
 import {
+  extractExternalPathsFromBashCommand,
+  formatBashExternalDirectoryAskPrompt,
+  formatBashExternalDirectoryDenyReason,
   formatExternalDirectoryAskPrompt,
   formatExternalDirectoryDenyReason,
+  formatExternalDirectoryHardStopHint,
   formatExternalDirectoryUserDeniedReason,
   getPathBearingToolPath,
   isPathOutsideWorkingDirectory,
@@ -895,6 +899,90 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
         }
       }
       // state === "allow" → fall through to normal permission check
+    }
+
+    // Bash external directory gate: extract paths from bash commands
+    if (ctx.cwd && toolName === "bash") {
+      const command = getNonEmptyString(toRecord(input).command);
+      if (command) {
+        const externalPaths = extractExternalPathsFromBashCommand(
+          command,
+          ctx.cwd,
+        );
+        if (externalPaths.length > 0) {
+          const extCheck = permissionManager.checkPermission(
+            "external_directory",
+            {},
+            agentName ?? undefined,
+          );
+
+          if (extCheck.state === "deny") {
+            writeReviewLog("permission_request.blocked", {
+              source: "tool_call",
+              toolCallId: event.toolCallId,
+              toolName,
+              agentName,
+              command,
+              externalPaths,
+              resolution: "policy_denied",
+            });
+            return {
+              block: true,
+              reason: formatBashExternalDirectoryDenyReason(
+                command,
+                externalPaths,
+                ctx.cwd,
+                agentName ?? undefined,
+              ),
+            };
+          }
+
+          if (extCheck.state === "ask") {
+            const message = formatBashExternalDirectoryAskPrompt(
+              command,
+              externalPaths,
+              ctx.cwd,
+              agentName ?? undefined,
+            );
+            if (!canRequestPermissionConfirmation(ctx)) {
+              writeReviewLog("permission_request.blocked", {
+                source: "tool_call",
+                toolCallId: event.toolCallId,
+                toolName,
+                agentName,
+                command,
+                externalPaths,
+                message,
+                resolution: "confirmation_unavailable",
+              });
+              return {
+                block: true,
+                reason: `Bash command '${command}' references path(s) outside the working directory and requires approval, but no interactive UI is available.`,
+              };
+            }
+
+            const extDecision = await promptPermission(ctx, {
+              requestId: event.toolCallId,
+              source: "tool_call",
+              agentName,
+              message,
+              toolCallId: event.toolCallId,
+              toolName,
+              command,
+            });
+            if (!extDecision.approved) {
+              const reasonSuffix = extDecision.denialReason
+                ? ` Reason: ${extDecision.denialReason}.`
+                : "";
+              return {
+                block: true,
+                reason: `User denied external directory access for bash command '${command}'.${reasonSuffix} ${formatExternalDirectoryHardStopHint()}`,
+              };
+            }
+          }
+          // state === "allow" → fall through to normal bash permission check
+        }
+      }
     }
 
     const check = permissionManager.checkPermission(
