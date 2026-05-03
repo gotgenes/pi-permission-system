@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.8.0](https://github.com/gotgenes/pi-permission-system/compare/v3.7.0...v3.8.0) (2026-05-03)
+
+
+### Features
+
+* define ExtensionRuntime and createExtensionRuntime factory ([#43](https://github.com/gotgenes/pi-permission-system/issues/43)) ([6ad3db6](https://github.com/gotgenes/pi-permission-system/commit/6ad3db6671629f6480a49e6be890dbaff211ad69))
+* eliminate module-scope state in src/index.ts ([#43](https://github.com/gotgenes/pi-permission-system/issues/43)) ([45b2bc1](https://github.com/gotgenes/pi-permission-system/commit/45b2bc1f4bff3693f295892c942328cc6a53f5e0))
+* relocate factory helpers into src/runtime.ts ([#43](https://github.com/gotgenes/pi-permission-system/issues/43)) ([88c1acd](https://github.com/gotgenes/pi-permission-system/commit/88c1acd4e99f24e808b60bbeee2cbed69c2a67ef))
+* simplify HandlerDeps to use ExtensionRuntime ([#43](https://github.com/gotgenes/pi-permission-system/issues/43)) ([2ff5971](https://github.com/gotgenes/pi-permission-system/commit/2ff59712f88c8bde2095df7e475ecb0c19cb3335))
+* thread logger through forwarded-permissions IO ([#43](https://github.com/gotgenes/pi-permission-system/issues/43)) ([66db158](https://github.com/gotgenes/pi-permission-system/commit/66db158cfe423cf503fc08fc472f31f595527381))
+
+
+### Documentation
+
+* plan eliminate module-scope mutable state ([#43](https://github.com/gotgenes/pi-permission-system/issues/43)) ([6a782d7](https://github.com/gotgenes/pi-permission-system/commit/6a782d7e8df871c15cf9d5c4b27c5e90f9e12d4d))
+* **retro:** add retro notes for issue [#42](https://github.com/gotgenes/pi-permission-system/issues/42) ([9b91110](https://github.com/gotgenes/pi-permission-system/commit/9b91110832e562440c3a881bb16e5f0a7989b33a))
+* update plan with implementation notes ([#43](https://github.com/gotgenes/pi-permission-system/issues/43)) ([d29a7c0](https://github.com/gotgenes/pi-permission-system/commit/d29a7c0d037f3e44791c713474190a1873a5d294))
+
 ## [3.7.0](https://github.com/gotgenes/pi-permission-system/compare/v3.6.0...v3.7.0) (2026-05-03)
 
 
