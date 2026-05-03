@@ -31,9 +31,6 @@ function defaultGlobalConfigPath(): string {
 function defaultAgentsDir(): string {
   return join(getAgentDir(), "agents");
 }
-function defaultLegacyGlobalSettingsPath(): string {
-  return join(getAgentDir(), "settings.json");
-}
 function defaultGlobalMcpConfigPath(): string {
   return join(getAgentDir(), "mcp.json");
 }
@@ -524,7 +521,6 @@ export class PermissionManager {
   private readonly agentsDir: string;
   private readonly projectGlobalConfigPath: string | null;
   private readonly projectAgentsDir: string | null;
-  private readonly legacyGlobalSettingsPath: string;
   private readonly globalMcpConfigPath: string;
   private readonly configuredMcpServerNamesOverride: readonly string[] | null;
   private globalConfigCache: FileCacheEntry<GlobalPermissionConfig> | null =
@@ -554,7 +550,6 @@ export class PermissionManager {
       agentsDir?: string;
       projectGlobalConfigPath?: string;
       projectAgentsDir?: string;
-      legacyGlobalSettingsPath?: string;
       globalMcpConfigPath?: string;
       mcpServerNames?: readonly string[];
     } = {},
@@ -564,8 +559,6 @@ export class PermissionManager {
     this.agentsDir = options.agentsDir || defaultAgentsDir();
     this.projectGlobalConfigPath = options.projectGlobalConfigPath || null;
     this.projectAgentsDir = options.projectAgentsDir || null;
-    this.legacyGlobalSettingsPath =
-      options.legacyGlobalSettingsPath || defaultLegacyGlobalSettingsPath();
     this.globalMcpConfigPath =
       options.globalMcpConfigPath || defaultGlobalMcpConfigPath();
     this.configuredMcpServerNamesOverride = options.mcpServerNames
@@ -840,7 +833,7 @@ export class PermissionManager {
       return this.configuredMcpServerNamesOverride;
     }
 
-    const paths = [this.globalMcpConfigPath, this.legacyGlobalSettingsPath];
+    const paths = [this.globalMcpConfigPath];
     const stamp = paths
       .map((path) => `${path}:${getFileStamp(path)}`)
       .join("|");

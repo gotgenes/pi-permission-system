@@ -958,7 +958,6 @@ test("MCP server names in settings.json are not used — only mcp.json is consul
     globalConfigPath,
     agentsDir,
     globalMcpConfigPath: mcpConfigPath,
-    legacyGlobalSettingsPath: settingsJsonPath,
   });
 
   try {
