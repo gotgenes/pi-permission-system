@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 // Mock logging collaborator before importing the module under test.
 vi.mock("../src/logging.js", () => ({
@@ -29,8 +29,11 @@ import type { PermissionCheckResult } from "../src/types.js";
 
 const mockedStringify = vi.mocked(safeJsonStringify);
 
+beforeEach(() => {
+  mockedStringify.mockReset();
+});
+
 afterEach(() => {
-  vi.clearAllMocks();
   vi.restoreAllMocks();
 });
 
