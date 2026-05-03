@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.7.0](https://github.com/gotgenes/pi-permission-system/compare/v3.6.0...v3.7.0) (2026-05-03)
+
+
+### Features
+
+* define HandlerDeps interface for handler extraction ([#42](https://github.com/gotgenes/pi-permission-system/issues/42)) ([a71e553](https://github.com/gotgenes/pi-permission-system/commit/a71e553ec988b4b222177f90a21519757cb62380))
+* extract before_agent_start handler into src/handlers/before-agent-start.ts ([#42](https://github.com/gotgenes/pi-permission-system/issues/42)) ([9443a99](https://github.com/gotgenes/pi-permission-system/commit/9443a99b0e60b17868fc240782c2b31f53f409af))
+* extract input handler into src/handlers/input.ts ([#42](https://github.com/gotgenes/pi-permission-system/issues/42)) ([196862a](https://github.com/gotgenes/pi-permission-system/commit/196862a86b270628b77f23049eb4902f85cde617))
+* extract lifecycle handlers into src/handlers/lifecycle.ts ([#42](https://github.com/gotgenes/pi-permission-system/issues/42)) ([0edb194](https://github.com/gotgenes/pi-permission-system/commit/0edb194be90b5c5b5465acb4be38fbd2f749cdf9))
+* extract tool_call handler into src/handlers/tool-call.ts ([#42](https://github.com/gotgenes/pi-permission-system/issues/42)) ([a4b81ca](https://github.com/gotgenes/pi-permission-system/commit/a4b81caa34da4959988ac311952a881ffdad72fe))
+
+
+### Documentation
+
+* align handler extraction plan with architecture docs ([#42](https://github.com/gotgenes/pi-permission-system/issues/42)) ([4d91e03](https://github.com/gotgenes/pi-permission-system/commit/4d91e03b9ba11beccc5855d81f1f15be707495b0))
+* **retro:** add retro notes for issue [#55](https://github.com/gotgenes/pi-permission-system/issues/55) ([ee763ff](https://github.com/gotgenes/pi-permission-system/commit/ee763ffccfbf19b9ec3627ea29847251e1505020))
+* update plan with implementation notes for handler extraction ([#42](https://github.com/gotgenes/pi-permission-system/issues/42)) ([73603b2](https://github.com/gotgenes/pi-permission-system/commit/73603b25f5b5a53b0dd4300620b1f8ef8c844353))
+
 ## [3.6.0](https://github.com/gotgenes/pi-permission-system/compare/v3.5.0...v3.6.0) (2026-05-03)
 
 
