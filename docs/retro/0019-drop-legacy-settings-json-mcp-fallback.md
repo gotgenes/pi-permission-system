@@ -22,7 +22,7 @@ Released as v1.2.0.
 
 #### What caused friction (agent side)
 
-- `instruction-violation` (self-identified) — Markdownlint table separator style (`|---|---|` vs `| --- | --- |`) failed the pre-commit hook on the plan commit, requiring a fix before the commit could land. This is the same friction seen in the #18 retro. Impact: one failed pre-commit hook, ~30 seconds of rework.
+- `instruction-violation` (self-identified) — Markdownlint MD060 (table column alignment) failed the pre-commit hook on the plan commit because separator widths didn't match header widths. This is the same friction seen in the #18 retro. MD060 is not auto-fixable by `markdownlint-cli2 --fix`. Impact: one failed pre-commit hook, ~30 seconds of rework.
 
 #### What caused friction (user side)
 
@@ -31,4 +31,4 @@ Released as v1.2.0.
 ### Changes made
 
 1. Created `docs/retro/0019-drop-legacy-settings-json-mcp-fallback.md` (this file).
-2. Added markdownlint table-separator spacing rule to `AGENTS.md` § Markdown.
+2. Added markdownlint MD060 table-column-alignment rule to `AGENTS.md` § Markdown (not auto-fixable; must match separator widths to header widths).
