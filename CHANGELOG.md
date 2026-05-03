@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0](https://github.com/gotgenes/pi-permission-system/compare/v1.1.0...v1.2.0) (2026-05-03)
+
+
+### Features
+
+* drop legacy settings.json fallback for MCP server names ([#19](https://github.com/gotgenes/pi-permission-system/issues/19)) ([3978f94](https://github.com/gotgenes/pi-permission-system/commit/3978f94acfe01b32e6e37c4fa0f5ca3b22881208))
+
+
+### Documentation
+
+* plan drop legacy settings.json MCP fallback ([#19](https://github.com/gotgenes/pi-permission-system/issues/19)) ([fd88aac](https://github.com/gotgenes/pi-permission-system/commit/fd88aac8e52c0b617b5ce2582c700bbb86b9bf84))
+* **retro:** add retro notes for issue [#18](https://github.com/gotgenes/pi-permission-system/issues/18) ([1bb9cc5](https://github.com/gotgenes/pi-permission-system/commit/1bb9cc52abe159d77b8ab29960bafdb2740c9c98))
+
 ## [1.1.0](https://github.com/gotgenes/pi-permission-system/compare/v1.0.0...v1.1.0) (2026-05-03)
 
 
