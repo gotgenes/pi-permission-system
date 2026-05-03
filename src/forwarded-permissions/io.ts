@@ -8,7 +8,6 @@ import {
   unlinkSync,
   writeFileSync,
 } from "node:fs";
-import { join } from "node:path";
 
 import { isPermissionDecisionState } from "../permission-dialog.js";
 import {
