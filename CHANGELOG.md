@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.0](https://github.com/gotgenes/pi-permission-system/compare/v2.0.0...v3.0.0) (2026-05-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* Config is now loaded from ~/.pi/agent/extensions/pi-permission-system/config.json (global) and <cwd>/.pi/extensions/pi-permission-system/config.json (project). Legacy paths are detected and merged with migration warnings.
+* Config and log file paths move from the extension install directory and ~/.pi/agent/ to the extensions/<id>/ convention.
+
+### Features
+
+* add config-paths module with new layout paths ([#10](https://github.com/gotgenes/pi-permission-system/issues/10)) ([532d2a1](https://github.com/gotgenes/pi-permission-system/commit/532d2a1f1d816c1cfba5419f7d0041382c848b31))
+* add unified config loader ([#10](https://github.com/gotgenes/pi-permission-system/issues/10)) ([20143e0](https://github.com/gotgenes/pi-permission-system/commit/20143e0f7b608965d889433a6b9bbd6f9ab8b4cc))
+* detect and merge legacy config paths ([#10](https://github.com/gotgenes/pi-permission-system/issues/10)) ([95046de](https://github.com/gotgenes/pi-permission-system/commit/95046de6a57d604c5f0d9fa8c13a64478ba15c89))
+* implement config merge in unified loader ([#10](https://github.com/gotgenes/pi-permission-system/issues/10)) ([30b9afe](https://github.com/gotgenes/pi-permission-system/commit/30b9afe3d83940aa3ad708c9d6783bb2d4337743))
+* update config-reporter for consolidated layout ([#10](https://github.com/gotgenes/pi-permission-system/issues/10)) ([96c9ef4](https://github.com/gotgenes/pi-permission-system/commit/96c9ef4964f9551b0fa89bbbc506f7660c055d74))
+* wire index.ts to consolidated config layout ([#10](https://github.com/gotgenes/pi-permission-system/issues/10)) ([e7f8e5f](https://github.com/gotgenes/pi-permission-system/commit/e7f8e5f2fb094f0d291561258190d1892a1e6856))
+
+
+### Documentation
+
+* plan config layout consolidation ([#10](https://github.com/gotgenes/pi-permission-system/issues/10)) ([eb2924d](https://github.com/gotgenes/pi-permission-system/commit/eb2924d57655d06f67891574839aebfa0586a43d))
+* **retro:** add retro notes for issue [#20](https://github.com/gotgenes/pi-permission-system/issues/20) ([4735f0c](https://github.com/gotgenes/pi-permission-system/commit/4735f0c646a0ede11c9a76083822969eb6ca4a8f))
+* update schema, example, and docs for consolidated config ([#10](https://github.com/gotgenes/pi-permission-system/issues/10)) ([39b5c01](https://github.com/gotgenes/pi-permission-system/commit/39b5c01de1c8c721e998b244e9c825a6eb05f858))
+
 ## [2.0.0](https://github.com/gotgenes/pi-permission-system/compare/v1.2.1...v2.0.0) (2026-05-03)
 
 
