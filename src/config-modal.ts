@@ -8,7 +8,7 @@ import { type SettingItem, SettingsList } from "@mariozechner/pi-tui";
 import {
   DEFAULT_EXTENSION_CONFIG,
   type PermissionSystemExtensionConfig,
-} from "./extension-config.js";
+} from "./extension-config";
 
 interface PermissionSystemConfigController {
   getConfig(): PermissionSystemExtensionConfig;

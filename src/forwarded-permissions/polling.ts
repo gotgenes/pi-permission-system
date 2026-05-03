@@ -5,9 +5,9 @@ import type { ExtensionContext } from "@mariozechner/pi-coding-agent";
 import {
   getActiveAgentName,
   getActiveAgentNameFromSystemPrompt,
-} from "../active-agent.js";
-import { toRecord } from "../common.js";
-import type { PermissionPromptDecision } from "../permission-dialog.js";
+} from "../active-agent";
+import { toRecord } from "../common";
+import type { PermissionPromptDecision } from "../permission-dialog";
 import {
   type ForwardedPermissionRequest,
   type ForwardedPermissionResponse,
@@ -15,8 +15,8 @@ import {
   PERMISSION_FORWARDING_POLL_INTERVAL_MS,
   PERMISSION_FORWARDING_TIMEOUT_MS,
   resolvePermissionForwardingTargetSessionId,
-} from "../permission-forwarding.js";
-import { isSubagentExecutionContext } from "../subagent-context.js";
+} from "../permission-forwarding";
+import { isSubagentExecutionContext } from "../subagent-context";
 
 import {
   cleanupPermissionForwardingLocationIfEmpty,
@@ -30,7 +30,7 @@ import {
   safeDeleteFile,
   sleep,
   writeJsonFileAtomic,
-} from "./io.js";
+} from "./io";
 
 export interface PermissionForwardingDeps {
   forwardingDir: string;

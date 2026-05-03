@@ -6,8 +6,8 @@ import type {
 import {
   EXTENSION_ID,
   type PermissionSystemExtensionConfig,
-} from "./extension-config.js";
-import { isYoloModeEnabled } from "./yolo-mode.js";
+} from "./extension-config";
+import { isYoloModeEnabled } from "./yolo-mode";
 
 export const PERMISSION_SYSTEM_STATUS_KEY = EXTENSION_ID;
 export const PERMISSION_SYSTEM_YOLO_STATUS_VALUE = "yolo";

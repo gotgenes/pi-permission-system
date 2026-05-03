@@ -1,9 +1,9 @@
-import type { BashPermissions, PermissionState } from "./types.js";
+import type { BashPermissions, PermissionState } from "./types";
 import {
   type CompiledWildcardPattern,
   compileWildcardPatterns,
   findCompiledWildcardMatch,
-} from "./wildcard-matcher.js";
+} from "./wildcard-matcher";
 
 type CompiledPattern = CompiledWildcardPattern<PermissionState>;
 

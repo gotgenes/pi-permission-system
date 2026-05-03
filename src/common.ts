@@ -1,4 +1,4 @@
-import type { PermissionState } from "./types.js";
+import type { PermissionState } from "./types";
 
 export function toRecord(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== "object" || Array.isArray(value)) {

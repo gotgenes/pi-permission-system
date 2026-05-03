@@ -16,15 +16,15 @@ import {
 import {
   getActiveAgentName,
   getActiveAgentNameFromSystemPrompt,
-} from "./active-agent.js";
+} from "./active-agent";
 import {
   createActiveToolsCacheKey,
   createBeforeAgentStartPromptStateKey,
   shouldApplyCachedAgentStartState,
-} from "./before-agent-start-cache.js";
-import { toRecord } from "./common.js";
-import { loadAndMergeConfigs, loadUnifiedConfig } from "./config-loader.js";
-import { registerPermissionSystemCommand } from "./config-modal.js";
+} from "./before-agent-start-cache";
+import { toRecord } from "./common";
+import { loadAndMergeConfigs, loadUnifiedConfig } from "./config-loader";
+import { registerPermissionSystemCommand } from "./config-modal";
 import {
   DEBUG_LOG_FILENAME,
   getGlobalConfigPath,
@@ -34,15 +34,15 @@ import {
   getLegacyProjectPolicyPath,
   getProjectConfigPath,
   REVIEW_LOG_FILENAME,
-} from "./config-paths.js";
-import { buildResolvedConfigLogEntry } from "./config-reporter.js";
+} from "./config-paths";
+import { buildResolvedConfigLogEntry } from "./config-reporter";
 import {
   DEFAULT_EXTENSION_CONFIG,
   EXTENSION_ROOT,
   ensurePermissionSystemLogsDirectory,
   normalizePermissionSystemConfig,
   type PermissionSystemExtensionConfig,
-} from "./extension-config.js";
+} from "./extension-config";
 import {
   formatExternalDirectoryAskPrompt,
   formatExternalDirectoryDenyReason,
@@ -51,20 +51,20 @@ import {
   isPathOutsideWorkingDirectory,
   normalizePathForComparison,
   PATH_BEARING_TOOLS,
-} from "./external-directory.js";
-import { setForwardedPermissionLogger } from "./forwarded-permissions/io.js";
+} from "./external-directory";
+import { setForwardedPermissionLogger } from "./forwarded-permissions/io";
 import {
   confirmPermission,
   type PermissionForwardingDeps,
   processForwardedPermissionRequests,
-} from "./forwarded-permissions/polling.js";
-import { createPermissionSystemLogger } from "./logging.js";
+} from "./forwarded-permissions/polling";
+import { createPermissionSystemLogger } from "./logging";
 import {
   type PermissionPromptDecision,
   requestPermissionDecisionFromUi,
-} from "./permission-dialog.js";
-import { PERMISSION_FORWARDING_POLL_INTERVAL_MS } from "./permission-forwarding.js";
-import { PermissionManager } from "./permission-manager.js";
+} from "./permission-dialog";
+import { PERMISSION_FORWARDING_POLL_INTERVAL_MS } from "./permission-forwarding";
+import { PermissionManager } from "./permission-manager";
 import {
   formatAskPrompt,
   formatDenyReason,
@@ -74,27 +74,27 @@ import {
   formatSkillPathDenyReason,
   formatUnknownToolReason,
   formatUserDeniedReason,
-} from "./permission-prompts.js";
+} from "./permission-prompts";
 import {
   findSkillPathMatch,
   resolveSkillPromptEntries,
   type SkillPromptEntry,
-} from "./skill-prompt-sanitizer.js";
+} from "./skill-prompt-sanitizer";
 import {
   PERMISSION_SYSTEM_STATUS_KEY,
   syncPermissionSystemStatus,
-} from "./status.js";
-import { isSubagentExecutionContext } from "./subagent-context.js";
-import { sanitizeAvailableToolsSection } from "./system-prompt-sanitizer.js";
-import { getPermissionLogContext } from "./tool-input-preview.js";
+} from "./status";
+import { isSubagentExecutionContext } from "./subagent-context";
+import { sanitizeAvailableToolsSection } from "./system-prompt-sanitizer";
+import { getPermissionLogContext } from "./tool-input-preview";
 import {
   checkRequestedToolRegistration,
   getToolNameFromValue,
-} from "./tool-registry.js";
+} from "./tool-registry";
 import {
   canResolveAskPermissionRequest,
   shouldAutoApprovePermissionState,
-} from "./yolo-mode.js";
+} from "./yolo-mode";
 
 const PI_AGENT_DIR = getAgentDir();
 const SESSIONS_DIR = join(PI_AGENT_DIR, "sessions");

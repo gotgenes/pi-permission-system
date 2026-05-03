@@ -2,16 +2,16 @@ import { existsSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { getAgentDir } from "@mariozechner/pi-coding-agent";
 
-import { BashFilter } from "./bash-filter.js";
+import { BashFilter } from "./bash-filter";
 import {
   extractFrontmatter,
   getNonEmptyString,
   isPermissionState,
   parseSimpleYamlMap,
   toRecord,
-} from "./common.js";
-import { loadUnifiedConfig, stripJsonComments } from "./config-loader.js";
-import { getGlobalConfigPath } from "./config-paths.js";
+} from "./common";
+import { loadUnifiedConfig, stripJsonComments } from "./config-loader";
+import { getGlobalConfigPath } from "./config-paths";
 import type {
   AgentPermissions,
   BashPermissions,
@@ -19,13 +19,13 @@ import type {
   PermissionCheckResult,
   PermissionDefaultPolicy,
   PermissionState,
-} from "./types.js";
+} from "./types";
 import {
   type CompiledWildcardPattern,
   compileWildcardPatternEntries,
   findCompiledWildcardMatch,
   findCompiledWildcardMatchForNames,
-} from "./wildcard-matcher.js";
+} from "./wildcard-matcher";
 
 function defaultGlobalConfigPath(): string {
   return getGlobalConfigPath(getAgentDir());

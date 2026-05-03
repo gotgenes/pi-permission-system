@@ -1,3 +1,3 @@
-import permissionSystemExtension from "./src/index.js";
+import permissionSystemExtension from "./src/index";
 
 export default permissionSystemExtension;

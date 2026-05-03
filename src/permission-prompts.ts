@@ -1,6 +1,6 @@
-import type { SkillPromptEntry } from "./skill-prompt-sanitizer.js";
-import { formatToolInputForPrompt } from "./tool-input-preview.js";
-import type { PermissionCheckResult } from "./types.js";
+import type { SkillPromptEntry } from "./skill-prompt-sanitizer";
+import { formatToolInputForPrompt } from "./tool-input-preview";
+import type { PermissionCheckResult } from "./types";
 
 export function formatMissingToolNameReason(): string {
   return "Tool call was blocked because no tool name was provided. Use a registered tool name from pi.getAllTools().";

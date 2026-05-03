@@ -9,13 +9,13 @@ import {
   writeFileSync,
 } from "node:fs";
 
-import { isPermissionDecisionState } from "../permission-dialog.js";
+import { isPermissionDecisionState } from "../permission-dialog";
 import {
   createPermissionForwardingLocation,
   type ForwardedPermissionRequest,
   type ForwardedPermissionResponse,
   type PermissionForwardingLocation,
-} from "../permission-forwarding.js";
+} from "../permission-forwarding";
 
 type LogFn = (event: string, details: Record<string, unknown>) => void;
 

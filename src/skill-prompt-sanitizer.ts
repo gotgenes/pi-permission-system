@@ -1,8 +1,8 @@
 import { homedir } from "node:os";
 import { dirname, join, normalize, resolve, sep } from "node:path";
 
-import type { PermissionManager } from "./permission-manager.js";
-import type { PermissionState } from "./types.js";
+import type { PermissionManager } from "./permission-manager";
+import type { PermissionState } from "./types";
 
 const AVAILABLE_SKILLS_OPEN_TAG = "<available_skills>";
 const AVAILABLE_SKILLS_CLOSE_TAG = "</available_skills>";

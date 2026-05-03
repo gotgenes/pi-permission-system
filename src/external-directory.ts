@@ -1,7 +1,7 @@
 import { homedir } from "node:os";
 import { join, normalize, resolve, sep } from "node:path";
 
-import { getNonEmptyString, toRecord } from "./common.js";
+import { getNonEmptyString, toRecord } from "./common";
 
 export const PATH_BEARING_TOOLS = new Set([
   "read",

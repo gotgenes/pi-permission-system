@@ -1,6 +1,6 @@
-import { getNonEmptyString, toRecord } from "./common.js";
-import { safeJsonStringify } from "./logging.js";
-import type { PermissionCheckResult } from "./types.js";
+import { getNonEmptyString, toRecord } from "./common";
+import { safeJsonStringify } from "./logging";
+import type { PermissionCheckResult } from "./types";
 
 export const TOOL_INPUT_PREVIEW_MAX_LENGTH = 200;
 export const TOOL_INPUT_LOG_PREVIEW_MAX_LENGTH = 1000;

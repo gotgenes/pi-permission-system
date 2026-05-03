@@ -9,7 +9,7 @@ import {
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { toRecord } from "./common.js";
+import { toRecord } from "./common";
 
 export const EXTENSION_ID = "pi-permission-system";
 

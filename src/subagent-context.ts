@@ -1,7 +1,7 @@
 import { normalize } from "node:path";
 import type { ExtensionContext } from "@mariozechner/pi-coding-agent";
 
-import { SUBAGENT_ENV_HINT_KEYS } from "./permission-forwarding.js";
+import { SUBAGENT_ENV_HINT_KEYS } from "./permission-forwarding";
 
 export function normalizeFilesystemPath(pathValue: string): string {
   const normalizedPath = normalize(pathValue);

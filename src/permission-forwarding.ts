@@ -1,6 +1,6 @@
 import { join } from "node:path";
 
-import type { PermissionDecisionState } from "./permission-dialog.js";
+import type { PermissionDecisionState } from "./permission-dialog";
 
 export const PERMISSION_FORWARDING_POLL_INTERVAL_MS = 250;
 export const PERMISSION_FORWARDING_TIMEOUT_MS = 10 * 60 * 1000;

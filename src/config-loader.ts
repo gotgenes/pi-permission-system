@@ -1,15 +1,15 @@
 import { existsSync, readFileSync } from "node:fs";
 import { normalize } from "node:path";
 
-import { isPermissionState, toRecord } from "./common.js";
+import { isPermissionState, toRecord } from "./common";
 import {
   getGlobalConfigPath,
   getLegacyExtensionConfigPath,
   getLegacyGlobalPolicyPath,
   getLegacyProjectPolicyPath,
   getProjectConfigPath,
-} from "./config-paths.js";
-import type { PermissionDefaultPolicy, PermissionState } from "./types.js";
+} from "./config-paths";
+import type { PermissionDefaultPolicy, PermissionState } from "./types";
 
 /**
  * Unified config shape combining runtime knobs and policy in one object.

@@ -7,7 +7,7 @@ import {
   LOGS_DIR,
   PERMISSION_REVIEW_LOG_PATH,
   type PermissionSystemExtensionConfig,
-} from "./extension-config.js";
+} from "./extension-config";
 
 export function safeJsonStringify(value: unknown): string | undefined {
   const seen = new WeakSet<object>();
