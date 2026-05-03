@@ -1569,6 +1569,13 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
     startForwardedPermissionPolling(ctx);
     logResolvedConfigPaths();
 
+    const policyIssues = permissionManager.getConfigIssues(
+      lastKnownActiveAgentName,
+    );
+    for (const issue of policyIssues) {
+      notifyWarning(issue);
+    }
+
     if (event.reason === "reload") {
       writeDebugLog("lifecycle.reload", {
         triggeredBy: "session_start",

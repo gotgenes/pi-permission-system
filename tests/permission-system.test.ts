@@ -33,8 +33,8 @@ import {
   SUBAGENT_PARENT_SESSION_ENV_KEY,
 } from "../src/permission-forwarding.js";
 import {
-  PermissionManager,
   normalizeRawPermission,
+  PermissionManager,
 } from "../src/permission-manager.js";
 import {
   findSkillPathMatch,
@@ -2398,7 +2398,13 @@ test("normalizeRawPermission emits no issues when special is absent", () => {
 
 test("PermissionManager.getConfigIssues returns deprecation for tool_call_limit in global config", () => {
   const config: GlobalPermissionConfig = {
-    defaultPolicy: { tools: "ask", bash: "ask", mcp: "ask", skills: "ask", special: "ask" },
+    defaultPolicy: {
+      tools: "ask",
+      bash: "ask",
+      mcp: "ask",
+      skills: "ask",
+      special: "ask",
+    },
     tools: {},
     bash: {},
     mcp: {},
@@ -2417,7 +2423,13 @@ test("PermissionManager.getConfigIssues returns deprecation for tool_call_limit 
 
 test("PermissionManager.getConfigIssues returns empty array for clean config", () => {
   const config: GlobalPermissionConfig = {
-    defaultPolicy: { tools: "ask", bash: "ask", mcp: "ask", skills: "ask", special: "ask" },
+    defaultPolicy: {
+      tools: "ask",
+      bash: "ask",
+      mcp: "ask",
+      skills: "ask",
+      special: "ask",
+    },
     tools: {},
     bash: {},
     mcp: {},
