@@ -7,6 +7,7 @@
   "additionalProperties": false,
   "properties": {
     "$schema": {
+      "description": "JSON Schema URI for editor autocomplete and validation.",
       "type": "string"
     },
     "debugLog": {
@@ -25,22 +26,28 @@
       "default": false
     },
     "defaultPolicy": {
+      "description": "Fallback permission state per category when no specific rule matches.",
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "tools": {
+          "description": "Default permission for registered tools when no exact-name rule matches in the tools map.",
           "$ref": "#/$defs/permissionState"
         },
         "bash": {
+          "description": "Default permission for bash commands when no pattern in the bash map matches.",
           "$ref": "#/$defs/permissionState"
         },
         "mcp": {
+          "description": "Default permission for MCP operations when no target pattern in the mcp map matches.",
           "$ref": "#/$defs/permissionState"
         },
         "skills": {
+          "description": "Default permission for skill loading when no pattern in the skills map matches.",
           "$ref": "#/$defs/permissionState"
         },
         "special": {
+          "description": "Default permission for special checks (doom_loop, external_directory) when no explicit rule matches.",
           "$ref": "#/$defs/permissionState"
         }
       }
@@ -50,6 +57,7 @@
       "$ref": "#/$defs/permissionMap"
     },
     "bash": {
+      "description": "Wildcard pattern permissions for bash commands. Patterns use * globs matched against the full command string. Last matching rule wins.",
       "$ref": "#/$defs/permissionMap"
     },
     "mcp": {
@@ -57,16 +65,20 @@
       "$ref": "#/$defs/permissionMap"
     },
     "skills": {
+      "description": "Wildcard pattern permissions for skill names. Controls which skills can be loaded or read from disk.",
       "$ref": "#/$defs/permissionMap"
     },
     "special": {
+      "description": "Reserved permission checks for special runtime behaviors.",
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "doom_loop": {
+          "description": "Controls doom loop detection behavior.",
           "$ref": "#/$defs/permissionState"
         },
         "external_directory": {
+          "description": "Enforces permission checks for path-bearing file tools (read, write, edit, find, grep, ls) when they target paths outside the active working directory.",
           "$ref": "#/$defs/permissionState"
         }
       }
@@ -74,12 +86,15 @@
   },
   "$defs": {
     "permissionState": {
+      "description": "A permission decision: allow (permit silently), deny (block with error), or ask (prompt the user for confirmation).",
       "type": "string",
       "enum": ["allow", "deny", "ask"]
     },
     "permissionMap": {
+      "description": "A map of name or wildcard patterns to permission states. Keys are matched against the relevant target (tool name, bash command, MCP target, or skill name).",
       "type": "object",
       "propertyNames": {
+        "description": "A non-empty pattern string. Use * for wildcard matching.",
         "type": "string",
         "minLength": 1
       },
