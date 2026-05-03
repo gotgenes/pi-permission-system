@@ -47,7 +47,11 @@ import {
   checkRequestedToolRegistration,
   getToolNameFromValue,
 } from "../src/tool-registry.js";
-import type { AgentPermissions, GlobalPermissionConfig } from "../src/types.js";
+import type {
+  AgentPermissions,
+  GlobalPermissionConfig,
+  PermissionState,
+} from "../src/types.js";
 import {
   canResolveAskPermissionRequest,
   shouldAutoApprovePermissionState,
@@ -2390,4 +2394,41 @@ test("normalizeRawPermission emits no issues for valid special keys", () => {
 test("normalizeRawPermission emits no issues when special is absent", () => {
   const result = normalizeRawPermission({ tools: { read: "allow" } });
   assert.equal(result.configIssues.length, 0);
+});
+
+test("PermissionManager.getConfigIssues returns deprecation for tool_call_limit in global config", () => {
+  const config: GlobalPermissionConfig = {
+    defaultPolicy: { tools: "ask", bash: "ask", mcp: "ask", skills: "ask", special: "ask" },
+    tools: {},
+    bash: {},
+    mcp: {},
+    skills: {},
+    special: { tool_call_limit: "allow" as PermissionState, doom_loop: "deny" },
+  };
+  const { manager, cleanup } = createManager(config);
+  try {
+    const issues = manager.getConfigIssues();
+    assert.equal(issues.length, 1);
+    assert.ok(issues[0].includes("tool_call_limit"));
+  } finally {
+    cleanup();
+  }
+});
+
+test("PermissionManager.getConfigIssues returns empty array for clean config", () => {
+  const config: GlobalPermissionConfig = {
+    defaultPolicy: { tools: "ask", bash: "ask", mcp: "ask", skills: "ask", special: "ask" },
+    tools: {},
+    bash: {},
+    mcp: {},
+    skills: {},
+    special: { doom_loop: "deny" },
+  };
+  const { manager, cleanup } = createManager(config);
+  try {
+    const issues = manager.getConfigIssues();
+    assert.equal(issues.length, 0);
+  } finally {
+    cleanup();
+  }
 });
