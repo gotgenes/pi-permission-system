@@ -2313,6 +2313,162 @@ test("tool_call skips external_directory checks for optional path tools without 
   }
 });
 
+// --- bash external_directory integration tests (#39) ---
+
+test("tool_call blocks bash command with external path when external_directory is denied", async () => {
+  const harness = createToolCallHarness(
+    {
+      defaultPolicy: {
+        tools: "allow",
+        bash: "allow",
+        mcp: "allow",
+        skills: "allow",
+        special: "ask",
+      },
+      special: { external_directory: "deny" },
+    },
+    ["bash"],
+  );
+
+  try {
+    const result = await runToolCall(harness, {
+      toolName: "bash",
+      toolCallId: "bash-external-deny",
+      input: { command: "cat /etc/hosts" },
+    });
+
+    assert.equal(result.block, true);
+    assert.match(
+      String(result.reason),
+      /external directory permission denial/i,
+    );
+    assert.match(String(result.reason), /\/etc\/hosts/);
+  } finally {
+    await harness.cleanup();
+  }
+});
+
+test("tool_call allows bash command with only internal paths when external_directory is denied", async () => {
+  const harness = createToolCallHarness(
+    {
+      defaultPolicy: {
+        tools: "allow",
+        bash: "allow",
+        mcp: "allow",
+        skills: "allow",
+        special: "ask",
+      },
+      special: { external_directory: "deny" },
+    },
+    ["bash"],
+  );
+
+  try {
+    const result = await runToolCall(harness, {
+      toolName: "bash",
+      toolCallId: "bash-internal-allow",
+      input: { command: "cat src/index.ts" },
+    });
+
+    assert.deepEqual(result, {});
+  } finally {
+    await harness.cleanup();
+  }
+});
+
+test("tool_call prompts for bash command with external path when external_directory is ask", async () => {
+  const harness = createToolCallHarness(
+    {
+      defaultPolicy: {
+        tools: "allow",
+        bash: "allow",
+        mcp: "allow",
+        skills: "allow",
+        special: "ask",
+      },
+      special: { external_directory: "ask" },
+    },
+    ["bash"],
+  );
+
+  try {
+    const result = await runToolCall(harness, {
+      toolName: "bash",
+      toolCallId: "bash-external-ask-no-ui",
+      input: { command: "cat /etc/hosts" },
+    });
+
+    // No UI available in default harness, so it should block
+    assert.equal(result.block, true);
+    assert.match(
+      String(result.reason),
+      /requires approval.*no interactive UI/i,
+    );
+  } finally {
+    await harness.cleanup();
+  }
+});
+
+test("tool_call allows bash command with external path when external_directory is allow", async () => {
+  const harness = createToolCallHarness(
+    {
+      defaultPolicy: {
+        tools: "allow",
+        bash: "allow",
+        mcp: "allow",
+        skills: "allow",
+        special: "ask",
+      },
+      special: { external_directory: "allow" },
+    },
+    ["bash"],
+  );
+
+  try {
+    const result = await runToolCall(harness, {
+      toolName: "bash",
+      toolCallId: "bash-external-allow",
+      input: { command: "cat /etc/hosts" },
+    });
+
+    // Should pass through to normal bash permission (which is also allow)
+    assert.deepEqual(result, {});
+  } finally {
+    await harness.cleanup();
+  }
+});
+
+test("tool_call applies bash pattern permissions after external_directory allow", async () => {
+  const harness = createToolCallHarness(
+    {
+      defaultPolicy: {
+        tools: "allow",
+        bash: "allow",
+        mcp: "allow",
+        skills: "allow",
+        special: "ask",
+      },
+      special: { external_directory: "allow" },
+      bash: { "cat *": "deny" },
+    },
+    ["bash"],
+  );
+
+  try {
+    const result = await runToolCall(harness, {
+      toolName: "bash",
+      toolCallId: "bash-pattern-deny-after-ext-allow",
+      input: { command: "cat /etc/hosts" },
+    });
+
+    // external_directory allows, but bash pattern denies
+    assert.equal(result.block, true);
+    assert.match(String(result.reason), /not permitted/i);
+  } finally {
+    await harness.cleanup();
+  }
+});
+
 test("generic ask prompts include serialized tool input for informed approval", async () => {
   const harness = createToolCallHarness(
     {

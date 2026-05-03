@@ -188,6 +188,41 @@ describe("extractExternalPathsFromBashCommand", () => {
     });
   });
 
+  describe("quoted strings are ignored", () => {
+    test("does not flag path inside double-quoted string", () => {
+      const result = extractExternalPathsFromBashCommand(
+        'git commit -m "fix: update /etc/hosts handler"',
+        cwd,
+      );
+      expect(result).toHaveLength(0);
+    });
+
+    test("does not flag path inside single-quoted string", () => {
+      const result = extractExternalPathsFromBashCommand(
+        "echo 'see /usr/local/docs for info'",
+        cwd,
+      );
+      expect(result).toHaveLength(0);
+    });
+
+    test("still flags unquoted path alongside quoted content", () => {
+      const result = extractExternalPathsFromBashCommand(
+        'cat /etc/hosts && echo "done"',
+        cwd,
+      );
+      expect(result).toContain("/etc/hosts");
+    });
+
+    test.fails("escaped quotes inside strings cause false positive (known limitation)", () => {
+      // The regex-based quote stripping can't handle escaped quotes
+      const result = extractExternalPathsFromBashCommand(
+        'echo "path is "/etc/hosts""',
+        cwd,
+      );
+      expect(result).toHaveLength(0);
+    });
+  });
+
   describe("deduplication", () => {
     test("returns deduplicated paths", () => {
       const result = extractExternalPathsFromBashCommand(
