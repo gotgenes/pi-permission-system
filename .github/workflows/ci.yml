@@ -24,11 +24,8 @@ jobs:
       - name: Type check
         run: npm run build
 
-      - name: Lint (biome)
-        run: npm run lint
-
-      - name: Lint (markdown)
-        run: npm run lint:md
+      - name: Lint
+        run: npm run lint:all
 
       - name: Test
         run: npm test
