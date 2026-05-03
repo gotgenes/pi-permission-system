@@ -10,6 +10,7 @@ import {
   parseSimpleYamlMap,
   toRecord,
 } from "./common.js";
+import { loadUnifiedConfig, stripJsonComments } from "./config-loader.js";
 import type {
   AgentPermissions,
   BashPermissions,
@@ -69,78 +70,6 @@ const EMPTY_GLOBAL_CONFIG: GlobalPermissionConfig = {
   skills: {},
   special: {},
 };
-
-function stripJsonComments(input: string): string {
-  let output = "";
-  let inString = false;
-  let stringQuote: '"' | "'" | "" = "";
-  let escaping = false;
-  let inLineComment = false;
-  let inBlockComment = false;
-
-  for (let i = 0; i < input.length; i++) {
-    const char = input[i];
-    const next = input[i + 1] || "";
-
-    if (inLineComment) {
-      if (char === "\n") {
-        inLineComment = false;
-        output += char;
-      }
-      continue;
-    }
-
-    if (inBlockComment) {
-      if (char === "*" && next === "/") {
-        inBlockComment = false;
-        i++;
-      }
-      continue;
-    }
-
-    if (!inString && char === "/" && next === "/") {
-      inLineComment = true;
-      i++;
-      continue;
-    }
-
-    if (!inString && char === "/" && next === "*") {
-      inBlockComment = true;
-      i++;
-      continue;
-    }
-
-    output += char;
-
-    if (!inString && (char === '"' || char === "'")) {
-      inString = true;
-      stringQuote = char;
-      escaping = false;
-      continue;
-    }
-
-    if (!inString) {
-      continue;
-    }
-
-    if (escaping) {
-      escaping = false;
-      continue;
-    }
-
-    if (char === "\\") {
-      escaping = true;
-      continue;
-    }
-
-    if (char === stringQuote) {
-      inString = false;
-      stringQuote = "";
-    }
-  }
-
-  return output;
-}
 
 function normalizePolicy(value: unknown): PermissionDefaultPolicy {
   const record = toRecord(value);
@@ -592,25 +521,17 @@ export class PermissionManager {
       return this.globalConfigCache.value;
     }
 
-    let value: GlobalPermissionConfig;
-    try {
-      const raw = readFileSync(this.globalConfigPath, "utf-8");
-      const parsed = JSON.parse(stripJsonComments(raw)) as unknown;
-      const { permissions: normalized, configIssues } =
-        normalizeRawPermission(parsed);
-      this.accumulateConfigIssues(configIssues);
+    const { config, issues } = loadUnifiedConfig(this.globalConfigPath);
+    this.accumulateConfigIssues(issues);
 
-      value = {
-        defaultPolicy: normalizePolicy(normalized.defaultPolicy),
-        tools: normalized.tools || {},
-        bash: normalized.bash || {},
-        mcp: normalized.mcp || {},
-        skills: normalized.skills || {},
-        special: normalized.special || {},
-      };
-    } catch {
-      value = EMPTY_GLOBAL_CONFIG;
-    }
+    const value: GlobalPermissionConfig = {
+      defaultPolicy: normalizePolicy(config.defaultPolicy),
+      tools: config.tools || {},
+      bash: config.bash || {},
+      mcp: config.mcp || {},
+      skills: config.skills || {},
+      special: config.special || {},
+    };
 
     this.globalConfigCache = { stamp, value };
     return value;
@@ -626,16 +547,17 @@ export class PermissionManager {
       return this.projectGlobalConfigCache.value;
     }
 
-    let value: AgentPermissions;
-    try {
-      const raw = readFileSync(this.projectGlobalConfigPath, "utf-8");
-      const parsed = JSON.parse(stripJsonComments(raw)) as unknown;
-      const result = normalizeRawPermission(parsed);
-      value = result.permissions;
-      this.accumulateConfigIssues(result.configIssues);
-    } catch {
-      value = {};
-    }
+    const { config, issues } = loadUnifiedConfig(this.projectGlobalConfigPath);
+    this.accumulateConfigIssues(issues);
+
+    const value: AgentPermissions = {
+      defaultPolicy: config.defaultPolicy,
+      tools: config.tools,
+      bash: config.bash,
+      mcp: config.mcp,
+      skills: config.skills,
+      special: config.special,
+    };
 
     this.projectGlobalConfigCache = { stamp, value };
     return value;
