@@ -626,14 +626,14 @@ The old extension-root `config.json` is no longer read from the install director
 ## Development
 
 ```bash
-npm run build       # Type-check TypeScript (no emit)
-npm run lint        # Biome lint + format check
-npm run lint:fix    # Biome lint + format auto-fix
-npm run lint:md     # markdownlint-cli2 on README etc.
-npm run lint:all    # lint + lint:md
-npm run format      # Biome format --write
-npm run test        # Run tests from ./tests
-npm run check       # build + lint:all + test
+pnpm run build       # Type-check TypeScript (no emit)
+pnpm run lint        # Biome lint + format check
+pnpm run lint:fix    # Biome lint + format auto-fix
+pnpm run lint:md     # markdownlint-cli2 on README etc.
+pnpm run lint:all    # lint + lint:md
+pnpm run format      # Biome format --write
+pnpm run test        # Run tests from ./tests
+pnpm run check       # build + lint:all + test
 ```
 
 ### Pre-commit hooks
@@ -642,7 +642,7 @@ This project uses [prek](https://prek.j178.dev/) to run Biome and markdownlint o
 This catches lint and formatting issues locally instead of waiting for CI.
 
 1. Install prek ([installation guide](https://prek.j178.dev/installation/)).
-2. Run `npm install` — the `prepare` script calls `prek install` automatically.
+2. Run `pnpm install` — the `prepare` script calls `prek install` automatically.
    If prek is not installed, the script prints a warning and continues.
 3. Hooks run automatically on `git commit`.
    To skip in emergencies: `git commit --no-verify`.

@@ -25,11 +25,11 @@
     "lint:md": "markdownlint-cli2 '*.md' 'docs/**/*.md' '.pi/prompts/**/*.md'",
     "lint:md:fix": "markdownlint-cli2 --fix '*.md' 'docs/**/*.md' '.pi/prompts/**/*.md'",
     "lint:imports": "! grep -rn --include='*.ts' 'from \"\\.[./][^\"]*\\.js\"' src/ tests/ index.ts",
-    "lint:all": "npm run lint && npm run lint:md && npm run lint:imports",
+    "lint:all": "pnpm run lint && pnpm run lint:md && pnpm run lint:imports",
     "format": "biome format --write .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "check": "npm run build && npm run lint:all && npm run test"
+    "check": "pnpm run build && pnpm run lint:all && pnpm run test"
   },
   "keywords": [
     "pi-package",
@@ -55,6 +55,7 @@
   "bugs": {
     "url": "https://github.com/gotgenes/pi-permission-system/issues"
   },
+  "packageManager": "pnpm@10.33.2",
   "engines": {
     "node": ">=20"
   },
