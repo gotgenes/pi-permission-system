@@ -16,14 +16,6 @@ vi.mock("@mariozechner/pi-coding-agent", () => ({
 }));
 
 vi.mock("@mariozechner/pi-tui", () => ({
-  Box: class {},
-  Container: class {
-    addChild(): void {}
-    render(): string[] {
-      return [];
-    }
-    invalidate(): void {}
-  },
   SettingsList: class {
     handleInput(): void {}
     updateValue(): void {}
@@ -32,10 +24,6 @@ vi.mock("@mariozechner/pi-tui", () => ({
     }
     invalidate(): void {}
   },
-  Spacer: class {},
-  Text: class {},
-  truncateToWidth: (text: string) => text,
-  visibleWidth: (text: string) => text.length,
 }));
 
 type Notification = { message: string; level: "info" | "warning" | "error" };

@@ -1,14 +1,14 @@
-import type {
-  ExtensionAPI,
-  ExtensionCommandContext,
+import {
+  type ExtensionAPI,
+  type ExtensionCommandContext,
+  getSettingsListTheme,
 } from "@mariozechner/pi-coding-agent";
-import type { SettingItem } from "@mariozechner/pi-tui";
+import { type SettingItem, SettingsList } from "@mariozechner/pi-tui";
 
 import {
   DEFAULT_EXTENSION_CONFIG,
   type PermissionSystemExtensionConfig,
 } from "./extension-config.js";
-import { ZellijModal, ZellijSettingsModal } from "./zellij-modal.js";
 
 interface PermissionSystemConfigController {
   getConfig(): PermissionSystemExtensionConfig;
@@ -17,10 +17,6 @@ interface PermissionSystemConfigController {
     ctx: ExtensionCommandContext,
   ): void;
   getConfigPath(): string;
-}
-
-interface SettingValueSyncTarget {
-  updateValue(id: string, value: string): void;
 }
 
 const ON_OFF = ["on", "off"];
@@ -118,7 +114,7 @@ function applySetting(
 }
 
 function syncSettingValues(
-  settingsList: SettingValueSyncTarget,
+  settingsList: SettingsList,
   config: PermissionSystemExtensionConfig,
 ): void {
   settingsList.updateValue("yoloMode", toOnOff(config.yoloMode));
@@ -155,60 +151,22 @@ async function openSettingsModal(
   };
 
   await ctx.ui.custom<void>(
-    (tui, theme, _keybindings, done) => {
+    (_tui, _theme, _keybindings, done) => {
       let current = controller.getConfig();
-      let settingsModal: ZellijSettingsModal | null = null;
-
-      settingsModal = new ZellijSettingsModal(
-        {
-          title: "Permission System Settings",
-          description:
-            "Local extension options for permission logging and auto-approval behavior",
-          settings: buildSettingItems(current),
-          onChange: (id, newValue) => {
-            current = applySetting(current, id, newValue);
-            controller.setConfig(current, ctx);
-            current = controller.getConfig();
-            if (settingsModal) {
-              syncSettingValues(settingsModal, current);
-            }
-          },
-          onClose: () => done(),
-          helpText: `/permission-system show • /permission-system reset • ${controller.getConfigPath()}`,
-          enableSearch: true,
+      const settingsList = new SettingsList(
+        buildSettingItems(current),
+        10,
+        getSettingsListTheme(),
+        (id, newValue) => {
+          current = applySetting(current, id, newValue);
+          controller.setConfig(current, ctx);
+          current = controller.getConfig();
+          syncSettingValues(settingsList, current);
         },
-        theme,
+        () => done(),
       );
 
-      const modal = new ZellijModal(
-        settingsModal,
-        {
-          borderStyle: "rounded",
-          titleBar: {
-            left: "Permission System Settings",
-            right: "pi-permission-system",
-          },
-          helpUndertitle: {
-            text: "Esc: close | ↑↓: navigate | Space: toggle",
-            color: "dim",
-          },
-          overlay: overlayOptions,
-        },
-        theme,
-      );
-
-      return {
-        render(width: number) {
-          return modal.renderModal(width).lines;
-        },
-        invalidate() {
-          modal.invalidate();
-        },
-        handleInput(data: string) {
-          modal.handleInput(data);
-          tui.requestRender();
-        },
-      };
+      return settingsList;
     },
     { overlay: true, overlayOptions },
   );
