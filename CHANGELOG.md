@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.4](https://github.com/gotgenes/pi-permission-system/compare/v3.0.3...v3.0.4) (2026-05-03)
+
+
+### Documentation
+
+* plan drop .js extensions from internal imports ([#32](https://github.com/gotgenes/pi-permission-system/issues/32)) ([1d73759](https://github.com/gotgenes/pi-permission-system/commit/1d73759bafb4de02f20817d977eca181a5df5a54))
+* **retro:** add retro notes for issue [#33](https://github.com/gotgenes/pi-permission-system/issues/33) ([4e4ef43](https://github.com/gotgenes/pi-permission-system/commit/4e4ef4397efe9fd0c75ac00b1b411eef50603f33))
+
+
+### Miscellaneous Chores
+
+* add lint:imports guard against .js extensions ([#32](https://github.com/gotgenes/pi-permission-system/issues/32)) ([fa0b924](https://github.com/gotgenes/pi-permission-system/commit/fa0b924fb5a8741de294eff8b2f2f94aded34f5d))
+
 ## [3.0.3](https://github.com/gotgenes/pi-permission-system/compare/v3.0.2...v3.0.3) (2026-05-03)
 
 
