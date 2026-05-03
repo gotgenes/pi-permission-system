@@ -32,7 +32,10 @@ import {
   SUBAGENT_ENV_HINT_KEYS,
   SUBAGENT_PARENT_SESSION_ENV_KEY,
 } from "../src/permission-forwarding.js";
-import { PermissionManager } from "../src/permission-manager.js";
+import {
+  PermissionManager,
+  normalizeRawPermission,
+} from "../src/permission-manager.js";
 import {
   findSkillPathMatch,
   parseAllSkillPromptSections,
@@ -2356,4 +2359,35 @@ test("getResolvedPolicyPaths returns false for missing files and null for absent
   } finally {
     rmSync(tempDir, { recursive: true, force: true });
   }
+});
+
+// --- tool_call_limit deprecation tests (#18) ---
+
+test("normalizeRawPermission emits deprecation issue for special.tool_call_limit (integer)", () => {
+  const result = normalizeRawPermission({ special: { tool_call_limit: 5 } });
+  assert.equal(result.configIssues.length, 1);
+  assert.ok(result.configIssues[0].includes("tool_call_limit"));
+  assert.equal(result.permissions.special?.tool_call_limit, undefined);
+});
+
+test("normalizeRawPermission emits deprecation issue for special.tool_call_limit (string)", () => {
+  const result = normalizeRawPermission({
+    special: { tool_call_limit: "allow" },
+  });
+  assert.equal(result.configIssues.length, 1);
+  assert.ok(result.configIssues[0].includes("tool_call_limit"));
+  assert.equal(result.permissions.special?.tool_call_limit, undefined);
+});
+
+test("normalizeRawPermission emits no issues for valid special keys", () => {
+  const result = normalizeRawPermission({
+    special: { doom_loop: "deny" },
+  });
+  assert.equal(result.configIssues.length, 0);
+  assert.equal(result.permissions.special?.doom_loop, "deny");
+});
+
+test("normalizeRawPermission emits no issues when special is absent", () => {
+  const result = normalizeRawPermission({ tools: { read: "allow" } });
+  assert.equal(result.configIssues.length, 0);
 });
