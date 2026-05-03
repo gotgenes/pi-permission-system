@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1](https://github.com/gotgenes/pi-permission-system/compare/v1.2.0...v1.2.1) (2026-05-03)
+
+
+### Bug Fixes
+
+* **retro:** correct MD060 rule — column alignment, not separator spacing ([7f116b8](https://github.com/gotgenes/pi-permission-system/commit/7f116b884c03d9c346a640f306bca934b91214cd))
+
+
+### Documentation
+
+* plan relax on-disk identity rule ([#22](https://github.com/gotgenes/pi-permission-system/issues/22)) ([d886862](https://github.com/gotgenes/pi-permission-system/commit/d886862a3686746f48e618ab2f950c7b1109d804))
+* relax on-disk identity rule for config/log paths ([#22](https://github.com/gotgenes/pi-permission-system/issues/22)) ([352b103](https://github.com/gotgenes/pi-permission-system/commit/352b1038b1492b1f8222950edf4b6d093157128d))
+* **retro:** add retro notes for issue [#19](https://github.com/gotgenes/pi-permission-system/issues/19) ([1d4a4a6](https://github.com/gotgenes/pi-permission-system/commit/1d4a4a6959905f102dea08273e7b827d8111a583))
+* update README badges to match pi-autoformat style ([5c6ef1f](https://github.com/gotgenes/pi-permission-system/commit/5c6ef1fcfb2b6f5ee353765ebeeac7cdf09d2bbb))
+
 ## [1.2.0](https://github.com/gotgenes/pi-permission-system/compare/v1.1.0...v1.2.0) (2026-05-03)
 
 
