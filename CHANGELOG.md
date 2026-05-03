@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.6.0](https://github.com/gotgenes/pi-permission-system/compare/v3.5.0...v3.6.0) (2026-05-03)
+
+
+### Features
+
+* add Rule, Ruleset, getDefaultAction, and evaluate() in src/rule.ts ([482e00a](https://github.com/gotgenes/pi-permission-system/commit/482e00a04289f46f14c4b94486fbd98232159d66))
+* add wildcardMatch convenience function to wildcard-matcher ([fa65219](https://github.com/gotgenes/pi-permission-system/commit/fa6521954a71ab146f14b87dc0723434a6dfd5ae))
+
+
+### Bug Fixes
+
+* replace findLast with manual backwards loop in evaluate() ([1911f37](https://github.com/gotgenes/pi-permission-system/commit/1911f37dd6074d926f959aeefa3d795b29d1681c))
+
+
+### Documentation
+
+* mark [#55](https://github.com/gotgenes/pi-permission-system/issues/55) complete in target architecture refactoring sequence ([0c87289](https://github.com/gotgenes/pi-permission-system/commit/0c87289d053a7f8c33aaa21a515db28d097a1925))
+* plan extract pure evaluate() function ([#55](https://github.com/gotgenes/pi-permission-system/issues/55)) ([fd11860](https://github.com/gotgenes/pi-permission-system/commit/fd118606ba90af83d2d9eb5e752e76353beaf0ba))
+* **retro:** add retro notes for issue [#54](https://github.com/gotgenes/pi-permission-system/issues/54) ([d7c5e8a](https://github.com/gotgenes/pi-permission-system/commit/d7c5e8aaae31fa658bcfb235547662bf226e6855))
+
 ## [3.5.0](https://github.com/gotgenes/pi-permission-system/compare/v3.4.0...v3.5.0) (2026-05-03)
 
 
