@@ -1,8 +1,10 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
 
+import type { PermissionState } from "../src/types.js";
+
 // Mock wildcard-matcher before importing the module under test.
 vi.mock("../src/wildcard-matcher.js", () => ({
-  compileWildcardPatterns: vi.fn((patterns: Record<string, string>) =>
+  compileWildcardPatterns: vi.fn((patterns: Record<string, PermissionState>) =>
     Object.entries(patterns).map(([pattern, state]) => ({
       pattern,
       state,
@@ -56,7 +58,10 @@ describe("BashFilter.check", () => {
   test("delegates pattern compilation to compileWildcardPatterns", () => {
     mockedFindMatch.mockReturnValue(null);
 
-    const permissions = { "git *": "allow", "npm *": "deny" };
+    const permissions: Record<string, PermissionState> = {
+      "git *": "allow",
+      "npm *": "deny",
+    };
     new BashFilter(permissions, "ask");
 
     expect(compileWildcardPatterns).toHaveBeenCalledWith(permissions);

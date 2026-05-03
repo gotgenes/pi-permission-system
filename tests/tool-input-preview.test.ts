@@ -11,7 +11,6 @@ import {
   formatCount,
   formatEditInputForPrompt,
   formatGenericToolInputForLog,
-  formatJsonInputForPrompt,
   formatReadInputForPrompt,
   formatSearchInputForPrompt,
   formatToolInputForPrompt,
