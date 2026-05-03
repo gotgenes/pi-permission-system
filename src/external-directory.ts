@@ -112,6 +112,28 @@ export function formatExternalDirectoryUserDeniedReason(
   return `User denied external directory access for tool '${toolName}' path '${pathValue}'.${reasonSuffix} ${formatExternalDirectoryHardStopHint()}`;
 }
 
+export function formatBashExternalDirectoryAskPrompt(
+  command: string,
+  externalPaths: string[],
+  cwd: string,
+  agentName?: string,
+): string {
+  const subject = agentName ? `Agent '${agentName}'` : "Current agent";
+  const pathList = externalPaths.join(", ");
+  return `${subject} requested bash command '${command}' which references path(s) outside working directory '${cwd}': ${pathList}. Allow this external directory access?`;
+}
+
+export function formatBashExternalDirectoryDenyReason(
+  command: string,
+  externalPaths: string[],
+  cwd: string,
+  agentName?: string,
+): string {
+  const subject = agentName ? `Agent '${agentName}'` : "Current agent";
+  const pathList = externalPaths.join(", ");
+  return `${subject} is not permitted to run bash command '${command}' which references path(s) outside working directory '${cwd}': ${pathList}. ${formatExternalDirectoryHardStopHint()}`;
+}
+
 /**
  * URL pattern to skip tokens that look like URLs rather than paths.
  */

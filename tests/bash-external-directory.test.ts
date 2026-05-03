@@ -9,7 +9,11 @@ vi.mock("node:os", () => {
   };
 });
 
-import { extractExternalPathsFromBashCommand } from "../src/external-directory";
+import {
+  extractExternalPathsFromBashCommand,
+  formatBashExternalDirectoryAskPrompt,
+  formatBashExternalDirectoryDenyReason,
+} from "../src/external-directory";
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -193,5 +197,70 @@ describe("extractExternalPathsFromBashCommand", () => {
       const etcHostsCount = result.filter((p) => p === "/etc/hosts").length;
       expect(etcHostsCount).toBe(1);
     });
+  });
+});
+
+describe("formatBashExternalDirectoryAskPrompt", () => {
+  test("includes command, external paths, and CWD", () => {
+    const result = formatBashExternalDirectoryAskPrompt(
+      "cat /etc/hosts",
+      ["/etc/hosts"],
+      "/projects/my-app",
+    );
+    expect(result).toContain("cat /etc/hosts");
+    expect(result).toContain("/etc/hosts");
+    expect(result).toContain("/projects/my-app");
+  });
+
+  test("includes agent name when provided", () => {
+    const result = formatBashExternalDirectoryAskPrompt(
+      "cat /etc/hosts",
+      ["/etc/hosts"],
+      "/projects/my-app",
+      "my-agent",
+    );
+    expect(result).toContain("my-agent");
+  });
+
+  test("shows multiple external paths", () => {
+    const result = formatBashExternalDirectoryAskPrompt(
+      "diff /etc/hosts /var/log/syslog",
+      ["/etc/hosts", "/var/log/syslog"],
+      "/projects/my-app",
+    );
+    expect(result).toContain("/etc/hosts");
+    expect(result).toContain("/var/log/syslog");
+  });
+});
+
+describe("formatBashExternalDirectoryDenyReason", () => {
+  test("includes command, external paths, and CWD", () => {
+    const result = formatBashExternalDirectoryDenyReason(
+      "cat /etc/hosts",
+      ["/etc/hosts"],
+      "/projects/my-app",
+    );
+    expect(result).toContain("cat /etc/hosts");
+    expect(result).toContain("/etc/hosts");
+    expect(result).toContain("/projects/my-app");
+  });
+
+  test("includes hard stop hint", () => {
+    const result = formatBashExternalDirectoryDenyReason(
+      "cat /etc/hosts",
+      ["/etc/hosts"],
+      "/projects/my-app",
+    );
+    expect(result).toContain("Hard stop");
+  });
+
+  test("includes agent name when provided", () => {
+    const result = formatBashExternalDirectoryDenyReason(
+      "cat /etc/hosts",
+      ["/etc/hosts"],
+      "/projects/my-app",
+      "my-agent",
+    );
+    expect(result).toContain("my-agent");
   });
 });
