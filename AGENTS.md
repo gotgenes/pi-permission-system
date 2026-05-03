@@ -5,7 +5,8 @@
 This repository is a Pi extension that enforces deterministic permission gates over tool, bash, MCP, skill, and special operations so the agent cannot silently exceed the policy a user has configured.
 
 This package is a friendly fork of [`MasuRii/pi-permission-system`](https://github.com/MasuRii/pi-permission-system).
-The on-disk identity (config directory, log filenames, `/permission-system` slash command, event channel names) is intentionally preserved so the fork and upstream share runtime state and stay drop-in interchangeable.
+This fork diverges from upstream in config layout (see #10).
+The `/permission-system` slash command name and the `pi-permission-system:permission-request` event channel name are preserved; config and log paths are not.
 
 Read `docs/plans/` before making architectural changes (created by `/plan-issue` on first use).
 
@@ -23,7 +24,8 @@ Read `docs/plans/` before making architectural changes (created by `/plan-issue`
 - Keep policy files (`~/.pi/agent/pi-permissions.jsonc`, per-agent overrides) the source of truth; do not bake policy into code.
 - Hide denied tools from the agent before it starts (tool filtering + system-prompt sanitization) so the agent does not waste turns probing for blocked tools.
 - Keep block/ask/allow decisions reviewable: write to the permission review log by default and surface readable approval summaries in the dialog.
-- Preserve the upstream extension's on-disk identity (config dir, log filenames, slash command, event channel names). Renaming any of these is a breaking change for users of the fork.
+- Preserve the `/permission-system` slash command name and the `pi-permission-system:permission-request` event channel name — renaming either is a breaking change.
+  Config and log paths intentionally diverge from upstream as of #10 and are not preserved.
 - Wildcard matching (bash patterns, skill globs) must be explicit and tested — silent over-matching is a permission bypass.
 - When a config pattern or documented recommendation can solve a problem, prefer that over a new runtime mechanism. Mechanism is forever; docs are reversible.
 - Treat any declared config field not read at runtime as a maintenance trap. Remove it or document its purpose.
@@ -116,7 +118,8 @@ Before implementing, understand:
 1. the problem being solved
 2. which permission surface is involved (tools / bash / mcp / skills / special / external_directory)
 3. the merge precedence between global, project, and per-agent policies
-4. whether the change affects the upstream-shared on-disk identity (config dir, log filenames, slash command, event channel names) — if yes, it is breaking
+4. whether the change renames the `/permission-system` slash command or the `pi-permission-system:permission-request` event channel — if yes, it is breaking.
+   Config and log paths diverge from upstream (#10) and are not part of the stability contract.
 5. the need to keep schema, example config, loader, and docs aligned
 
 Do not assume "allow" is a safe default. Do not add a permission surface without also adding a policy field, schema entry, and example.

@@ -5,7 +5,9 @@
 
 Permission enforcement extension for the Pi coding agent that provides centralized, deterministic permission gates for tool, bash, MCP, skill, and special operations.
 
-> **Fork notice:** This package is a friendly fork of [MasuRii/pi-permission-system](https://github.com/MasuRii/pi-permission-system), published to npm as `@gotgenes/pi-permission-system`. The extension's on-disk identity (config directory, log filenames, `/permission-system` slash command, and event channel names) is intentionally preserved so this fork and upstream share runtime state and remain drop-in interchangeable.
+> **Fork notice:** This package is a friendly fork of [MasuRii/pi-permission-system](https://github.com/MasuRii/pi-permission-system), published to npm as `@gotgenes/pi-permission-system`.
+> This fork diverges from upstream in config layout (#10).
+> The `/permission-system` slash command and `pi-permission-system:permission-request` event channel names are preserved; the config and log paths are not.
 
 ## Features
 
