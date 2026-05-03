@@ -18,6 +18,11 @@ import {
   isToolCallEventType,
 } from "@mariozechner/pi-coding-agent";
 import {
+  getActiveAgentName,
+  getActiveAgentNameFromSystemPrompt,
+  normalizeAgentName,
+} from "./active-agent.js";
+import {
   createActiveToolsCacheKey,
   createBeforeAgentStartPromptStateKey,
   shouldApplyCachedAgentStartState,
@@ -85,8 +90,6 @@ const PI_AGENT_DIR = getAgentDir();
 const SESSIONS_DIR = join(PI_AGENT_DIR, "sessions");
 const SUBAGENT_SESSIONS_DIR = join(PI_AGENT_DIR, "subagent-sessions");
 const PERMISSION_FORWARDING_DIR = join(SESSIONS_DIR, "permission-forwarding");
-
-const ACTIVE_AGENT_TAG_REGEX = /<active_agent\s+name=["']([^"']+)["'][^>]*>/i;
 
 type PermissionReviewSource = "tool_call" | "skill_input" | "skill_read";
 const PATH_BEARING_TOOLS = new Set([
@@ -246,56 +249,6 @@ function getEventInput(event: unknown): unknown {
   }
 
   return {};
-}
-
-function normalizeAgentName(value: unknown): string | null {
-  if (typeof value !== "string") {
-    return null;
-  }
-
-  const trimmed = value.trim();
-  return trimmed ? trimmed : null;
-}
-
-function getActiveAgentName(ctx: ExtensionContext): string | null {
-  const entries = ctx.sessionManager.getEntries();
-  for (let i = entries.length - 1; i >= 0; i--) {
-    const entry = entries[i] as {
-      type: string;
-      customType?: string;
-      data?: unknown;
-    };
-    if (entry.type !== "custom" || entry.customType !== "active_agent") {
-      continue;
-    }
-
-    const data = entry.data as { name?: unknown } | undefined;
-    const normalizedName = normalizeAgentName(data?.name);
-    if (normalizedName) {
-      return normalizedName;
-    }
-
-    if (data?.name === null) {
-      return null;
-    }
-  }
-
-  return null;
-}
-
-function getActiveAgentNameFromSystemPrompt(
-  systemPrompt: string | undefined,
-): string | null {
-  if (!systemPrompt) {
-    return null;
-  }
-
-  const match = systemPrompt.match(ACTIVE_AGENT_TAG_REGEX);
-  if (!match?.[1]) {
-    return null;
-  }
-
-  return normalizeAgentName(match[1]);
 }
 
 function getContextSystemPrompt(ctx: ExtensionContext): string | undefined {
