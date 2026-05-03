@@ -1,10 +1,7 @@
 import {
   existsSync,
   mkdirSync,
-  readdirSync,
-  readFileSync,
   renameSync,
-  rmdirSync,
   unlinkSync,
   writeFileSync,
 } from "node:fs";
@@ -55,20 +52,31 @@ import {
   normalizePathForComparison,
   PATH_BEARING_TOOLS,
 } from "./external-directory.js";
+import {
+  cleanupPermissionForwardingLocationIfEmpty,
+  ensurePermissionForwardingLocation,
+  getExistingPermissionForwardingLocation,
+  listRequestFiles,
+  logPermissionForwardingError,
+  logPermissionForwardingWarning,
+  readForwardedPermissionRequest,
+  readForwardedPermissionResponse,
+  safeDeleteFile,
+  setForwardedPermissionLogger,
+  sleep,
+  writeJsonFileAtomic,
+} from "./forwarded-permissions/io.js";
 import { createPermissionSystemLogger } from "./logging.js";
 import {
-  isPermissionDecisionState,
   type PermissionPromptDecision,
   requestPermissionDecisionFromUi,
 } from "./permission-dialog.js";
 import {
-  createPermissionForwardingLocation,
   type ForwardedPermissionRequest,
   type ForwardedPermissionResponse,
   isForwardedPermissionRequestForSession,
   PERMISSION_FORWARDING_POLL_INTERVAL_MS,
   PERMISSION_FORWARDING_TIMEOUT_MS,
-  type PermissionForwardingLocation,
   resolvePermissionForwardingTargetSessionId,
 } from "./permission-forwarding.js";
 import { PermissionManager } from "./permission-manager.js";
@@ -93,10 +101,7 @@ import {
 } from "./status.js";
 import { isSubagentExecutionContext } from "./subagent-context.js";
 import { sanitizeAvailableToolsSection } from "./system-prompt-sanitizer.js";
-import {
-  formatToolInputForPrompt,
-  getPermissionLogContext,
-} from "./tool-input-preview.js";
+import { getPermissionLogContext } from "./tool-input-preview.js";
 import {
   checkRequestedToolRegistration,
   getToolNameFromValue,
@@ -221,12 +226,6 @@ function getContextSystemPrompt(ctx: ExtensionContext): string | undefined {
   }
 }
 
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
-
 function getSessionId(ctx: ExtensionContext): string {
   try {
     const sessionId = ctx.sessionManager.getSessionId();
@@ -244,266 +243,6 @@ function canRequestPermissionConfirmation(ctx: ExtensionContext): boolean {
     hasUI: ctx.hasUI,
     isSubagent: isSubagentExecutionContext(ctx, SUBAGENT_SESSIONS_DIR),
   });
-}
-
-function formatUnknownErrorMessage(error: unknown): string {
-  if (error instanceof Error && error.message) {
-    return error.message;
-  }
-  return String(error);
-}
-
-function isErrnoCode(error: unknown, code: string): boolean {
-  return Boolean(
-    error &&
-      typeof error === "object" &&
-      "code" in error &&
-      (error as { code?: string }).code === code,
-  );
-}
-
-function logPermissionForwardingWarning(
-  message: string,
-  error?: unknown,
-): void {
-  const details =
-    typeof error === "undefined"
-      ? { message }
-      : { message, error: formatUnknownErrorMessage(error) };
-
-  writeReviewLog("permission_forwarding.warning", details);
-  writeDebugLog("permission_forwarding.warning", details);
-}
-
-function logPermissionForwardingError(message: string, error?: unknown): void {
-  const details =
-    typeof error === "undefined"
-      ? { message }
-      : { message, error: formatUnknownErrorMessage(error) };
-
-  writeReviewLog("permission_forwarding.error", details);
-  writeDebugLog("permission_forwarding.error", details);
-}
-
-function ensureDirectoryExists(path: string, description: string): boolean {
-  try {
-    mkdirSync(path, { recursive: true });
-    return true;
-  } catch (error) {
-    logPermissionForwardingError(
-      `Failed to create ${description} directory '${path}'`,
-      error,
-    );
-    return false;
-  }
-}
-
-function getPermissionForwardingLocationForSession(
-  sessionId: string,
-): PermissionForwardingLocation {
-  return createPermissionForwardingLocation(
-    PERMISSION_FORWARDING_DIR,
-    sessionId,
-  );
-}
-
-function ensurePermissionForwardingLocation(
-  sessionId: string,
-): PermissionForwardingLocation | null {
-  let location: PermissionForwardingLocation;
-  try {
-    location = getPermissionForwardingLocationForSession(sessionId);
-  } catch (error) {
-    logPermissionForwardingError(
-      "Failed to resolve permission forwarding location",
-      error,
-    );
-    return null;
-  }
-
-  const sessionRootReady = ensureDirectoryExists(
-    location.sessionRootDir,
-    "permission forwarding session root",
-  );
-  const requestsReady = ensureDirectoryExists(
-    location.requestsDir,
-    "permission forwarding requests",
-  );
-  const responsesReady = ensureDirectoryExists(
-    location.responsesDir,
-    "permission forwarding responses",
-  );
-
-  return sessionRootReady && requestsReady && responsesReady ? location : null;
-}
-
-function getExistingPermissionForwardingLocation(
-  sessionId: string,
-): PermissionForwardingLocation | null {
-  let location: PermissionForwardingLocation;
-  try {
-    location = getPermissionForwardingLocationForSession(sessionId);
-  } catch {
-    return null;
-  }
-
-  return existsSync(location.requestsDir) ? location : null;
-}
-
-function tryRemoveDirectoryIfEmpty(path: string, description: string): void {
-  if (!existsSync(path)) {
-    return;
-  }
-
-  let entries: string[];
-  try {
-    entries = readdirSync(path);
-  } catch (error) {
-    logPermissionForwardingWarning(
-      `Failed to inspect ${description} directory '${path}'`,
-      error,
-    );
-    return;
-  }
-
-  if (entries.length > 0) {
-    return;
-  }
-
-  try {
-    rmdirSync(path);
-  } catch (error) {
-    if (isErrnoCode(error, "ENOENT") || isErrnoCode(error, "ENOTEMPTY")) {
-      return;
-    }
-
-    logPermissionForwardingWarning(
-      `Failed to remove empty ${description} directory '${path}'`,
-      error,
-    );
-  }
-}
-
-function cleanupPermissionForwardingLocationIfEmpty(
-  location: PermissionForwardingLocation,
-): void {
-  tryRemoveDirectoryIfEmpty(
-    location.requestsDir,
-    `${location.label} permission forwarding requests`,
-  );
-  tryRemoveDirectoryIfEmpty(
-    location.responsesDir,
-    `${location.label} permission forwarding responses`,
-  );
-  tryRemoveDirectoryIfEmpty(
-    location.sessionRootDir,
-    `${location.label} permission forwarding session root`,
-  );
-}
-
-function safeDeleteFile(filePath: string, description: string): void {
-  try {
-    unlinkSync(filePath);
-  } catch (error) {
-    if (isErrnoCode(error, "ENOENT")) {
-      return;
-    }
-
-    logPermissionForwardingWarning(
-      `Failed to delete ${description} file '${filePath}'`,
-      error,
-    );
-  }
-}
-
-function writeJsonFileAtomic(filePath: string, value: unknown): void {
-  const tempPath = `${filePath}.${process.pid}.${Date.now()}.tmp`;
-
-  try {
-    writeFileSync(tempPath, JSON.stringify(value), "utf-8");
-    renameSync(tempPath, filePath);
-  } catch (error) {
-    safeDeleteFile(tempPath, "temporary permission-forwarding");
-    throw error;
-  }
-}
-
-function readForwardedPermissionRequest(
-  filePath: string,
-): ForwardedPermissionRequest | null {
-  try {
-    const raw = readFileSync(filePath, "utf-8");
-    const parsed = JSON.parse(raw) as Partial<ForwardedPermissionRequest>;
-    if (
-      !parsed ||
-      typeof parsed.id !== "string" ||
-      typeof parsed.createdAt !== "number" ||
-      typeof parsed.requesterSessionId !== "string" ||
-      typeof parsed.targetSessionId !== "string" ||
-      typeof parsed.requesterAgentName !== "string" ||
-      typeof parsed.message !== "string"
-    ) {
-      logPermissionForwardingWarning(
-        `Ignoring invalid forwarded permission request format in '${filePath}'`,
-      );
-      return null;
-    }
-
-    return {
-      id: parsed.id,
-      createdAt: parsed.createdAt,
-      requesterSessionId: parsed.requesterSessionId,
-      targetSessionId: parsed.targetSessionId,
-      requesterAgentName: parsed.requesterAgentName,
-      message: parsed.message,
-    };
-  } catch (error) {
-    logPermissionForwardingWarning(
-      `Failed to read forwarded permission request '${filePath}'`,
-      error,
-    );
-    return null;
-  }
-}
-
-function readForwardedPermissionResponse(
-  filePath: string,
-): ForwardedPermissionResponse | null {
-  try {
-    const raw = readFileSync(filePath, "utf-8");
-    const parsed = JSON.parse(raw) as Partial<ForwardedPermissionResponse>;
-    if (
-      !parsed ||
-      typeof parsed.approved !== "boolean" ||
-      !isPermissionDecisionState(parsed.state) ||
-      typeof parsed.responderSessionId !== "string"
-    ) {
-      logPermissionForwardingWarning(
-        `Ignoring invalid forwarded permission response format in '${filePath}'`,
-      );
-      return null;
-    }
-
-    return {
-      approved: parsed.approved,
-      state: parsed.state,
-      denialReason:
-        typeof parsed.denialReason === "string"
-          ? parsed.denialReason
-          : undefined,
-      responderSessionId: parsed.responderSessionId,
-      respondedAt:
-        typeof parsed.respondedAt === "number"
-          ? parsed.respondedAt
-          : Date.now(),
-    };
-  } catch (error) {
-    logPermissionForwardingWarning(
-      `Failed to read forwarded permission response '${filePath}'`,
-      error,
-    );
-    return null;
-  }
 }
 
 function formatForwardedPermissionPrompt(
@@ -538,7 +277,10 @@ async function waitForForwardedPermissionApproval(
     return { approved: false, state: "denied" };
   }
 
-  const location = ensurePermissionForwardingLocation(targetSessionId);
+  const location = ensurePermissionForwardingLocation(
+    PERMISSION_FORWARDING_DIR,
+    targetSessionId,
+  );
   if (!location) {
     logPermissionForwardingError(
       `Permission forwarding is unavailable because session-scoped directories could not be prepared for '${targetSessionId}'`,
@@ -626,21 +368,16 @@ async function processForwardedPermissionRequests(
   }
 
   const currentSessionId = getSessionId(ctx);
-  const location = getExistingPermissionForwardingLocation(currentSessionId);
+  const location = getExistingPermissionForwardingLocation(
+    PERMISSION_FORWARDING_DIR,
+    currentSessionId,
+  );
   if (!location) {
     return;
   }
 
-  let requestFiles: string[] = [];
-  try {
-    requestFiles = readdirSync(location.requestsDir)
-      .filter((name) => name.endsWith(".json"))
-      .sort();
-  } catch (error) {
-    logPermissionForwardingWarning(
-      `Failed to read ${location.label} permission forwarding requests from '${location.requestsDir}'`,
-      error,
-    );
+  const requestFiles = listRequestFiles(location.requestsDir);
+  if (requestFiles.length === 0) {
     return;
   }
 
@@ -903,6 +640,7 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
   };
 
   setLoggingWarningReporter(notifyWarning);
+  setForwardedPermissionLogger({ writeReviewLog, writeDebugLog });
   refreshExtensionConfig();
   registerPermissionSystemCommand(pi, {
     getConfig: () => extensionConfig,
