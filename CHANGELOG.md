@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0](https://github.com/gotgenes/pi-permission-system/compare/v1.0.0...v1.1.0) (2026-05-03)
+
+
+### Features
+
+* emit deprecation warning for special.tool_call_limit ([#18](https://github.com/gotgenes/pi-permission-system/issues/18)) ([1170d40](https://github.com/gotgenes/pi-permission-system/commit/1170d401d3adc438ad3c69bf96f5264b981ed4d5))
+* notify user of deprecated config fields at startup ([#18](https://github.com/gotgenes/pi-permission-system/issues/18)) ([3408672](https://github.com/gotgenes/pi-permission-system/commit/3408672afb94783f173b579e9e33fe088f0971f3))
+* surface config issues from PermissionManager ([#18](https://github.com/gotgenes/pi-permission-system/issues/18)) ([4c8103b](https://github.com/gotgenes/pi-permission-system/commit/4c8103bed99c3d31813f5450a6f4d1938fd74f25))
+
+
+### Documentation
+
+* plan drop unread special.tool_call_limit from schema ([#18](https://github.com/gotgenes/pi-permission-system/issues/18)) ([c45f6f7](https://github.com/gotgenes/pi-permission-system/commit/c45f6f7e5a504cac4f6156a97f51ff9588639d94))
+* remove tool_call_limit from schema and README ([#18](https://github.com/gotgenes/pi-permission-system/issues/18)) ([780b414](https://github.com/gotgenes/pi-permission-system/commit/780b41431b1ac06ccf11dca00e1c59575386bbd2))
+
 ## [1.0.0](https://github.com/gotgenes/pi-permission-system/compare/v0.8.0...v1.0.0) (2026-05-03)
 
 
