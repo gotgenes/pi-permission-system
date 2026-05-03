@@ -21,7 +21,7 @@ Permission enforcement extension for the Pi coding agent that provides centraliz
 - **File-Based Review Logging** — Writes permission request/denial review entries to a file by default for later auditing
 - **Optional Debug Logging** — Keeps verbose extension diagnostics in a separate file when enabled in `config.json`
 - **JSON Schema Validation** — Full schema for editor autocomplete and config validation
-- **External Directory Guard** — Enforces `special.external_directory` for path-bearing file tools that target paths outside the active working directory
+- **External Directory Guard** — Enforces `special.external_directory` for path-bearing file tools and bash commands that reference paths outside the active working directory
 
 ## Installation
 
@@ -97,6 +97,7 @@ The extension integrates via Pi's lifecycle hooks:
 - Generic extension-tool approval prompts include a bounded input preview; built-in file tools use concise human-readable summaries instead of raw multiline JSON
 - Permission review logs include bounded `toolInputPreview` values for non-bash/non-MCP tool calls so approvals can be audited without writing raw full payloads
 - Path-bearing file tools (`read`, `write`, `edit`, `find`, `grep`, `ls`) evaluate `special.external_directory` before their normal tool permission when an explicit path points outside `ctx.cwd`
+- Bash commands are scanned for path tokens (absolute, `~/`, or `..`-relative) that resolve outside `ctx.cwd`; matching commands trigger the same `special.external_directory` gate before the normal bash pattern check
 
 ## Configuration
 
@@ -353,7 +354,7 @@ Reserved permission checks:
 | Key                  | Description                                                                                                                                                                   |
 | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `doom_loop`          | Controls doom loop detection behavior                                                                                                                                         |
-| `external_directory` | Enforces ask/allow/deny decisions for path-bearing built-in tools (`read`, `write`, `edit`, `find`, `grep`, `ls`) when they target paths outside the active working directory |
+| `external_directory` | Enforces ask/allow/deny decisions for path-bearing tools and bash commands that reference paths outside the active working directory                                          |
 
 ```jsonc
 {
@@ -365,6 +366,8 @@ Reserved permission checks:
 ```
 
 `external_directory` is evaluated before the normal tool permission check. For example, `tools.read: "allow"` can permit ordinary reads while `special.external_directory: "ask"` still requires confirmation before reading `../outside.txt` or an absolute path outside `ctx.cwd`. Optional-path search tools (`find`, `grep`, `ls`) skip this check when no `path` is provided because they default to the active working directory.
+
+Bash commands are also covered: the extension extracts path-like tokens from the command string and applies the same gate when any resolve outside `ctx.cwd`. Quoted strings are stripped first to reduce false positives (e.g., paths inside `git commit -m "..."` messages). This is a best-effort heuristic — variable expansion, subshells, and escaped quotes are not parsed.
 
 ---
 
