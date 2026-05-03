@@ -41,9 +41,10 @@ Post-release, enriched the JSON schema with examples, defaults, `markdownDescrip
    Impact: one revert edit, minor rework.
    Self-identified.
 
-3. `other` (formatting) — Three commits were rejected by the Biome pre-commit hook.
+3. `missing-context` (formatting) — Three commits were rejected by the Biome pre-commit hook.
    Each required `npm run lint:fix` and re-staging.
-   This is inherent to writing code via `Write`/`Edit` tools that don't auto-format, but it adds a predictable ~30 seconds per occurrence.
+   `pi-autoformat` is configured for this project and should have formatted files automatically on `agent_end`, but the `/tdd-plan` workflow commits immediately after tests go green — likely before `agent_end` fires the formatter flush.
+   The friction is not inherent to `Write`/`Edit` tools; it is a sequencing gap between the TDD commit cadence and the autoformatter's `agent_end` trigger.
    Impact: added friction but no rework.
 
 #### What caused friction (user side)
