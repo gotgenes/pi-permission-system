@@ -6,7 +6,7 @@ description: Read a GitHub issue, gather context, and write a numbered plan to d
 
 Issue number: `$1`
 
-Your job is to produce a numbered implementation plan at `docs/plans/NNNN-<slug>.md` for issue #$1, then commit it. Stop after the commit. Do **not** start implementation — the next step is `/tdd-plan`.
+Your job is to produce a numbered implementation plan at `docs/plans/NNNN-<slug>.md` for issue #$1, then commit it. Stop after the commit. Do **not** start implementation — the next step is `/tdd-plan` (for plans with test cycles) or `/build-plan` (for docs-only or non-code changes).
 
 ## Sync with remote (do this first)
 
