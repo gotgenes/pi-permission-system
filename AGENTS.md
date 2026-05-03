@@ -38,6 +38,8 @@ Read `docs/plans/` before making architectural changes (created by `/plan-issue`
 - Keep modules focused and composable (one concern per file in `src/`: `bash-filter.ts`, `wildcard-matcher.ts`, `permission-manager.ts`, etc.).
 - Prefer explicit configuration over hidden behavior.
 - Permission decisions should be pure functions of (policy, request) wherever possible — keep IO at the edges.
+- Do not cache `getAgentDir()` or other environment-derived values at module scope — tests set `PI_CODING_AGENT_DIR` after import.
+  Call `getAgentDir()` at invocation time inside `piPermissionSystemExtension()` closures.
 
 ## Markdown
 
