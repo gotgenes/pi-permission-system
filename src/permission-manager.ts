@@ -237,8 +237,18 @@ function getConfiguredMcpServerNamesFromPaths(
   );
 }
 
-function normalizeRawPermission(raw: unknown): AgentPermissions {
+const DEPRECATED_SPECIAL_KEYS: ReadonlySet<string> = new Set([
+  "tool_call_limit",
+]);
+
+export interface NormalizeResult {
+  permissions: AgentPermissions;
+  configIssues: string[];
+}
+
+export function normalizeRawPermission(raw: unknown): NormalizeResult {
   const record = toRecord(raw);
+  const configIssues: string[] = [];
   const normalizedTools = normalizePermissionRecord(record.tools);
 
   const normalized: AgentPermissions = {
@@ -249,6 +259,20 @@ function normalizeRawPermission(raw: unknown): AgentPermissions {
     skills: normalizePermissionRecord(record.skills),
     special: normalizePermissionRecord(record.special),
   };
+
+  // Detect deprecated keys in the raw special sub-object before discarding.
+  const rawSpecial = toRecord(record.special);
+  for (const key of DEPRECATED_SPECIAL_KEYS) {
+    if (key in rawSpecial) {
+      configIssues.push(
+        `special.${key} is deprecated and ignored — remove it from your policy file.`,
+      );
+      // Ensure the key is stripped even if its value was a valid PermissionState.
+      if (normalized.special) {
+        delete normalized.special[key];
+      }
+    }
+  }
 
   for (const [key, value] of Object.entries(record)) {
     if (!isPermissionState(value)) {
@@ -265,7 +289,7 @@ function normalizeRawPermission(raw: unknown): AgentPermissions {
     }
   }
 
-  return normalized;
+  return { permissions: normalized, configIssues };
 }
 
 function parseQualifiedMcpToolName(
@@ -522,6 +546,7 @@ export class PermissionManager {
   private configuredMcpServerNamesCache: FileCacheEntry<
     readonly string[]
   > | null = null;
+  private accumulatedConfigIssues: string[] = [];
 
   constructor(
     options: {
@@ -554,6 +579,20 @@ export class PermissionManager {
       : null;
   }
 
+  private accumulateConfigIssues(issues: string[]): void {
+    for (const issue of issues) {
+      if (!this.accumulatedConfigIssues.includes(issue)) {
+        this.accumulatedConfigIssues.push(issue);
+      }
+    }
+  }
+
+  getConfigIssues(agentName?: string): string[] {
+    // Trigger a load/resolve to ensure issues are collected.
+    this.resolvePermissions(agentName);
+    return [...this.accumulatedConfigIssues];
+  }
+
   private loadGlobalConfig(): GlobalPermissionConfig {
     const stamp = getFileStamp(this.globalConfigPath);
     if (this.globalConfigCache?.stamp === stamp) {
@@ -564,7 +603,9 @@ export class PermissionManager {
     try {
       const raw = readFileSync(this.globalConfigPath, "utf-8");
       const parsed = JSON.parse(stripJsonComments(raw)) as unknown;
-      const normalized = normalizeRawPermission(parsed);
+      const { permissions: normalized, configIssues } =
+        normalizeRawPermission(parsed);
+      this.accumulateConfigIssues(configIssues);
 
       value = {
         defaultPolicy: normalizePolicy(normalized.defaultPolicy),
@@ -596,7 +637,9 @@ export class PermissionManager {
     try {
       const raw = readFileSync(this.projectGlobalConfigPath, "utf-8");
       const parsed = JSON.parse(stripJsonComments(raw)) as unknown;
-      value = normalizeRawPermission(parsed);
+      const result = normalizeRawPermission(parsed);
+      value = result.permissions;
+      this.accumulateConfigIssues(result.configIssues);
     } catch {
       value = {};
     }
@@ -629,7 +672,9 @@ export class PermissionManager {
         value = {};
       } else {
         const parsed = parseSimpleYamlMap(frontmatter);
-        value = normalizeRawPermission(parsed.permission);
+        const result = normalizeRawPermission(parsed.permission);
+        value = result.permissions;
+        this.accumulateConfigIssues(result.configIssues);
       }
     } catch {
       value = {};
