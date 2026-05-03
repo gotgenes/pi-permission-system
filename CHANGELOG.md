@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.3](https://github.com/gotgenes/pi-permission-system/compare/v3.0.2...v3.0.3) (2026-05-03)
+
+
+### Bug Fixes
+
+* stop findSection at first non-body line instead of EOF ([#33](https://github.com/gotgenes/pi-permission-system/issues/33)) ([15c178e](https://github.com/gotgenes/pi-permission-system/commit/15c178ea1aa42c091885f0aeacd87ba5b298ce24))
+
+
+### Documentation
+
+* plan fix for findSection greedy end boundary ([#33](https://github.com/gotgenes/pi-permission-system/issues/33)) ([72a5f9e](https://github.com/gotgenes/pi-permission-system/commit/72a5f9e4ab14cc9959781994cdc7dc52f1dfa657))
+* **retro:** add retro notes for issue [#35](https://github.com/gotgenes/pi-permission-system/issues/35) ([89830cb](https://github.com/gotgenes/pi-permission-system/commit/89830cb7c562ed092d4f08031584f0e0855326de))
+
 ## [3.0.2](https://github.com/gotgenes/pi-permission-system/compare/v3.0.1...v3.0.2) (2026-05-03)
 
 
