@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0](https://github.com/gotgenes/pi-permission-system/compare/v0.7.0...v0.8.0) (2026-05-03)
+
+
+### Features
+
+* replace vendored zellij-modal with direct pi-tui SettingsList ([#16](https://github.com/gotgenes/pi-permission-system/issues/16)) ([868675f](https://github.com/gotgenes/pi-permission-system/commit/868675ff2df1ab429dc48160c7e545ddc8a451e1))
+
+
+### Documentation
+
+* plan delete vendored zellij-modal and rebuild settings UI ([#16](https://github.com/gotgenes/pi-permission-system/issues/16)) ([35274da](https://github.com/gotgenes/pi-permission-system/commit/35274da005b90023de29bbc144abfa6ad27bb73c))
+
+
+### Miscellaneous Chores
+
+* add project-local pi-autoformat config ([13a6f33](https://github.com/gotgenes/pi-permission-system/commit/13a6f339a52a546812432bc055bdb32cc2bd6d90))
+
 ## [0.7.0](https://github.com/gotgenes/pi-permission-system/compare/v0.6.1...v0.7.0) (2026-05-02)
 
 
