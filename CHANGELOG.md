@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0](https://github.com/gotgenes/pi-permission-system/compare/v1.2.1...v2.0.0) (2026-05-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* the pi-permission-system:permission-request event channel is no longer emitted. No known consumers exist; the type was never exported. Re-adding with a proper public contract is tracked
+
+### Features
+
+* add /build-plan prompt template for non-TDD plans ([e98f13c](https://github.com/gotgenes/pi-permission-system/commit/e98f13c2ef32f51edda58ea065635bef31365baa))
+* delete permission-request event channel ([#20](https://github.com/gotgenes/pi-permission-system/issues/20)) ([6a41cfa](https://github.com/gotgenes/pi-permission-system/commit/6a41cfadc56e709d255538f63ff63d587e1b64f3))
+
+
+### Documentation
+
+* plan delete permission-request event channel ([#20](https://github.com/gotgenes/pi-permission-system/issues/20)) ([e202350](https://github.com/gotgenes/pi-permission-system/commit/e2023509f9ab849f5a1d8bc28a5705b2898b912b))
+* remove event channel from preserved-identity list ([#20](https://github.com/gotgenes/pi-permission-system/issues/20)) ([52299a2](https://github.com/gotgenes/pi-permission-system/commit/52299a27aeaed6e35849878fa224d8a78dcf0f6d))
+* **retro:** add retro notes for issue [#22](https://github.com/gotgenes/pi-permission-system/issues/22) ([55629fe](https://github.com/gotgenes/pi-permission-system/commit/55629fed16b6d73b6d7b02698227e2adab7acd3e))
+* update copyright in license ([b27994e](https://github.com/gotgenes/pi-permission-system/commit/b27994e7d67863ce8b28aa6bd680b60bc700d66d))
+
 ## [1.2.1](https://github.com/gotgenes/pi-permission-system/compare/v1.2.0...v1.2.1) (2026-05-03)
 
 
