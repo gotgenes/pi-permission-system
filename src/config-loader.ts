@@ -233,6 +233,45 @@ export function normalizeUnifiedConfig(raw: unknown): {
 }
 
 /**
+ * Merge two unified configs. Object-shaped fields (defaultPolicy, tools, bash,
+ * mcp, skills, special) are shallow-merged (override wins per-key). Scalar
+ * fields (debugLog, permissionReviewLog, yoloMode) are replaced when present
+ * in the override.
+ */
+export function mergeUnifiedConfigs(
+  base: UnifiedPermissionConfig,
+  override: UnifiedPermissionConfig,
+): UnifiedPermissionConfig {
+  const merged: UnifiedPermissionConfig = {};
+
+  // Scalars: override replaces base when defined
+  for (const key of ["debugLog", "permissionReviewLog", "yoloMode"] as const) {
+    const value = override[key] ?? base[key];
+    if (value !== undefined) {
+      merged[key] = value;
+    }
+  }
+
+  // Object fields: shallow spread merge
+  for (const key of [
+    "defaultPolicy",
+    "tools",
+    "bash",
+    "mcp",
+    "skills",
+    "special",
+  ] as const) {
+    const baseVal = base[key];
+    const overrideVal = override[key];
+    if (baseVal || overrideVal) {
+      merged[key] = { ...(baseVal || {}), ...(overrideVal || {}) } as never;
+    }
+  }
+
+  return merged;
+}
+
+/**
  * Load and normalize a unified config file.
  * Returns an empty config with no issues if the file does not exist.
  * Returns an empty config with an issue if the file cannot be parsed.
