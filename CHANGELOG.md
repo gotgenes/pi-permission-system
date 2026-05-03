@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.4.0](https://github.com/gotgenes/pi-permission-system/compare/v3.3.0...v3.4.0) (2026-05-03)
+
+
+### Features
+
+* add "approve for session" option to permission dialog ([#45](https://github.com/gotgenes/pi-permission-system/issues/45)) ([909d5ee](https://github.com/gotgenes/pi-permission-system/commit/909d5ee540615f876852b3bdb60154487c2570fd))
+* add SessionApprovalCache for ephemeral session approvals ([#45](https://github.com/gotgenes/pi-permission-system/issues/45)) ([4f97779](https://github.com/gotgenes/pi-permission-system/commit/4f9777980eba139c9c85a027eeddc84ff932911c))
+* wire session approvals into external-directory gates ([#45](https://github.com/gotgenes/pi-permission-system/issues/45)) ([3ab156d](https://github.com/gotgenes/pi-permission-system/commit/3ab156dc4ad10bd37938a5096dc6c33970767b1a))
+
+
+### Documentation
+
+* document session-scoped approval option ([#45](https://github.com/gotgenes/pi-permission-system/issues/45)) ([eb1eb9c](https://github.com/gotgenes/pi-permission-system/commit/eb1eb9c0052e7dd88ad7162b322160cfd6e0e62b))
+* plan session-scoped approvals for permission prompts ([#45](https://github.com/gotgenes/pi-permission-system/issues/45)) ([29dcede](https://github.com/gotgenes/pi-permission-system/commit/29dcede17ad68fd3980bf3289069e237de2b4ef0))
+* **retro:** add retro notes for issue [#41](https://github.com/gotgenes/pi-permission-system/issues/41) ([fd2755f](https://github.com/gotgenes/pi-permission-system/commit/fd2755fcf4ec68c9e65e6128e9b869da1f368abb))
+
 ## [3.3.0](https://github.com/gotgenes/pi-permission-system/compare/v3.2.0...v3.3.0) (2026-05-03)
 
 
