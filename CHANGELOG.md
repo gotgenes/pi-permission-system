@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.1](https://github.com/gotgenes/pi-permission-system/compare/v3.0.0...v3.0.1) (2026-05-03)
+
+
+### Documentation
+
+* add descriptions to all JSON schema entities ([cb3a7ce](https://github.com/gotgenes/pi-permission-system/commit/cb3a7ce5257111159312ebb95a9f75dd4e4a9527))
+* enrich JSON schema with examples, defaults, and markdown descriptions ([6f38d7e](https://github.com/gotgenes/pi-permission-system/commit/6f38d7edf01b950f20e2fab8604a398bf725a6c4))
+* plan index.ts split into focused modules ([#21](https://github.com/gotgenes/pi-permission-system/issues/21)) ([ccd736a](https://github.com/gotgenes/pi-permission-system/commit/ccd736a83a4af208044eec925c80555ee645e344))
+* **retro:** add retro notes for issue [#10](https://github.com/gotgenes/pi-permission-system/issues/10) ([31e59d6](https://github.com/gotgenes/pi-permission-system/commit/31e59d6172da7b0e9f02894afd2ba66a292de168))
+* **retro:** correct formatting friction attribution ([#10](https://github.com/gotgenes/pi-permission-system/issues/10)) ([2e96b7b](https://github.com/gotgenes/pi-permission-system/commit/2e96b7bc1007a2ef55f95b29c40b8417c2c6c52f))
+* update plan with Phase 2 unit tests using DI and vitest mocks ([#21](https://github.com/gotgenes/pi-permission-system/issues/21)) ([ad7f5fe](https://github.com/gotgenes/pi-permission-system/commit/ad7f5feeb856c84142a2a4258a9e173c8006532d))
+
 ## [3.0.0](https://github.com/gotgenes/pi-permission-system/compare/v2.0.0...v3.0.0) (2026-05-03)
 
 
