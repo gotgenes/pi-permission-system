@@ -94,6 +94,14 @@ function isTopLevelSectionHeader(line: string): boolean {
   );
 }
 
+function isSectionBodyLine(line: string): boolean {
+  const trimmed = line.trim();
+  if (trimmed.length === 0) return true; // blank line
+  if (trimmed.startsWith("- ")) return true; // bullet
+  if (line !== line.trimStart()) return true; // indented
+  return false;
+}
+
 function findSection(
   lines: readonly string[],
   header: string,
@@ -103,12 +111,25 @@ function findSection(
     return null;
   }
 
-  let end = lines.length;
+  // If a subsequent recognised section header exists, use it as the boundary.
+  // This preserves the original behaviour for the common case where sections
+  // are adjacent (e.g. "Available tools:" followed by "Guidelines:") and
+  // ensures any prose continuation between the two headers is also removed.
   for (let index = start + 1; index < lines.length; index += 1) {
     if (isTopLevelSectionHeader(lines[index])) {
+      return { start, end: index };
+    }
+  }
+
+  // No subsequent section header — stop at the first non-body line so that
+  // content after the section (e.g. custom user notes) is not silently deleted.
+  let end = start + 1;
+  for (let index = start + 1; index < lines.length; index += 1) {
+    if (!isSectionBodyLine(lines[index])) {
       end = index;
       break;
     }
+    end = index + 1;
   }
 
   return { start, end };

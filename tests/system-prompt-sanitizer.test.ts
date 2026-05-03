@@ -184,3 +184,44 @@ describe("sanitizeAvailableToolsSection — multi-section prompt", () => {
     expect(result.prompt).not.toMatch(/\n{3,}/);
   });
 });
+
+describe("sanitizeAvailableToolsSection — findSection boundary edge cases", () => {
+  test("preserves content after Guidelines when Guidelines is the last recognised section", () => {
+    const input = prompt(
+      guidelinesSection(["use bash for file operations like ls, rg, find"]),
+      "Trailing custom instructions",
+    );
+    const result = sanitizeAvailableToolsSection(input, []);
+    expect(result.prompt).toContain("Trailing custom instructions");
+  });
+
+  test("preserves trailing prose when both sections are removed", () => {
+    const input = prompt(
+      availableToolsSection(["bash"]),
+      guidelinesSection(["use bash for file operations like ls, rg, find"]),
+      "Important user note",
+    );
+    const result = sanitizeAvailableToolsSection(input, []);
+    expect(result.removed).toBe(true);
+    expect(result.prompt).not.toContain("Available tools:");
+    expect(result.prompt).not.toContain("Guidelines:");
+    expect(result.prompt).toContain("Important user note");
+  });
+
+  test("section at EOF with no trailing content still works", () => {
+    const input = availableToolsSection(["bash", "read"]);
+    const result = sanitizeAvailableToolsSection(input, ["bash", "read"]);
+    expect(result.removed).toBe(true);
+    expect(result.prompt).toBe("");
+  });
+
+  test("section followed by blank lines then prose — prose survives", () => {
+    const input = ["Available tools:", "- bash", "", "", "Custom note"].join(
+      "\n",
+    );
+    const result = sanitizeAvailableToolsSection(input, ["bash"]);
+    expect(result.removed).toBe(true);
+    expect(result.prompt).toContain("Custom note");
+    expect(result.prompt).not.toContain("Available tools:");
+  });
+});
