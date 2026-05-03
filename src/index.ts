@@ -35,7 +35,6 @@ import {
   savePermissionSystemConfig,
 } from "./extension-config.js";
 import { createPermissionSystemLogger, safeJsonStringify } from "./logging.js";
-import { registerModelOptionCompatibilityGuard } from "./model-option-compatibility.js";
 import {
   isPermissionDecisionState,
   type PermissionPromptDecision,
@@ -1338,8 +1337,6 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
 
   setLoggingWarningReporter(notifyWarning);
   refreshExtensionConfig();
-  registerModelOptionCompatibilityGuard(pi);
-
   registerPermissionSystemCommand(pi, {
     getConfig: () => extensionConfig,
     setConfig: saveExtensionConfig,
