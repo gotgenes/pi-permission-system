@@ -3,12 +3,7 @@
   "version": "3.1.0",
   "description": "Permission enforcement extension for the Pi coding agent.",
   "type": "module",
-  "main": "./index.ts",
-  "exports": {
-    ".": "./index.ts"
-  },
   "files": [
-    "index.ts",
     "src",
     "tests",
     "config/config.example.json",
@@ -24,7 +19,7 @@
     "lint:fix": "biome check --write .",
     "lint:md": "markdownlint-cli2 '*.md' 'docs/**/*.md' '.pi/prompts/**/*.md'",
     "lint:md:fix": "markdownlint-cli2 --fix '*.md' 'docs/**/*.md' '.pi/prompts/**/*.md'",
-    "lint:imports": "! grep -rn --include='*.ts' 'from \"\\.[./][^\"]*\\.js\"' src/ tests/ index.ts",
+    "lint:imports": "! grep -rn --include='*.ts' 'from \"\\.[./][^\"]*\\.js\"' src/ tests/",
     "lint:all": "pnpm run lint && pnpm run lint:md && pnpm run lint:imports",
     "format": "biome format --write .",
     "test": "vitest run",
@@ -64,7 +59,7 @@
   },
   "pi": {
     "extensions": [
-      "./index.ts"
+      "./src/index.ts"
     ]
   },
   "peerDependencies": {
