@@ -9,7 +9,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { homedir } from "node:os";
-import { join, normalize, resolve, sep } from "node:path";
+import { dirname, join, normalize, resolve, sep } from "node:path";
 import {
   type ExtensionAPI,
   type ExtensionCommandContext,
@@ -23,16 +23,25 @@ import {
   shouldApplyCachedAgentStartState,
 } from "./before-agent-start-cache.js";
 import { getNonEmptyString, toRecord } from "./common.js";
+import { loadAndMergeConfigs, loadUnifiedConfig } from "./config-loader.js";
 import { registerPermissionSystemCommand } from "./config-modal.js";
+import {
+  DEBUG_LOG_FILENAME,
+  getGlobalConfigPath,
+  getGlobalLogsDir,
+  getLegacyExtensionConfigPath,
+  getLegacyGlobalPolicyPath,
+  getLegacyProjectPolicyPath,
+  getProjectConfigPath,
+  REVIEW_LOG_FILENAME,
+} from "./config-paths.js";
 import { buildResolvedConfigLogEntry } from "./config-reporter.js";
 import {
-  CONFIG_PATH,
   DEFAULT_EXTENSION_CONFIG,
-  getPermissionSystemConfigPath,
-  loadPermissionSystemConfig,
+  EXTENSION_ROOT,
+  ensurePermissionSystemLogsDirectory,
   normalizePermissionSystemConfig,
   type PermissionSystemExtensionConfig,
-  savePermissionSystemConfig,
 } from "./extension-config.js";
 import { createPermissionSystemLogger, safeJsonStringify } from "./logging.js";
 import {
@@ -92,8 +101,13 @@ const PATH_BEARING_TOOLS = new Set([
 let extensionConfig: PermissionSystemExtensionConfig = {
   ...DEFAULT_EXTENSION_CONFIG,
 };
+const GLOBAL_LOGS_DIR = getGlobalLogsDir(PI_AGENT_DIR);
 const extensionLogger = createPermissionSystemLogger({
   getConfig: () => extensionConfig,
+  debugLogPath: join(GLOBAL_LOGS_DIR, DEBUG_LOG_FILENAME),
+  reviewLogPath: join(GLOBAL_LOGS_DIR, REVIEW_LOG_FILENAME),
+  ensureLogsDirectory: () =>
+    ensurePermissionSystemLogsDirectory(GLOBAL_LOGS_DIR),
 });
 const reportedLoggingWarnings = new Set<string>();
 let loggingWarningReporter: ((message: string) => void) | null = null;
@@ -1217,24 +1231,22 @@ function derivePiProjectPaths(cwd: string | undefined | null): {
     return null;
   }
 
-  const projectAgentRoot = join(cwd, ".pi", "agent");
   return {
-    projectGlobalConfigPath: join(projectAgentRoot, "pi-permissions.jsonc"),
-    projectAgentsDir: join(projectAgentRoot, "agents"),
+    projectGlobalConfigPath: getProjectConfigPath(cwd),
+    projectAgentsDir: join(cwd, ".pi", "agent", "agents"),
   };
 }
 
 function createPermissionManagerForCwd(
   cwd: string | undefined | null,
 ): PermissionManager {
+  const agentDir = getAgentDir();
   const projectPaths = derivePiProjectPaths(cwd);
-  if (!projectPaths) {
-    return new PermissionManager();
-  }
 
   return new PermissionManager({
-    projectGlobalConfigPath: projectPaths.projectGlobalConfigPath,
-    projectAgentsDir: projectPaths.projectAgentsDir,
+    globalConfigPath: getGlobalConfigPath(agentDir),
+    projectGlobalConfigPath: projectPaths?.projectGlobalConfigPath,
+    projectAgentsDir: projectPaths?.projectAgentsDir,
   });
 }
 
@@ -1269,26 +1281,34 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
       runtimeContext = ctx;
     }
 
-    const result = loadPermissionSystemConfig();
-    setExtensionConfig(result.config);
+    const cwd = runtimeContext?.cwd ?? null;
+    const agentDir = getAgentDir();
+    const mergeResult = loadAndMergeConfigs(
+      agentDir,
+      cwd ?? "",
+      EXTENSION_ROOT,
+    );
+    const runtimeConfig = normalizePermissionSystemConfig(mergeResult.merged);
+    setExtensionConfig(runtimeConfig);
 
     if (runtimeContext?.hasUI) {
-      syncPermissionSystemStatus(runtimeContext, result.config);
+      syncPermissionSystemStatus(runtimeContext, runtimeConfig);
     }
 
-    if (result.warning && result.warning !== lastConfigWarning) {
-      lastConfigWarning = result.warning;
-      notifyWarning(result.warning);
-    } else if (!result.warning) {
+    const warning =
+      mergeResult.issues.length > 0 ? mergeResult.issues.join("\n") : undefined;
+    if (warning && warning !== lastConfigWarning) {
+      lastConfigWarning = warning;
+      notifyWarning(warning);
+    } else if (!warning) {
       lastConfigWarning = null;
     }
 
     writeDebugLog("config.loaded", {
-      created: result.created,
-      warning: result.warning ?? null,
-      debugLog: result.config.debugLog,
-      permissionReviewLog: result.config.permissionReviewLog,
-      yoloMode: result.config.yoloMode,
+      warning: warning ?? null,
+      debugLog: runtimeConfig.debugLog,
+      permissionReviewLog: runtimeConfig.permissionReviewLog,
+      yoloMode: runtimeConfig.yoloMode,
     });
   };
 
@@ -1297,11 +1317,35 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
     ctx: ExtensionCommandContext,
   ): void => {
     const normalized = normalizePermissionSystemConfig(next);
-    const saved = savePermissionSystemConfig(normalized);
-    if (!saved.success) {
-      if (saved.error) {
-        ctx.ui.notify(saved.error, "error");
+    const globalPath = getGlobalConfigPath(getAgentDir());
+
+    // Load existing global config and merge runtime knobs into it
+    const existing = loadUnifiedConfig(globalPath);
+    const merged = {
+      ...existing.config,
+      debugLog: normalized.debugLog,
+      permissionReviewLog: normalized.permissionReviewLog,
+      yoloMode: normalized.yoloMode,
+    };
+
+    const tmpPath = `${globalPath}.tmp`;
+    try {
+      mkdirSync(dirname(globalPath), { recursive: true });
+      writeFileSync(tmpPath, `${JSON.stringify(merged, null, 2)}\n`, "utf-8");
+      renameSync(tmpPath, globalPath);
+    } catch (error) {
+      try {
+        if (existsSync(tmpPath)) {
+          unlinkSync(tmpPath);
+        }
+      } catch {
+        // Ignore cleanup failures.
       }
+      const message = error instanceof Error ? error.message : String(error);
+      ctx.ui.notify(
+        `Failed to save permission-system config at '${globalPath}': ${message}`,
+        "error",
+      );
       return;
     }
 
@@ -1321,7 +1365,7 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
   registerPermissionSystemCommand(pi, {
     getConfig: () => extensionConfig,
     setConfig: saveExtensionConfig,
-    getConfigPath: getPermissionSystemConfigPath,
+    getConfigPath: () => getGlobalConfigPath(getAgentDir()),
   });
 
   const createPermissionRequestId = (prefix: string): string => {
@@ -1470,7 +1514,28 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
 
   const logResolvedConfigPaths = (): void => {
     const policyPaths = permissionManager.getResolvedPolicyPaths();
-    const entry = buildResolvedConfigLogEntry({ policyPaths });
+    const cwd = runtimeContext?.cwd ?? null;
+
+    // Detect legacy files for the log entry
+    const agentDir = getAgentDir();
+    const legacyGlobalPolicyDetected = existsSync(
+      getLegacyGlobalPolicyPath(agentDir),
+    );
+    const legacyProjectPolicyDetected = cwd
+      ? existsSync(getLegacyProjectPolicyPath(cwd))
+      : false;
+    const legacyExtConfigPath = getLegacyExtensionConfigPath(EXTENSION_ROOT);
+    const newGlobalPath = getGlobalConfigPath(agentDir);
+    const legacyExtensionConfigDetected =
+      normalize(legacyExtConfigPath) !== normalize(newGlobalPath) &&
+      existsSync(legacyExtConfigPath);
+
+    const entry = buildResolvedConfigLogEntry({
+      policyPaths,
+      legacyGlobalPolicyDetected,
+      legacyProjectPolicyDetected,
+      legacyExtensionConfigDetected,
+    });
     writeReviewLog(
       "config.resolved",
       entry as unknown as Record<string, unknown>,

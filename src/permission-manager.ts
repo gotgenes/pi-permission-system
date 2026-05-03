@@ -11,6 +11,7 @@ import {
   toRecord,
 } from "./common.js";
 import { loadUnifiedConfig, stripJsonComments } from "./config-loader.js";
+import { getGlobalConfigPath } from "./config-paths.js";
 import type {
   AgentPermissions,
   BashPermissions,
@@ -27,7 +28,7 @@ import {
 } from "./wildcard-matcher.js";
 
 function defaultGlobalConfigPath(): string {
-  return join(getAgentDir(), "pi-permissions.jsonc");
+  return getGlobalConfigPath(getAgentDir());
 }
 function defaultAgentsDir(): string {
   return join(getAgentDir(), "agents");

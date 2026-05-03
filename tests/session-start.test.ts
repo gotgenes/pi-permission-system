@@ -1,19 +1,9 @@
-import {
-  existsSync,
-  mkdirSync,
-  mkdtempSync,
-  readFileSync,
-  rmSync,
-  unlinkSync,
-  writeFileSync,
-} from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
-import {
-  CONFIG_PATH,
-  DEFAULT_EXTENSION_CONFIG,
-} from "../src/extension-config.js";
+import { getGlobalConfigPath } from "../src/config-paths.js";
+import { DEFAULT_EXTENSION_CONFIG } from "../src/extension-config.js";
 import piPermissionSystemExtension from "../src/index.js";
 import type { GlobalPermissionConfig } from "../src/types.js";
 
@@ -28,16 +18,13 @@ type MockHandler = (
 describe("session_start handler consolidation", () => {
   let baseDir: string;
   let originalAgentDir: string | undefined;
-  let originalExtensionConfig: string | null;
-
   beforeEach(() => {
     baseDir = mkdtempSync(join(tmpdir(), "pi-permission-session-start-"));
     originalAgentDir = process.env.PI_CODING_AGENT_DIR;
-    originalExtensionConfig = existsSync(CONFIG_PATH)
-      ? readFileSync(CONFIG_PATH, "utf8")
-      : null;
 
+    const globalConfigPath = getGlobalConfigPath(baseDir);
     mkdirSync(join(baseDir, "agents"), { recursive: true });
+    mkdirSync(dirname(globalConfigPath), { recursive: true });
 
     const config: GlobalPermissionConfig = {
       defaultPolicy: {
@@ -49,13 +36,8 @@ describe("session_start handler consolidation", () => {
       },
     };
     writeFileSync(
-      join(baseDir, "pi-permissions.jsonc"),
-      `${JSON.stringify(config, null, 2)}\n`,
-      "utf8",
-    );
-    writeFileSync(
-      CONFIG_PATH,
-      `${JSON.stringify(DEFAULT_EXTENSION_CONFIG, null, 2)}\n`,
+      globalConfigPath,
+      `${JSON.stringify({ ...DEFAULT_EXTENSION_CONFIG, ...config }, null, 2)}\n`,
       "utf8",
     );
 
@@ -67,13 +49,6 @@ describe("session_start handler consolidation", () => {
       delete process.env.PI_CODING_AGENT_DIR;
     } else {
       process.env.PI_CODING_AGENT_DIR = originalAgentDir;
-    }
-    if (originalExtensionConfig === null) {
-      if (existsSync(CONFIG_PATH)) {
-        unlinkSync(CONFIG_PATH);
-      }
-    } else {
-      writeFileSync(CONFIG_PATH, originalExtensionConfig, "utf8");
     }
     rmSync(baseDir, { recursive: true, force: true });
   });

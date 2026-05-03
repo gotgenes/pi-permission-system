@@ -9,7 +9,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { test } from "vitest";
 import { BashFilter } from "../src/bash-filter.js";
 import {
@@ -17,6 +17,7 @@ import {
   createBeforeAgentStartPromptStateKey,
   shouldApplyCachedAgentStartState,
 } from "../src/before-agent-start-cache.js";
+import { getGlobalConfigPath } from "../src/config-paths.js";
 import {
   CONFIG_PATH,
   DEFAULT_EXTENSION_CONFIG,
@@ -156,20 +157,13 @@ function createToolCallHarness(
   const prompts: string[] = [];
   const handlers: Record<string, MockHandler> = {};
   const originalAgentDir = process.env.PI_CODING_AGENT_DIR;
-  const originalExtensionConfig = existsSync(CONFIG_PATH)
-    ? readFileSync(CONFIG_PATH, "utf8")
-    : null;
-
+  const globalConfigPath = getGlobalConfigPath(baseDir);
   mkdirSync(join(baseDir, "agents"), { recursive: true });
+  mkdirSync(dirname(globalConfigPath), { recursive: true });
   mkdirSync(cwd, { recursive: true });
   writeFileSync(
-    join(baseDir, "pi-permissions.jsonc"),
-    `${JSON.stringify(config, null, 2)}\n`,
-    "utf8",
-  );
-  writeFileSync(
-    CONFIG_PATH,
-    `${JSON.stringify(DEFAULT_EXTENSION_CONFIG, null, 2)}\n`,
+    globalConfigPath,
+    `${JSON.stringify({ ...DEFAULT_EXTENSION_CONFIG, ...config }, null, 2)}\n`,
     "utf8",
   );
 
@@ -208,13 +202,6 @@ function createToolCallHarness(
           createMockContext(cwd, prompts, options),
         ),
       );
-      if (originalExtensionConfig === null) {
-        if (existsSync(CONFIG_PATH)) {
-          unlinkSync(CONFIG_PATH);
-        }
-      } else {
-        writeFileSync(CONFIG_PATH, originalExtensionConfig, "utf8");
-      }
       rmSync(baseDir, { recursive: true, force: true });
     },
   };
@@ -1818,7 +1805,9 @@ permission:
 test("PermissionManager reads config from PI_CODING_AGENT_DIR when set", () => {
   const baseDir = mkdtempSync(join(tmpdir(), "pi-permission-system-envdir-"));
   const agentsDir = join(baseDir, "agents");
+  const newConfigPath = getGlobalConfigPath(baseDir);
   mkdirSync(agentsDir, { recursive: true });
+  mkdirSync(dirname(newConfigPath), { recursive: true });
 
   const config: GlobalPermissionConfig = {
     defaultPolicy: {
@@ -1834,11 +1823,7 @@ test("PermissionManager reads config from PI_CODING_AGENT_DIR when set", () => {
     skills: {},
     special: {},
   };
-  writeFileSync(
-    join(baseDir, "pi-permissions.jsonc"),
-    JSON.stringify(config),
-    "utf8",
-  );
+  writeFileSync(newConfigPath, JSON.stringify(config), "utf8");
 
   const original = process.env.PI_CODING_AGENT_DIR;
   process.env.PI_CODING_AGENT_DIR = baseDir;
