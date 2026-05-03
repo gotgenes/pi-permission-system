@@ -92,7 +92,10 @@ function createManager(
 type MockHandler = (
   event: Record<string, unknown>,
   ctx: Record<string, unknown>,
-) => Promise<Record<string, unknown> | void> | Record<string, unknown> | void;
+) =>
+  | Promise<Record<string, unknown> | undefined>
+  | Record<string, unknown>
+  | undefined;
 
 type ExtensionHarness = {
   baseDir: string;

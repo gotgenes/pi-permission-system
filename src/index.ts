@@ -297,7 +297,7 @@ function getActiveAgentNameFromSystemPrompt(
   }
 
   const match = systemPrompt.match(ACTIVE_AGENT_TAG_REGEX);
-  if (!match || !match[1]) {
+  if (!match?.[1]) {
     return null;
   }
 
