@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.5](https://github.com/gotgenes/pi-permission-system/compare/v3.0.4...v3.0.5) (2026-05-03)
+
+
+### Miscellaneous Chores
+
+* **deps:** update dependencies and clean up unused peers ([d8482a9](https://github.com/gotgenes/pi-permission-system/commit/d8482a9aab4a41798ba50e7b5db9ede1dcb7897a))
+
 ## [3.0.4](https://github.com/gotgenes/pi-permission-system/compare/v3.0.3...v3.0.4) (2026-05-03)
 
 
