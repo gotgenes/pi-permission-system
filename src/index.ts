@@ -8,8 +8,7 @@ import {
   unlinkSync,
   writeFileSync,
 } from "node:fs";
-import { homedir } from "node:os";
-import { dirname, join, normalize, resolve, sep } from "node:path";
+import { dirname, join, normalize } from "node:path";
 import {
   type ExtensionAPI,
   type ExtensionCommandContext,
@@ -20,14 +19,13 @@ import {
 import {
   getActiveAgentName,
   getActiveAgentNameFromSystemPrompt,
-  normalizeAgentName,
 } from "./active-agent.js";
 import {
   createActiveToolsCacheKey,
   createBeforeAgentStartPromptStateKey,
   shouldApplyCachedAgentStartState,
 } from "./before-agent-start-cache.js";
-import { getNonEmptyString, toRecord } from "./common.js";
+import { toRecord } from "./common.js";
 import { loadAndMergeConfigs, loadUnifiedConfig } from "./config-loader.js";
 import { registerPermissionSystemCommand } from "./config-modal.js";
 import {
@@ -48,7 +46,16 @@ import {
   normalizePermissionSystemConfig,
   type PermissionSystemExtensionConfig,
 } from "./extension-config.js";
-import { createPermissionSystemLogger, safeJsonStringify } from "./logging.js";
+import {
+  formatExternalDirectoryAskPrompt,
+  formatExternalDirectoryDenyReason,
+  formatExternalDirectoryUserDeniedReason,
+  getPathBearingToolPath,
+  isPathOutsideWorkingDirectory,
+  normalizePathForComparison,
+  PATH_BEARING_TOOLS,
+} from "./external-directory.js";
+import { createPermissionSystemLogger } from "./logging.js";
 import {
   isPermissionDecisionState,
   type PermissionPromptDecision,
@@ -63,7 +70,6 @@ import {
   PERMISSION_FORWARDING_TIMEOUT_MS,
   type PermissionForwardingLocation,
   resolvePermissionForwardingTargetSessionId,
-  SUBAGENT_ENV_HINT_KEYS,
 } from "./permission-forwarding.js";
 import { PermissionManager } from "./permission-manager.js";
 import {
@@ -80,8 +86,6 @@ import { sanitizeAvailableToolsSection } from "./system-prompt-sanitizer.js";
 import {
   formatToolInputForPrompt,
   getPermissionLogContext,
-  TOOL_INPUT_LOG_PREVIEW_MAX_LENGTH,
-  truncateInlineText,
 } from "./tool-input-preview.js";
 import {
   checkRequestedToolRegistration,
@@ -99,14 +103,6 @@ const SUBAGENT_SESSIONS_DIR = join(PI_AGENT_DIR, "subagent-sessions");
 const PERMISSION_FORWARDING_DIR = join(SESSIONS_DIR, "permission-forwarding");
 
 type PermissionReviewSource = "tool_call" | "skill_input" | "skill_read";
-const PATH_BEARING_TOOLS = new Set([
-  "read",
-  "write",
-  "edit",
-  "find",
-  "grep",
-  "ls",
-]);
 
 let extensionConfig: PermissionSystemExtensionConfig = {
   ...DEFAULT_EXTENSION_CONFIG,
@@ -159,67 +155,6 @@ function writeReviewLog(
   if (warning) {
     reportLoggingWarning(warning);
   }
-}
-
-function normalizePathForComparison(pathValue: string, cwd: string): string {
-  const trimmed = pathValue.trim().replace(/^['"]|['"]$/g, "");
-  if (!trimmed) {
-    return "";
-  }
-
-  let normalizedPath = trimmed.startsWith("@") ? trimmed.slice(1) : trimmed;
-
-  if (normalizedPath === "~") {
-    normalizedPath = homedir();
-  } else if (
-    normalizedPath.startsWith("~/") ||
-    normalizedPath.startsWith("~\\")
-  ) {
-    normalizedPath = join(homedir(), normalizedPath.slice(2));
-  }
-
-  const absolutePath = resolve(cwd, normalizedPath);
-  const normalizedAbsolutePath = normalize(absolutePath);
-  return process.platform === "win32"
-    ? normalizedAbsolutePath.toLowerCase()
-    : normalizedAbsolutePath;
-}
-
-function isPathWithinDirectory(pathValue: string, directory: string): boolean {
-  if (!pathValue || !directory) {
-    return false;
-  }
-
-  if (pathValue === directory) {
-    return true;
-  }
-
-  const prefix = directory.endsWith(sep) ? directory : `${directory}${sep}`;
-  return pathValue.startsWith(prefix);
-}
-
-function getPathBearingToolPath(
-  toolName: string,
-  input: unknown,
-): string | null {
-  if (!PATH_BEARING_TOOLS.has(toolName)) {
-    return null;
-  }
-
-  return getNonEmptyString(toRecord(input).path);
-}
-
-function isPathOutsideWorkingDirectory(
-  pathValue: string,
-  cwd: string,
-): boolean {
-  const normalizedCwd = normalizePathForComparison(cwd, cwd);
-  const normalizedPath = normalizePathForComparison(pathValue, cwd);
-  return Boolean(
-    normalizedCwd &&
-      normalizedPath &&
-      !isPathWithinDirectory(normalizedPath, normalizedCwd),
-  );
 }
 
 function extractSkillNameFromInput(text: string): string | null {
@@ -397,39 +332,6 @@ function formatSkillPathDenyReason(
 ): string {
   const subject = agentName ? `Agent '${agentName}'` : "Current agent";
   return `${subject} is not permitted to access skill '${skill.name}' via '${readPath}'.`;
-}
-
-function formatExternalDirectoryHardStopHint(): string {
-  return "Hard stop: this external directory permission denial is policy-enforced. Do not retry this path, do not attempt a filesystem bypass, and report the block to the user.";
-}
-
-function formatExternalDirectoryAskPrompt(
-  toolName: string,
-  pathValue: string,
-  cwd: string,
-  agentName?: string,
-): string {
-  const subject = agentName ? `Agent '${agentName}'` : "Current agent";
-  return `${subject} requested tool '${toolName}' for path '${pathValue}' outside working directory '${cwd}'. Allow this external directory access?`;
-}
-
-function formatExternalDirectoryDenyReason(
-  toolName: string,
-  pathValue: string,
-  cwd: string,
-  agentName?: string,
-): string {
-  const subject = agentName ? `Agent '${agentName}'` : "Current agent";
-  return `${subject} is not permitted to run tool '${toolName}' for path '${pathValue}' outside working directory '${cwd}'. ${formatExternalDirectoryHardStopHint()}`;
-}
-
-function formatExternalDirectoryUserDeniedReason(
-  toolName: string,
-  pathValue: string,
-  denialReason?: string,
-): string {
-  const reasonSuffix = denialReason ? ` Reason: ${denialReason}.` : "";
-  return `User denied external directory access for tool '${toolName}' path '${pathValue}'.${reasonSuffix} ${formatExternalDirectoryHardStopHint()}`;
 }
 
 function sleep(ms: number): Promise<void> {
