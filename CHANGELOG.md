@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.9.0](https://github.com/gotgenes/pi-permission-system/compare/v3.8.0...v3.9.0) (2026-05-03)
+
+
+### Features
+
+* add normalizeConfig and defaults modules ([84f9c3e](https://github.com/gotgenes/pi-permission-system/commit/84f9c3ef1c665e8d55b694ecf8bbec2dff41b093))
+* evaluate() accepts optional defaultAction parameter ([69dde81](https://github.com/gotgenes/pi-permission-system/commit/69dde81d05722065307b04102a8af6935df0e17c))
+
+
+### Bug Fixes
+
+* remove unused imports flagged by biome ([62704a3](https://github.com/gotgenes/pi-permission-system/commit/62704a3b5c833af74a3bd27942ffc4247c92c12c))
+
+
+### Documentation
+
+* mark [#42](https://github.com/gotgenes/pi-permission-system/issues/42) and [#43](https://github.com/gotgenes/pi-permission-system/issues/43) complete in target architecture ([04430f2](https://github.com/gotgenes/pi-permission-system/commit/04430f2ea000e9607541262a71ad2be633dc7bb6))
+* mark [#56](https://github.com/gotgenes/pi-permission-system/issues/56) complete in target architecture ([2fe95c5](https://github.com/gotgenes/pi-permission-system/commit/2fe95c577ec97e78c1390db91020294ba25662e0))
+* plan unify Rule type and normalize config into flat Ruleset ([#56](https://github.com/gotgenes/pi-permission-system/issues/56)) ([61e8c48](https://github.com/gotgenes/pi-permission-system/commit/61e8c4800f39a173b69f2773e8b2f09fa9c7318b))
+* **retro:** add retro notes for issue [#43](https://github.com/gotgenes/pi-permission-system/issues/43) ([bd6aea6](https://github.com/gotgenes/pi-permission-system/commit/bd6aea6ed2e1dfdad1ef610f9abb8319d87460cd))
+
 ## [3.8.0](https://github.com/gotgenes/pi-permission-system/compare/v3.7.0...v3.8.0) (2026-05-03)
 
 
