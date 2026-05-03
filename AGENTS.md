@@ -21,7 +21,7 @@ Read `docs/plans/` before making architectural changes (created by `/plan-issue`
 
 - Default to least privilege — when in doubt, prompt (`ask`), do not silently allow.
 - Enforce permissions deterministically; the same policy + same input must always produce the same decision.
-- Keep policy files (`~/.pi/agent/pi-permissions.jsonc`, per-agent overrides) the source of truth; do not bake policy into code.
+- Keep config files (`~/.pi/agent/extensions/pi-permission-system/config.json`, per-agent overrides) the source of truth; do not bake policy into code.
 - Hide denied tools from the agent before it starts (tool filtering + system-prompt sanitization) so the agent does not waste turns probing for blocked tools.
 - Keep block/ask/allow decisions reviewable: write to the permission review log by default and surface readable approval summaries in the dialog.
 - Preserve the `/permission-system` slash command name — renaming it is a breaking change.
@@ -51,20 +51,24 @@ Read `docs/plans/` before making architectural changes (created by `/plan-issue`
 
 ## Configuration
 
-Two distinct config surfaces — do not conflate them:
+One unified config file per scope, following the `pi-autoformat` convention (`extensions/<id>/config.json`).
+Both runtime knobs and permission policy live in the same file:
 
-- **Policy file** (the user's permission rules):
-  - global: `~/.pi/agent/pi-permissions.jsonc` (respects `PI_CODING_AGENT_DIR`)
-  - per-agent overrides: YAML frontmatter in agent definition files
-  - Schema: `schemas/permissions.schema.json`
-  - Example: `config/config.example.json`
-- **Extension runtime config** (knobs for this extension itself, not policy):
-  - extension root: `config.json` (e.g. `debugLog`, `permissionReviewLog`, `yoloMode`)
-  - loaded by `src/extension-config.ts`
+- **Global config**: `~/.pi/agent/extensions/pi-permission-system/config.json` (respects `PI_CODING_AGENT_DIR`)
+- **Project config**: `<cwd>/.pi/extensions/pi-permission-system/config.json`
+- **Per-agent overrides**: YAML frontmatter in agent definition files (unchanged)
+- Schema: `schemas/permissions.schema.json`
+- Example: `config/config.example.json`
+
+Merge precedence: project overrides global; per-agent frontmatter overrides both.
+Object-shaped fields (`defaultPolicy`, `tools`, `bash`, `mcp`, `skills`, `special`) use shallow-merge (later source wins per-key).
+Scalar fields (`debugLog`, `permissionReviewLog`, `yoloMode`) use simple replacement.
+
+Legacy paths (`~/.pi/agent/pi-permissions.jsonc`, `<cwd>/.pi/agent/pi-permissions.jsonc`, `<extension-root>/config.json`) are detected and merged with a migration warning for one release.
 
 Rules:
 
-- Project policy must always override global policy; per-agent frontmatter must override both.
+- Project config must always override global config; per-agent frontmatter must override both.
 - Do not move package configuration into Pi `settings.json` without explicit discussion.
 - Keep `schemas/permissions.schema.json`, `config/config.example.json`, `README.md`, and the TypeScript types/loaders aligned.
   Changing one without the others is a bug, not a refactor.

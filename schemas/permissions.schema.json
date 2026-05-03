@@ -1,17 +1,32 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://pi-coding-agent.local/schemas/permissions.schema.json",
-  "title": "PI Permission Configuration",
+  "$id": "https://raw.githubusercontent.com/gotgenes/pi-permission-system/main/schemas/permissions.schema.json",
+  "title": "PI Permission System Configuration",
+  "description": "Unified config file combining runtime knobs and permission policy for pi-permission-system.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
     "$schema": {
       "type": "string"
     },
+    "debugLog": {
+      "description": "Write verbose permission-system diagnostics to the extension logs directory.",
+      "type": "boolean",
+      "default": false
+    },
+    "permissionReviewLog": {
+      "description": "Write permission request and decision audit events to the extension logs directory.",
+      "type": "boolean",
+      "default": true
+    },
+    "yoloMode": {
+      "description": "Auto-approve ask-state permission checks, including subagent approval forwarding.",
+      "type": "boolean",
+      "default": false
+    },
     "defaultPolicy": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["tools", "bash", "mcp", "skills"],
       "properties": {
         "tools": {
           "$ref": "#/$defs/permissionState"
@@ -57,7 +72,6 @@
       }
     }
   },
-  "required": ["defaultPolicy"],
   "$defs": {
     "permissionState": {
       "type": "string",

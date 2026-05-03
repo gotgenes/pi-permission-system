@@ -48,7 +48,7 @@ Pi auto-discovers extensions in these paths.
 
 ### Quick Start
 
-1. Create the global policy file at the Pi agent runtime root (default: `~/.pi/agent/pi-permissions.jsonc`, respects `PI_CODING_AGENT_DIR`):
+1. Create the global config file (default: `~/.pi/agent/extensions/pi-permission-system/config.json`, respects `PI_CODING_AGENT_DIR`):
 
 ```jsonc
 {
@@ -57,12 +57,12 @@ Pi auto-discovers extensions in these paths.
     "bash": "ask",
     "mcp": "ask",
     "skills": "ask",
-    "special": "ask",
+    "special": "ask"
   },
   "tools": {
     "read": "allow",
-    "write": "deny",
-  },
+    "write": "deny"
+  }
 }
 ```
 
@@ -100,19 +100,47 @@ The extension integrates via Pi's lifecycle hooks:
 
 ## Configuration
 
-### Extension Config File
+### Config File
 
-**Location:** global Pi extension config (default: `~/.pi/agent/extensions/pi-permission-system/config.json`, respects `PI_CODING_AGENT_DIR`)
+**Location:** one unified config file per scope, following the `pi-autoformat` convention:
 
-The extension creates this file automatically when it is missing. It controls only extension-local logging behavior:
+| Scope   | Path                                                                                              |
+| ------- | ------------------------------------------------------------------------------------------------- |
+| Global  | `~/.pi/agent/extensions/pi-permission-system/config.json` (respects `PI_CODING_AGENT_DIR`)        |
+| Project | `<cwd>/.pi/extensions/pi-permission-system/config.json`                                           |
 
-```json
+Project config overrides global config; per-agent frontmatter overrides both.
+Object-shaped fields (`defaultPolicy`, `tools`, `bash`, `mcp`, `skills`, `special`) use shallow-merge (later source wins per-key).
+Scalar fields (`debugLog`, `permissionReviewLog`, `yoloMode`) use simple replacement.
+
+The config file combines runtime knobs and permission policy in one object:
+
+```jsonc
 {
+  "$schema": "https://raw.githubusercontent.com/gotgenes/pi-permission-system/main/schemas/permissions.schema.json",
+
+  // Runtime knobs
   "debugLog": false,
   "permissionReviewLog": true,
-  "yoloMode": false
+  "yoloMode": false,
+
+  // Policy
+  "defaultPolicy": {
+    "tools": "ask",
+    "bash": "ask",
+    "mcp": "ask",
+    "skills": "ask",
+    "special": "ask"
+  },
+  "tools": { "read": "allow", "write": "deny" },
+  "bash": { "git status": "allow", "git *": "ask" },
+  "mcp": { "mcp_status": "allow" },
+  "skills": { "*": "ask" },
+  "special": { "doom_loop": "deny", "external_directory": "ask" }
 }
 ```
+
+#### Runtime knobs
 
 | Key                   | Default | Description                                                                                             |
 | --------------------- | ------- | ------------------------------------------------------------------------------------------------------- |
@@ -120,16 +148,12 @@ The extension creates this file automatically when it is missing. It controls on
 | `permissionReviewLog` | `true`  | Enables the permission request/denial review log at `logs/pi-permission-system-permission-review.jsonl` |
 | `yoloMode`            | `false` | Auto-approves `ask` results instead of prompting when yolo mode is enabled                              |
 
-Both logs write to files only under the extension directory. No debug output is printed to the terminal.
+Both logs write to `~/.pi/agent/extensions/pi-permission-system/logs/`.
+No debug output is printed to the terminal.
 
-> **Note:** Permission-rule keys (`defaultPolicy`, `tools`, `bash`, `mcp`, `skills`, `special`, `external_directory`, `doom_loop`) placed in `config.json` are silently ignored — they belong in the policy file below.
-> The extension warns at startup when it detects misplaced keys.
+#### Policy sections
 
-### Global Policy File
-
-**Location:** global Pi policy file (default: `~/.pi/agent/pi-permissions.jsonc`, respects `PI_CODING_AGENT_DIR`)
-
-The policy file is a JSON object with these sections:
+The config file is a JSON object with these policy sections:
 
 | Section         | Description                                                                  |
 | --------------- | ---------------------------------------------------------------------------- |
@@ -169,21 +193,22 @@ permission:
 
 **Limitations:** The frontmatter parser is intentionally minimal. Use only `key: value` scalars and nested maps. Avoid arrays, multi-line scalars, and YAML anchors.
 
-### Project-Level Policy Files
+### Project-Level Config and Overrides
 
-The extension can also layer project-local permission files relative to the active session working directory:
+Project-local config uses the same format as the global config file.
+Per-agent overrides use YAML frontmatter in the project agents directory:
 
-| Scope                  | Path                                   |
-| ---------------------- | -------------------------------------- |
-| Project policy         | `<cwd>/.pi/agent/pi-permissions.jsonc` |
-| Project agent override | `<cwd>/.pi/agent/agents/<agent>.md`    |
+| Scope                  | Path                                                          |
+| ---------------------- | ------------------------------------------------------------- |
+| Project config         | `<cwd>/.pi/extensions/pi-permission-system/config.json`       |
+| Project agent override | `<cwd>/.pi/agent/agents/<agent>.md`                           |
 
-Project-local files use the same formats as the global policy file and global agent frontmatter. These project files are resolved from Pi's current session `cwd`, so they are workspace-specific and do **not** move under `PI_CODING_AGENT_DIR`.
+These project files are resolved from Pi's current session `cwd`, so they are workspace-specific and do **not** move under `PI_CODING_AGENT_DIR`.
 
 **Precedence order:**
 
-1. Global policy file
-2. Project policy file
+1. Global config file
+2. Project config file
 3. Global agent frontmatter
 4. Project agent frontmatter
 
@@ -454,7 +479,7 @@ When the extension prompts, denies, or forwards permission requests, it can appe
 
 ```text
 Default global logs directory: ~/.pi/agent/extensions/pi-permission-system/logs/
-Actual global logs directory: $PI_CODING_AGENT_DIR/extensions/pi-permission-system/logs when PI_CODING_AGENT_DIR is set
+Actual global logs directory: $PI_CODING_AGENT_DIR/extensions/pi-permission-system/logs/ when PI_CODING_AGENT_DIR is set
 ```
 
 - `pi-permission-system-permission-review.jsonl` — enabled by default for permission review/audit history, including bounded `toolInputPreview` values for non-bash/non-MCP tool calls
@@ -466,16 +491,17 @@ This makes it easy to verify which files the extension actually loaded:
 ```jsonc
 {
   "event": "config.resolved",
-  "extensionConfigPath": "/…/pi-permission-system/config.json",
-  "extensionConfigExists": true,
-  "globalConfigPath": "/…/.pi/agent/pi-permissions.jsonc",
-  "globalConfigExists": false,
-  "projectConfigPath": "/…/my-project/.pi/agent/pi-permissions.jsonc",
-  "projectConfigExists": true,
+  "globalConfigPath": "/…/.pi/agent/extensions/pi-permission-system/config.json",
+  "globalConfigExists": true,
+  "projectConfigPath": "/…/my-project/.pi/extensions/pi-permission-system/config.json",
+  "projectConfigExists": false,
   "agentsDir": "/…/.pi/agent/agents",
   "agentsDirExists": true,
   "projectAgentsDir": "/…/my-project/.pi/agent/agents",
   "projectAgentsDirExists": false,
+  "legacyGlobalPolicyDetected": false,
+  "legacyProjectPolicyDetected": false,
+  "legacyExtensionConfigDetected": false
 }
 ```
 
@@ -485,8 +511,10 @@ This makes it easy to verify which files the extension actually loaded:
 index.ts                    → Root Pi entrypoint shim
 src/
 ├── index.ts                → Extension bootstrap, permission checks, readable prompts, review logging, reload handling, and subagent forwarding
+├── config-loader.ts        → Unified config loader, merger, and legacy-path detection
+├── config-paths.ts         → Path derivation for global, project, and legacy config locations
 ├── config-reporter.ts      → Resolved config path reporting for diagnostic logs
-├── extension-config.ts     → Extension-local config loading and default creation
+├── extension-config.ts     → Runtime config normalization and defaults
 ├── logging.ts              → File-only debug/review logging helpers
 ├── permission-manager.ts   → Global/project policy loading, merging, and resolution with caching
 ├── skill-prompt-sanitizer.ts → Skill prompt parsing, multi-block sanitization, and skill-read path matching
@@ -553,11 +581,40 @@ npx --yes ajv-cli@5 validate \
 
 ---
 
+## Migration from pre-v2 layout
+
+Before v2, config was split across two files:
+
+- Policy: `~/.pi/agent/pi-permissions.jsonc`
+- Runtime knobs: `<extension-install-dir>/config.json`
+
+These are now consolidated into one file.
+The extension detects legacy files and merges them with a warning for one release.
+To migrate manually:
+
+```bash
+# Move the global policy file
+mkdir -p ~/.pi/agent/extensions/pi-permission-system
+mv ~/.pi/agent/pi-permissions.jsonc ~/.pi/agent/extensions/pi-permission-system/config.json
+
+# If you had project-level policy:
+mkdir -p .pi/extensions/pi-permission-system
+mv .pi/agent/pi-permissions.jsonc .pi/extensions/pi-permission-system/config.json
+```
+
+Then add any runtime knobs (`debugLog`, `permissionReviewLog`, `yoloMode`) to the same file.
+The old extension-root `config.json` is no longer read from the install directory.
+
+> **Note:** Logs also moved from `<extension-install-dir>/logs/` to `~/.pi/agent/extensions/pi-permission-system/logs/`.
+> Old log files are not deleted or migrated — they remain readable but no new entries are appended.
+
+---
+
 ## Troubleshooting
 
 | Problem                              | Cause                                                      | Solution                                                                                                                                                             |
 | ------------------------------------ | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Config not applied (everything asks) | File not found or parse error                              | Verify the global Pi policy file (default: `~/.pi/agent/pi-permissions.jsonc`, respects `PI_CODING_AGENT_DIR`); check for trailing commas                            |
+| Config not applied (everything asks) | File not found or parse error                              | Verify the global config at `~/.pi/agent/extensions/pi-permission-system/config.json` (respects `PI_CODING_AGENT_DIR`); check for trailing commas                    |
 | Per-agent override not applied       | Frontmatter parsing issue                                  | Ensure `---` delimiters at file top; keep YAML simple; restart session                                                                                               |
 | Tool blocked as unregistered         | Unknown tool name                                          | Use a registered `mcp` tool for server tools: `{ "tool": "server:tool" }`                                                                                            |
 | `/skill:<name>` blocked              | Deny policy or confirmation unavailable                    | Check merged `skills` policy (global/project/agent layers). Active agent context is optional in the main session; `ask` still requires UI or forwarded confirmation. |

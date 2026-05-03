@@ -5,7 +5,6 @@ import {
   mkdtempSync,
   readFileSync,
   rmSync,
-  unlinkSync,
   writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
@@ -19,7 +18,6 @@ import {
 } from "../src/before-agent-start-cache.js";
 import { getGlobalConfigPath } from "../src/config-paths.js";
 import {
-  CONFIG_PATH,
   DEFAULT_EXTENSION_CONFIG,
   loadPermissionSystemConfig,
   savePermissionSystemConfig,

@@ -63,15 +63,6 @@ const DEFAULT_POLICY: PermissionDefaultPolicy = {
   special: "ask",
 };
 
-const EMPTY_GLOBAL_CONFIG: GlobalPermissionConfig = {
-  defaultPolicy: DEFAULT_POLICY,
-  tools: {},
-  bash: {},
-  mcp: {},
-  skills: {},
-  special: {},
-};
-
 function normalizePolicy(value: unknown): PermissionDefaultPolicy {
   const record = toRecord(value);
   return {

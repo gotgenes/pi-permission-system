@@ -1,4 +1,10 @@
 {
+  "$schema": "https://raw.githubusercontent.com/gotgenes/pi-permission-system/main/schemas/permissions.schema.json",
+
+  "debugLog": false,
+  "permissionReviewLog": true,
+  "yoloMode": false,
+
   "defaultPolicy": {
     "tools": "ask",
     "bash": "ask",
