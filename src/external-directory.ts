@@ -111,3 +111,72 @@ export function formatExternalDirectoryUserDeniedReason(
   const reasonSuffix = denialReason ? ` Reason: ${denialReason}.` : "";
   return `User denied external directory access for tool '${toolName}' path '${pathValue}'.${reasonSuffix} ${formatExternalDirectoryHardStopHint()}`;
 }
+
+/**
+ * URL pattern to skip tokens that look like URLs rather than paths.
+ */
+const URL_PATTERN = /^[a-z][a-z0-9+.-]*:\/\//i;
+
+/**
+ * Determines whether a token looks like a path candidate worth resolving.
+ * Returns the raw token string if it's a candidate, or null to skip.
+ */
+function classifyTokenAsPathCandidate(token: string): string | null {
+  // Skip empty tokens
+  if (!token) return null;
+
+  // Skip flags
+  if (token.startsWith("-")) return null;
+
+  // Skip env assignments (FOO=/bar)
+  const eqIndex = token.indexOf("=");
+  const slashIndex = token.indexOf("/");
+  if (eqIndex !== -1 && (slashIndex === -1 || eqIndex < slashIndex)) {
+    return null;
+  }
+
+  // Skip URLs
+  if (URL_PATTERN.test(token)) return null;
+
+  // Skip @scope/package patterns
+  if (token.startsWith("@") && !token.startsWith("@/")) return null;
+
+  // Must look like a path: starts with /, ~/, or contains ..
+  if (token.startsWith("/")) return token;
+  if (token.startsWith("~/")) return token;
+  if (token.includes("..")) return token;
+
+  return null;
+}
+
+/**
+ * Extracts paths from a bash command string that resolve outside CWD.
+ * This is a best-effort heuristic (token splitting, not full shell parsing).
+ */
+export function extractExternalPathsFromBashCommand(
+  command: string,
+  cwd: string,
+): string[] {
+  // Split on shell metacharacters to isolate tokens
+  const tokens = command.split(/[|;&><\s]+/).filter(Boolean);
+  const seen = new Set<string>();
+  const externalPaths: string[] = [];
+
+  for (const token of tokens) {
+    const candidate = classifyTokenAsPathCandidate(token);
+    if (!candidate) continue;
+
+    const normalized = normalizePathForComparison(candidate, cwd);
+    if (!normalized) continue;
+
+    if (
+      isPathOutsideWorkingDirectory(candidate, cwd) &&
+      !seen.has(normalized)
+    ) {
+      seen.add(normalized);
+      externalPaths.push(normalized);
+    }
+  }
+
+  return externalPaths;
+}
