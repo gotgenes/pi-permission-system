@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   detectMisplacedPermissionKeys,
   loadPermissionSystemConfig,
+  normalizePermissionSystemConfig,
 } from "../src/extension-config.js";
 
 describe("detectMisplacedPermissionKeys", () => {
@@ -116,5 +117,55 @@ describe("loadPermissionSystemConfig", () => {
     );
     const result = loadPermissionSystemConfig(configPath);
     expect(result.config.debugLog).toBe(true);
+  });
+});
+
+describe("normalizePermissionSystemConfig", () => {
+  it("normalizes a valid config object", () => {
+    const result = normalizePermissionSystemConfig({
+      debugLog: true,
+      permissionReviewLog: false,
+      yoloMode: true,
+    });
+    expect(result).toEqual({
+      debugLog: true,
+      permissionReviewLog: false,
+      yoloMode: true,
+    });
+  });
+
+  it("defaults debugLog to false when missing", () => {
+    const result = normalizePermissionSystemConfig({});
+    expect(result.debugLog).toBe(false);
+  });
+
+  it("defaults permissionReviewLog to true when missing", () => {
+    const result = normalizePermissionSystemConfig({});
+    expect(result.permissionReviewLog).toBe(true);
+  });
+
+  it("defaults yoloMode to false when missing", () => {
+    const result = normalizePermissionSystemConfig({});
+    expect(result.yoloMode).toBe(false);
+  });
+
+  it("coerces non-boolean values to their defaults", () => {
+    const result = normalizePermissionSystemConfig({
+      debugLog: "yes",
+      permissionReviewLog: 1,
+      yoloMode: null,
+    });
+    expect(result.debugLog).toBe(false);
+    expect(result.permissionReviewLog).toBe(true);
+    expect(result.yoloMode).toBe(false);
+  });
+
+  it("handles null/undefined input gracefully", () => {
+    const result = normalizePermissionSystemConfig(null);
+    expect(result).toEqual({
+      debugLog: false,
+      permissionReviewLog: true,
+      yoloMode: false,
+    });
   });
 });
