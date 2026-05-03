@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.0](https://github.com/gotgenes/pi-permission-system/compare/v3.0.5...v3.1.0) (2026-05-03)
+
+
+### Features
+
+* add bash external-directory format helpers ([#39](https://github.com/gotgenes/pi-permission-system/issues/39)) ([5c7e93c](https://github.com/gotgenes/pi-permission-system/commit/5c7e93cbe5c428ab3ed5e32ab3f2bb8c3fe0431b))
+* enforce external_directory gate on bash commands ([#39](https://github.com/gotgenes/pi-permission-system/issues/39)) ([5342139](https://github.com/gotgenes/pi-permission-system/commit/53421391c5f5f3b277e26ea7cbee23ef06b6db41))
+* extract external paths from bash command tokens ([#39](https://github.com/gotgenes/pi-permission-system/issues/39)) ([8cb3c2a](https://github.com/gotgenes/pi-permission-system/commit/8cb3c2a1b56007ca10e634bd6be5b464ddfea957))
+
+
+### Documentation
+
+* document bash external_directory gate in README ([#39](https://github.com/gotgenes/pi-permission-system/issues/39)) ([d33e1ea](https://github.com/gotgenes/pi-permission-system/commit/d33e1ea2686e5390f9904d554668c00305702fc1))
+* plan bash external_directory gate ([#39](https://github.com/gotgenes/pi-permission-system/issues/39)) ([ba80c64](https://github.com/gotgenes/pi-permission-system/commit/ba80c647668542f934e2c14148cf94fb11d110da))
+
 ## [3.0.5](https://github.com/gotgenes/pi-permission-system/compare/v3.0.4...v3.0.5) (2026-05-03)
 
 
