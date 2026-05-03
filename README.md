@@ -328,7 +328,6 @@ Reserved permission checks:
 | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `doom_loop`          | Controls doom loop detection behavior                                                                                                                                         |
 | `external_directory` | Enforces ask/allow/deny decisions for path-bearing built-in tools (`read`, `write`, `edit`, `find`, `grep`, `ls`) when they target paths outside the active working directory |
-| `tool_call_limit`    | _(schema only, not enforced yet)_                                                                                                                                             |
 
 ```jsonc
 {
