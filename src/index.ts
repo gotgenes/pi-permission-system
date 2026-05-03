@@ -79,26 +79,7 @@ const PERMISSION_FORWARDING_DIR = join(SESSIONS_DIR, "permission-forwarding");
 
 const ACTIVE_AGENT_TAG_REGEX = /<active_agent\s+name=["']([^"']+)["'][^>]*>/i;
 
-type PermissionRequestSource = "tool_call" | "skill_input" | "skill_read";
-type PermissionRequestState = "waiting" | "approved" | "denied";
-
-type PermissionRequestEvent = {
-  requestId: string;
-  source: PermissionRequestSource;
-  state: PermissionRequestState;
-  message: string;
-  toolCallId?: string;
-  toolName?: string;
-  skillName?: string;
-  path?: string;
-  command?: string;
-  target?: string;
-  toolInputPreview?: string;
-  agentName?: string | null;
-};
-
-const PERMISSION_REQUEST_EVENT_CHANNEL =
-  "pi-permission-system:permission-request";
+type PermissionReviewSource = "tool_call" | "skill_input" | "skill_read";
 const PATH_BEARING_TOOLS = new Set([
   "read",
   "write",
@@ -1347,24 +1328,11 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
     return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 10)}-${process.pid}`;
   };
 
-  const emitPermissionRequestEvent = (event: PermissionRequestEvent): void => {
-    try {
-      pi.events.emit(PERMISSION_REQUEST_EVENT_CHANNEL, event);
-    } catch (error) {
-      writeDebugLog("permission_request.event_emit_failed", {
-        requestId: event.requestId,
-        source: event.source,
-        state: event.state,
-        error: formatUnknownErrorMessage(error),
-      });
-    }
-  };
-
   const reviewPermissionDecision = (
     event: string,
     details: {
       requestId: string;
-      source: PermissionRequestSource;
+      source: PermissionReviewSource;
       agentName: string | null;
       message: string;
       toolCallId?: string;
@@ -1399,7 +1367,7 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
     ctx: ExtensionContext,
     details: {
       requestId: string;
-      source: PermissionRequestSource;
+      source: PermissionReviewSource;
       agentName: string | null;
       message: string;
       toolCallId?: string;
@@ -1413,38 +1381,10 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
   ): Promise<PermissionPromptDecision> => {
     if (shouldAutoApprovePermissionState("ask", extensionConfig)) {
       reviewPermissionDecision("permission_request.auto_approved", details);
-      emitPermissionRequestEvent({
-        requestId: details.requestId,
-        source: details.source,
-        state: "approved",
-        message: details.message,
-        toolCallId: details.toolCallId,
-        toolName: details.toolName,
-        skillName: details.skillName,
-        path: details.path,
-        command: details.command,
-        target: details.target,
-        toolInputPreview: details.toolInputPreview,
-        agentName: details.agentName,
-      });
       return { approved: true, state: "approved" };
     }
 
     reviewPermissionDecision("permission_request.waiting", details);
-    emitPermissionRequestEvent({
-      requestId: details.requestId,
-      source: details.source,
-      state: "waiting",
-      message: details.message,
-      toolCallId: details.toolCallId,
-      toolName: details.toolName,
-      skillName: details.skillName,
-      path: details.path,
-      command: details.command,
-      target: details.target,
-      toolInputPreview: details.toolInputPreview,
-      agentName: details.agentName,
-    });
 
     const decision = await confirmPermission(ctx, details.message);
     reviewPermissionDecision(
@@ -1457,21 +1397,6 @@ export default function piPermissionSystemExtension(pi: ExtensionAPI): void {
         denialReason: decision.denialReason,
       },
     );
-    emitPermissionRequestEvent({
-      requestId: details.requestId,
-      source: details.source,
-      state: decision.approved ? "approved" : "denied",
-      message: details.message,
-      toolCallId: details.toolCallId,
-      toolName: details.toolName,
-      skillName: details.skillName,
-      path: details.path,
-      command: details.command,
-      target: details.target,
-      toolInputPreview: details.toolInputPreview,
-      agentName: details.agentName,
-    });
-
     return decision;
   };
 
