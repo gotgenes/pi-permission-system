@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.3.0](https://github.com/gotgenes/pi-permission-system/compare/v4.2.0...v4.3.0) (2026-05-04)
+
+
+### Features
+
+* add pattern-suggest module for session approval patterns ([0752604](https://github.com/gotgenes/pi-permission-system/commit/0752604ea63a3bcbf4a8d15f6a9760dde4de9b9d))
+* dynamic session approval label in permission dialog ([4737f0d](https://github.com/gotgenes/pi-permission-system/commit/4737f0dbe69b579dca057a149788408cb63e52ec))
+* extend checkPermission session evaluation to all surfaces ([ffc6731](https://github.com/gotgenes/pi-permission-system/commit/ffc67312e09fb0df0c4dbcb572a625b92c3cd018))
+* extend permission gate with sessionApproval pass-through ([a77bad7](https://github.com/gotgenes/pi-permission-system/commit/a77bad7d9193a5500678bf18ac7854da0be2e79f))
+* generalize session approvals to all permission surfaces ([#51](https://github.com/gotgenes/pi-permission-system/issues/51)) ([2fcc2e3](https://github.com/gotgenes/pi-permission-system/commit/2fcc2e37db4f704702fd3d4c64a1388ab417c407))
+
+
+### Documentation
+
+* document generalized session approvals ([#51](https://github.com/gotgenes/pi-permission-system/issues/51)) ([233666e](https://github.com/gotgenes/pi-permission-system/commit/233666e496dd81165dec44ef4242bca090750edd))
+* plan generalized session approvals for all surfaces ([#51](https://github.com/gotgenes/pi-permission-system/issues/51)) ([3b40cf9](https://github.com/gotgenes/pi-permission-system/commit/3b40cf954c9f598c7c3c199a4137e897c4fce4b2))
+* **retro:** add retro notes for issue [#74](https://github.com/gotgenes/pi-permission-system/issues/74) ([0eb2ea0](https://github.com/gotgenes/pi-permission-system/commit/0eb2ea001669cba1436d564af9e28ca0ff26c77e))
+
 ## [4.2.0](https://github.com/gotgenes/pi-permission-system/compare/v4.1.1...v4.2.0) (2026-05-04)
 
 
