@@ -5,6 +5,41 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.0](https://github.com/gotgenes/pi-permission-system/compare/v3.11.0...v4.0.0) (2026-05-04)
+
+
+### ⚠ BREAKING CHANGES
+
+* permissions.schema.json replaces defaultPolicy/tools/bash/mcp/ skills/special with a single 'permission' object where each key is a surface name and the value is a PermissionState string or pattern-action map. config.example.json updated to use flat format.
+* warning message now directs users to the flat permission format ({ "permission": { ... } }) instead of the legacy pi-permissions.jsonc paths. The set of detected misplaced keys is unchanged (legacy keys still warned). The flat-format "permission" key is explicitly not flagged.
+* PermissionManager now reads policy from permission.permission (FlatPermissionConfig) instead of defaultPolicy/tools/bash/mcp/skills/special.
+* PermissionDefaultPolicy type is removed from types.ts. ScopeConfig is simplified to { permission?: FlatPermissionConfig }. defaults.ts is stubbed out pending full PermissionManager migration (step 5).
+* UnifiedPermissionConfig now has permission?: FlatPermissionConfig instead of defaultPolicy/tools/bash/mcp/skills/special fields. Legacy files parsed with the flat-format parser produce no permission rules (old-format keys are not translated). Migration warnings are still emitted for legacy file paths.
+* synthesizeDefaults() now accepts PermissionState (the universal default) instead of PermissionDefaultPolicy. synthesizeOverrides() and OverrideScope are removed. composeRuleset() signature reduced from 4 parameters to 3 (no overrides layer). PermissionManager is updated in a follow-up step.
+* introduces FlatPermissionConfig type and normalizeFlatConfig(). The legacy normalizeConfig() remains temporarily until PermissionManager is updated in a follow-up step.
+
+### Features
+
+* add normalizeFlatConfig for flat permission format ([#66](https://github.com/gotgenes/pi-permission-system/issues/66)) ([c8f6177](https://github.com/gotgenes/pi-permission-system/commit/c8f61770e081447801fa301c661cacd591a4368f))
+* remove PermissionDefaultPolicy and legacy defaults ([#66](https://github.com/gotgenes/pi-permission-system/issues/66)) ([404ffa1](https://github.com/gotgenes/pi-permission-system/commit/404ffa115708b8c6cf02df79910adb0cd0b0ce2f))
+* replace config-loader with flat permission format ([#66](https://github.com/gotgenes/pi-permission-system/issues/66)) ([0bd8d71](https://github.com/gotgenes/pi-permission-system/commit/0bd8d71fa770a290fa3834aa598aa75d71fe6cfc))
+* simplify synthesize layer for flat config ([#66](https://github.com/gotgenes/pi-permission-system/issues/66)) ([c9a73a4](https://github.com/gotgenes/pi-permission-system/commit/c9a73a4d393a36a21e5d0617c1d803806da569e0))
+* update misplaced-key detection for flat format ([#66](https://github.com/gotgenes/pi-permission-system/issues/66)) ([5b8e9da](https://github.com/gotgenes/pi-permission-system/commit/5b8e9da475c056c621759e32d58ba36a67b35174))
+* update PermissionManager for flat permission config ([#66](https://github.com/gotgenes/pi-permission-system/issues/66)) ([eb578b0](https://github.com/gotgenes/pi-permission-system/commit/eb578b0585c7081a703254cf404bb2a6e81a5e06))
+* update schema and example for flat permission format ([#66](https://github.com/gotgenes/pi-permission-system/issues/66)) ([32dd44d](https://github.com/gotgenes/pi-permission-system/commit/32dd44da1ee7498633c22858675f65e4ed36a8e2))
+
+
+### Documentation
+
+* acknowledge MasuRii/pi-permission-system as the upstream origin ([fe8b642](https://github.com/gotgenes/pi-permission-system/commit/fe8b642ba83e2cacfc2f42e460b62d3270f62354))
+* add legacy-to-flat migration guide ([#66](https://github.com/gotgenes/pi-permission-system/issues/66)) ([d415cc4](https://github.com/gotgenes/pi-permission-system/commit/d415cc451c06cf8b580e9924aac0e73fc537872b))
+* add migration guide and fork-language revision to plan ([#66](https://github.com/gotgenes/pi-permission-system/issues/66)) ([be58dd1](https://github.com/gotgenes/pi-permission-system/commit/be58dd18ae85ddbe058f9075244fd36e4538c842))
+* link MasuRii profile and acknowledge OpenCode inspiration ([21e5bc7](https://github.com/gotgenes/pi-permission-system/commit/21e5bc765db26a0cf9109dc396f969bb0c414c02))
+* plan flat permission config format ([#66](https://github.com/gotgenes/pi-permission-system/issues/66)) ([b5e0657](https://github.com/gotgenes/pi-permission-system/commit/b5e0657ab2925c569eac167a604def34b9473284))
+* remove unrelated pi extensions section from README ([22d0057](https://github.com/gotgenes/pi-permission-system/commit/22d0057d8feee6a3ae425e8f19d1dffec4387580))
+* **retro:** add retro notes for issue [#65](https://github.com/gotgenes/pi-permission-system/issues/65) ([9e85dcb](https://github.com/gotgenes/pi-permission-system/commit/9e85dcb8efe95daadb1aaf1704eb0536b91d8d31))
+* revise fork language from friendly to full fork ([#66](https://github.com/gotgenes/pi-permission-system/issues/66)) ([bcea397](https://github.com/gotgenes/pi-permission-system/commit/bcea3973cb2e6bad7a49c594f85418f292a30d23))
+
 ## [3.11.0](https://github.com/gotgenes/pi-permission-system/compare/v3.10.0...v3.11.0) (2026-05-04)
 
 
