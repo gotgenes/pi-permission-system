@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.1.0](https://github.com/gotgenes/pi-permission-system/compare/v4.0.1...v4.1.0) (2026-05-04)
+
+
+### Features
+
+* replace regex tokenizer with shell-quote ([#72](https://github.com/gotgenes/pi-permission-system/issues/72)) ([1568992](https://github.com/gotgenes/pi-permission-system/commit/1568992fb82b45c84b10e3cc9c50777f42d30dfa))
+
+
+### Documentation
+
+* plan shell-quote tokenizer migration ([#72](https://github.com/gotgenes/pi-permission-system/issues/72)) ([0390e06](https://github.com/gotgenes/pi-permission-system/commit/0390e06de5ca0e5cc79e438f2a94db610ca90289))
+* **retro:** add retro notes for issue [#68](https://github.com/gotgenes/pi-permission-system/issues/68) ([4775453](https://github.com/gotgenes/pi-permission-system/commit/47754539806fbe15f739ea0eaa4a100a69db82ef))
+
 ## [4.0.1](https://github.com/gotgenes/pi-permission-system/compare/v4.0.0...v4.0.1) (2026-05-04)
 
 
