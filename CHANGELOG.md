@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.1](https://github.com/gotgenes/pi-permission-system/compare/v4.0.0...v4.0.1) (2026-05-04)
+
+
+### Bug Fixes
+
+* skip bare-slash tokens in bash external-directory extraction ([#68](https://github.com/gotgenes/pi-permission-system/issues/68)) ([84f9a88](https://github.com/gotgenes/pi-permission-system/commit/84f9a88243c0033ddf1ca72894ceb42eb0f5f298))
+
+
+### Documentation
+
+* plan skip bare-slash tokens in external-directory extraction ([#68](https://github.com/gotgenes/pi-permission-system/issues/68)) ([f4fded8](https://github.com/gotgenes/pi-permission-system/commit/f4fded847ab7f4c8b82ebcd08edb0cb640d18fa7))
+* plan skip bare-slash tokens in external-directory extraction ([#68](https://github.com/gotgenes/pi-permission-system/issues/68)) ([f33964a](https://github.com/gotgenes/pi-permission-system/commit/f33964a34da726e3667319bf2015193de171767c))
+* **retro:** add retro notes for issue [#66](https://github.com/gotgenes/pi-permission-system/issues/66) ([61d7e5c](https://github.com/gotgenes/pi-permission-system/commit/61d7e5ca30c20c48f52152f9443ede1900010410))
+
 ## [4.0.0](https://github.com/gotgenes/pi-permission-system/compare/v3.11.0...v4.0.0) (2026-05-04)
 
 
