@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.10.0](https://github.com/gotgenes/pi-permission-system/compare/v3.9.0...v3.10.0) (2026-05-04)
+
+
+### Features
+
+* migrate tool_call external_directory to SessionRules ([42c2bd9](https://github.com/gotgenes/pi-permission-system/commit/42c2bd91dbc35c6e4343133fb907f43a6a2550bf))
+* remove SessionApprovalCache ([9d5a5be](https://github.com/gotgenes/pi-permission-system/commit/9d5a5be8251491a66b2826183ca22cbd5a232374))
+* replace SessionApprovalCache with SessionRules in runtime ([4cec9c5](https://github.com/gotgenes/pi-permission-system/commit/4cec9c553779afa8a5fb62bf2ffbd35a43af3e23))
+
+
+### Documentation
+
+* plan replace SessionApprovalCache with session Ruleset ([#57](https://github.com/gotgenes/pi-permission-system/issues/57)) ([ed1cefe](https://github.com/gotgenes/pi-permission-system/commit/ed1cefec2fd81542084460eb02cd3706b7093c07))
+* **retro:** add retro notes for issue [#56](https://github.com/gotgenes/pi-permission-system/issues/56) ([f97f65c](https://github.com/gotgenes/pi-permission-system/commit/f97f65c448bd907866042bf9804378f441ae7c36))
+* update session approval references ([#57](https://github.com/gotgenes/pi-permission-system/issues/57)) ([40e5e89](https://github.com/gotgenes/pi-permission-system/commit/40e5e89bf29b404b36fedaa48c896391d30574f6))
+
 ## [3.9.0](https://github.com/gotgenes/pi-permission-system/compare/v3.8.0...v3.9.0) (2026-05-03)
 
 
