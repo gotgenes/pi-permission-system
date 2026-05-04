@@ -1,6 +1,6 @@
 {
   "name": "@gotgenes/pi-permission-system",
-  "version": "3.10.0",
+  "version": "3.11.0",
   "description": "Permission enforcement extension for the Pi coding agent.",
   "type": "module",
   "files": [

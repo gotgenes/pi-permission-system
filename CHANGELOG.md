@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.11.0](https://github.com/gotgenes/pi-permission-system/compare/v3.10.0...v3.11.0) (2026-05-04)
+
+
+### Features
+
+* add "session" source to PermissionCheckResult ([#65](https://github.com/gotgenes/pi-permission-system/issues/65)) ([039ae26](https://github.com/gotgenes/pi-permission-system/commit/039ae26c5756ae51d97da27aee53a7ca8b55fa91))
+* add synthesize module (synthesizeDefaults, synthesizeOverrides, synthesizeBaseline, composeRuleset) ([#65](https://github.com/gotgenes/pi-permission-system/issues/65)) ([e0469b2](https://github.com/gotgenes/pi-permission-system/commit/e0469b26a49cdb2858b1d441615f5511d5c271d5))
+* compose ruleset with synthesized defaults and overrides ([#65](https://github.com/gotgenes/pi-permission-system/issues/65)) ([dac47c1](https://github.com/gotgenes/pi-permission-system/commit/dac47c1ce4fe6b98ee657e2cb7dca46c1dbf5c89))
+* remove separate session pre-check from tool_call ([#65](https://github.com/gotgenes/pi-permission-system/issues/65)) ([d156e9b](https://github.com/gotgenes/pi-permission-system/commit/d156e9be08c053ebe62bb5f198d3f0ee411c6728))
+* tag session rules with layer metadata ([#65](https://github.com/gotgenes/pi-permission-system/issues/65)) ([2346f95](https://github.com/gotgenes/pi-permission-system/commit/2346f957e0e552846870576c129f1fc8a620ef0d))
+
+
+### Documentation
+
+* drop backward-compat language for config format ([#66](https://github.com/gotgenes/pi-permission-system/issues/66)) ([fabde91](https://github.com/gotgenes/pi-permission-system/commit/fabde91e86afc08ac8ccf11c211a701d01a4d91a))
+* plan generalized session approvals and update target architecture ([#51](https://github.com/gotgenes/pi-permission-system/issues/51)) ([23a019a](https://github.com/gotgenes/pi-permission-system/commit/23a019af3ef381f89a145ab8d435c2447b538894))
+* plan synthesize defaults into ruleset and unify evaluate path ([#65](https://github.com/gotgenes/pi-permission-system/issues/65)) ([295fd10](https://github.com/gotgenes/pi-permission-system/commit/295fd10d77827b547ad14c50d73709c3f45cbebf))
+* **retro:** add retro notes for issue [#57](https://github.com/gotgenes/pi-permission-system/issues/57) ([cffb3a5](https://github.com/gotgenes/pi-permission-system/commit/cffb3a56ee8059015f89bbe7ba2922eee45d3dda))
+* update architecture for synthesized defaults and deprecate getSurfaceDefault() ([#65](https://github.com/gotgenes/pi-permission-system/issues/65)) ([e703809](https://github.com/gotgenes/pi-permission-system/commit/e7038090ce9e8b42e6f4c4423bcf8c03fb1aa3ea))
+
 ## [3.10.0](https://github.com/gotgenes/pi-permission-system/compare/v3.9.0...v3.10.0) (2026-05-04)
 
 
