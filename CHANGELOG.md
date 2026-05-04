@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.2.0](https://github.com/gotgenes/pi-permission-system/compare/v4.1.1...v4.2.0) (2026-05-04)
+
+
+### Features
+
+* replace shell-quote with tree-sitter-bash for AST-based path extraction ([7dce2a4](https://github.com/gotgenes/pi-permission-system/commit/7dce2a4d264d26171a1d54db265f12f3f1d342c6))
+
+
+### Documentation
+
+* note tree-sitter follow-up addressed by [#74](https://github.com/gotgenes/pi-permission-system/issues/74) ([bd835bd](https://github.com/gotgenes/pi-permission-system/commit/bd835bda62af9aa9149149c24ddb14927d52abf4))
+* note tree-sitter-bash AST parser in architecture docs ([ecec2a6](https://github.com/gotgenes/pi-permission-system/commit/ecec2a6db375434a4bc2f920a21741fe29786896))
+* plan tree-sitter-bash AST-based path extraction ([#74](https://github.com/gotgenes/pi-permission-system/issues/74)) ([1693794](https://github.com/gotgenes/pi-permission-system/commit/1693794fd423eaf872400a2a6dc3b0d0faeba13a))
+* rename current-architecture.md to v3-architecture.md ([38d91c5](https://github.com/gotgenes/pi-permission-system/commit/38d91c587a842caa71b32f379ed5723e73f490f4))
+* **retro:** add retro notes for issue [#73](https://github.com/gotgenes/pi-permission-system/issues/73) ([d73097d](https://github.com/gotgenes/pi-permission-system/commit/d73097d7dcda097fb79b6213b482bac8642f4a90))
+* update bash external-directory description for tree-sitter AST parser ([d022d3d](https://github.com/gotgenes/pi-permission-system/commit/d022d3d87ab0cc0192ba9adbaf3b9bf379dfa414))
+
 ## [4.1.1](https://github.com/gotgenes/pi-permission-system/compare/v4.1.0...v4.1.1) (2026-05-04)
 
 
