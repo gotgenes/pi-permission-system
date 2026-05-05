@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.1.2](https://github.com/gotgenes/pi-permission-system/compare/v5.1.1...v5.1.2) (2026-05-05)
+
+
+### Documentation
+
+* fix README per-agent frontmatter example to flat format ([#78](https://github.com/gotgenes/pi-permission-system/issues/78)) ([1295427](https://github.com/gotgenes/pi-permission-system/commit/129542795218a6ada1f8d069a22b5ace5ec6c445))
+* plan fix README frontmatter example and add missing tests ([#78](https://github.com/gotgenes/pi-permission-system/issues/78)) ([3fc99e1](https://github.com/gotgenes/pi-permission-system/commit/3fc99e1b3adf8193c94ac778617ca830488fa621))
+* **retro:** add retro notes for issue [#93](https://github.com/gotgenes/pi-permission-system/issues/93) ([c9e8e89](https://github.com/gotgenes/pi-permission-system/commit/c9e8e89eb4057866198402add374d72a90a2fa2e))
+
 ## [5.1.1](https://github.com/gotgenes/pi-permission-system/compare/v5.1.0...v5.1.1) (2026-05-05)
 
 
