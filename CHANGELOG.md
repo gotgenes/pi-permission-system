@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.5.0](https://github.com/gotgenes/pi-permission-system/compare/v4.4.1...v4.5.0) (2026-05-05)
+
+
+### Features
+
+* add evaluateFirst multi-candidate evaluate helper ([6b1fa60](https://github.com/gotgenes/pi-permission-system/commit/6b1fa603e6eaf750624d1f553ddb84755ab9b78e))
+* add input normalizer for non-MCP surfaces ([6d25624](https://github.com/gotgenes/pi-permission-system/commit/6d256241e3f599aa9db5952a16b10d10b72e5321))
+* add MCP input normalization to input-normalizer ([6fa58b2](https://github.com/gotgenes/pi-permission-system/commit/6fa58b211f06eef5885f1e6f238285cdb77aab09))
+* concatenate session rules into composed ruleset ([e85e844](https://github.com/gotgenes/pi-permission-system/commit/e85e844f414c6dfd14ffbbc74826c976d8f0f234))
+
+
+### Documentation
+
+* mark unified checkPermission as implemented in target architecture ([bb7214a](https://github.com/gotgenes/pi-permission-system/commit/bb7214a8363b6b1ad70ae1233f297d28c36cd423))
+* plan unified checkPermission evaluate path ([#81](https://github.com/gotgenes/pi-permission-system/issues/81)) ([6562328](https://github.com/gotgenes/pi-permission-system/commit/65623287aa899424829b0e31e7c9aa46f17e3f81))
+* **retro:** add retro notes for issue [#82](https://github.com/gotgenes/pi-permission-system/issues/82) ([f748fe0](https://github.com/gotgenes/pi-permission-system/commit/f748fe00105dbce087ec0a41653171c53364d531))
+
 ## [4.4.1](https://github.com/gotgenes/pi-permission-system/compare/v4.4.0...v4.4.1) (2026-05-05)
 
 
