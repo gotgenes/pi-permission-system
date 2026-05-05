@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.9.0](https://github.com/gotgenes/pi-permission-system/compare/v4.8.0...v4.9.0) (2026-05-05)
+
+
+### Features
+
+* bypass external_directory gate for Pi infrastructure reads ([229a352](https://github.com/gotgenes/pi-permission-system/commit/229a35222dd47f1d0c079f0bcd34760569e912f3))
+
+
+### Bug Fixes
+
+* skip regex patterns in bash external-directory path extraction ([9fe4ba6](https://github.com/gotgenes/pi-permission-system/commit/9fe4ba6d259c25aa0a9e3a5508884d26a303cac3))
+
+
+### Documentation
+
+* document piInfrastructureReadPaths config and infrastructure auto-allow ([65e0ac8](https://github.com/gotgenes/pi-permission-system/commit/65e0ac8ef8a4973c261628e026c3772faa0849ab))
+* plan auto-allow reads from Pi infrastructure directories ([#48](https://github.com/gotgenes/pi-permission-system/issues/48)) ([06b8d44](https://github.com/gotgenes/pi-permission-system/commit/06b8d441d569b1c2893f5c434357eb8b2fc9180f))
+* **retro:** add retro notes for issue [#53](https://github.com/gotgenes/pi-permission-system/issues/53) ([1988d7a](https://github.com/gotgenes/pi-permission-system/commit/1988d7ab09432df09825c560ba377233e0d3ab33))
+
 ## [4.8.0](https://github.com/gotgenes/pi-permission-system/compare/v4.7.0...v4.8.0) (2026-05-05)
 
 
