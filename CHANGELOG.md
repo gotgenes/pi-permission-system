@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.6.0](https://github.com/gotgenes/pi-permission-system/compare/v4.5.0...v4.6.0) (2026-05-05)
+
+
+### Features
+
+* bump tsconfig target to ES2023 ([#60](https://github.com/gotgenes/pi-permission-system/issues/60)) ([7557ffd](https://github.com/gotgenes/pi-permission-system/commit/7557ffdc6ee17a03aeb173f5439b1aab3437a311))
+
+
+### Documentation
+
+* plan tsconfig ES2023 bump ([#60](https://github.com/gotgenes/pi-permission-system/issues/60)) ([7005929](https://github.com/gotgenes/pi-permission-system/commit/70059296bb68a9f1aeb832ffdc9e89746c3d2c3e))
+* **retro:** add retro notes for issue [#81](https://github.com/gotgenes/pi-permission-system/issues/81) ([7eb892e](https://github.com/gotgenes/pi-permission-system/commit/7eb892ee04c98e6edf8de7ddba5d1d973f1bc902))
+* update AGENTS.md ES version floor to ES2023 ([#60](https://github.com/gotgenes/pi-permission-system/issues/60)) ([3fe87da](https://github.com/gotgenes/pi-permission-system/commit/3fe87da121a591ceb083506d0ac6a14b2cd8217a))
+
 ## [4.5.0](https://github.com/gotgenes/pi-permission-system/compare/v4.4.1...v4.5.0) (2026-05-05)
 
 
