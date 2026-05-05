@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.7.0](https://github.com/gotgenes/pi-permission-system/compare/v4.6.0...v4.7.0) (2026-05-05)
+
+
+### Features
+
+* add bash arity table with prefix lookup ([#52](https://github.com/gotgenes/pi-permission-system/issues/52)) ([56a8e81](https://github.com/gotgenes/pi-permission-system/commit/56a8e81911a5869bceabf9076bca6e1bb709814b))
+* integrate arity table into suggestBashPattern ([#52](https://github.com/gotgenes/pi-permission-system/issues/52)) ([5a3c809](https://github.com/gotgenes/pi-permission-system/commit/5a3c8094319166a8f3bd7c97a68af6b8cd0d0205))
+
+
+### Documentation
+
+* document bash arity table ([#52](https://github.com/gotgenes/pi-permission-system/issues/52)) ([376ae5c](https://github.com/gotgenes/pi-permission-system/commit/376ae5cdd9d3a9d28f0e26ec26455f44b45b56d7))
+* plan bash arity table for smart approval patterns ([#52](https://github.com/gotgenes/pi-permission-system/issues/52)) ([6a78244](https://github.com/gotgenes/pi-permission-system/commit/6a78244b7552563e331bb2d426aa0abd35ef9065))
+* **retro:** add retro notes for issue [#60](https://github.com/gotgenes/pi-permission-system/issues/60) ([54ed04a](https://github.com/gotgenes/pi-permission-system/commit/54ed04a85e47a5b1ceb9d496851474856fb0fa17))
+
 ## [4.6.0](https://github.com/gotgenes/pi-permission-system/compare/v4.5.0...v4.6.0) (2026-05-05)
 
 
