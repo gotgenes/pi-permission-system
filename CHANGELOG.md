@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.8.0](https://github.com/gotgenes/pi-permission-system/compare/v4.7.0...v4.8.0) (2026-05-05)
+
+
+### Features
+
+* add expandHomePath utility for ~ and $HOME expansion ([18264e1](https://github.com/gotgenes/pi-permission-system/commit/18264e104f6aa12ca004a127d0f7b09b9e4fb740))
+* expand ~ and $HOME in wildcard patterns at compile time ([3c7e0c2](https://github.com/gotgenes/pi-permission-system/commit/3c7e0c2ab92c1e6bb58fdab32cfd9ae2c72e100a))
+
+
+### Documentation
+
+* document ~/$HOME pattern expansion in schema, example config, and README ([8ad5190](https://github.com/gotgenes/pi-permission-system/commit/8ad51909512ca294c83876868407866290234882))
+* plan home directory expansion in permission patterns ([#53](https://github.com/gotgenes/pi-permission-system/issues/53)) ([b5b77b6](https://github.com/gotgenes/pi-permission-system/commit/b5b77b640006b67b51420135be8fb78484c9d9a1))
+* **retro:** add retro notes for issue [#52](https://github.com/gotgenes/pi-permission-system/issues/52) ([7fc8113](https://github.com/gotgenes/pi-permission-system/commit/7fc8113390fd1dd9cf09c05e903d597c16d80104))
+* sleep before pulling release commit and tag ([af701b5](https://github.com/gotgenes/pi-permission-system/commit/af701b543b20f274ca9f8aa904af0a39bc232c26))
+
 ## [4.7.0](https://github.com/gotgenes/pi-permission-system/compare/v4.6.0...v4.7.0) (2026-05-05)
 
 
