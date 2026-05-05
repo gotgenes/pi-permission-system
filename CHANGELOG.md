@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.3.0](https://github.com/gotgenes/pi-permission-system/compare/v5.2.1...v5.3.0) (2026-05-05)
+
+
+### Features
+
+* add permission event types and emit helpers ([#29](https://github.com/gotgenes/pi-permission-system/issues/29)) ([45a4158](https://github.com/gotgenes/pi-permission-system/commit/45a415833818b78651671f6a33103e874cc137be))
+* add permissions:rpc:check policy query RPC ([#29](https://github.com/gotgenes/pi-permission-system/issues/29)) ([b230ff8](https://github.com/gotgenes/pi-permission-system/commit/b230ff8078679d85a63f14888f3feb36054201ff))
+* add permissions:rpc:prompt forwarding RPC ([#29](https://github.com/gotgenes/pi-permission-system/issues/29)) ([438227c](https://github.com/gotgenes/pi-permission-system/commit/438227c090d620c948cf91d26d8cf0b85ec9b66e))
+* clean up RPC handlers on session shutdown ([#29](https://github.com/gotgenes/pi-permission-system/issues/29)) ([0a54a10](https://github.com/gotgenes/pi-permission-system/commit/0a54a108a824168bfab7059c3d78bd182dbbaccd))
+* distinguish auto-approved from user-approved in decision events ([#29](https://github.com/gotgenes/pi-permission-system/issues/29)) ([746d988](https://github.com/gotgenes/pi-permission-system/commit/746d988fc0af4dd06e507b79069bf199b1c7dfd7))
+* emit permission decision events from input handler ([#29](https://github.com/gotgenes/pi-permission-system/issues/29)) ([bfc21bb](https://github.com/gotgenes/pi-permission-system/commit/bfc21bba8c81aff58655df8928c43c4e68e9a2af))
+* emit permission decision events from tool-call handler ([#29](https://github.com/gotgenes/pi-permission-system/issues/29)) ([40cf12e](https://github.com/gotgenes/pi-permission-system/commit/40cf12e78fcd52a37f7da46d75fb1c1b2a26d15e))
+* emit permissions:ready on extension load ([#29](https://github.com/gotgenes/pi-permission-system/issues/29)) ([bfa3606](https://github.com/gotgenes/pi-permission-system/commit/bfa360633b25048e7f435141700dbbecaf77274c))
+
+
+### Documentation
+
+* document permission event API and RPC protocol ([#29](https://github.com/gotgenes/pi-permission-system/issues/29)) ([3872e54](https://github.com/gotgenes/pi-permission-system/commit/3872e5416bfb118b4ab5538a122ac3f9bccf40d7))
+* plan permission event channel with decision broadcast and RPC ([#29](https://github.com/gotgenes/pi-permission-system/issues/29)) ([d31754a](https://github.com/gotgenes/pi-permission-system/commit/d31754ad90c02c11f6b92fcc3c33f8dbf76ccee3))
+* **retro:** add retro notes for issue [#97](https://github.com/gotgenes/pi-permission-system/issues/97) ([43d66d9](https://github.com/gotgenes/pi-permission-system/commit/43d66d932fc4ed121a6789b241112c1bd6c777f0))
+
 ## [5.2.1](https://github.com/gotgenes/pi-permission-system/compare/v5.2.0...v5.2.1) (2026-05-05)
 
 
