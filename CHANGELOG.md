@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.2.1](https://github.com/gotgenes/pi-permission-system/compare/v5.2.0...v5.2.1) (2026-05-05)
+
+
+### Documentation
+
+* document subagent extension coexistence ([#97](https://github.com/gotgenes/pi-permission-system/issues/97)) ([9bf2972](https://github.com/gotgenes/pi-permission-system/commit/9bf29726de98d44d7cfd8963f666be37fe807c9a))
+* plan subagent extension coexistence documentation ([#97](https://github.com/gotgenes/pi-permission-system/issues/97)) ([4cf975f](https://github.com/gotgenes/pi-permission-system/commit/4cf975f505081c5df46b20a2dd2d65e9a9a877f9))
+* **retro:** add retro notes for issue [#96](https://github.com/gotgenes/pi-permission-system/issues/96) ([8757ffc](https://github.com/gotgenes/pi-permission-system/commit/8757ffc3f186d137c65aea7abde9a383335584f8))
+
 ## [5.2.0](https://github.com/gotgenes/pi-permission-system/compare/v5.1.2...v5.2.0) (2026-05-05)
 
 
