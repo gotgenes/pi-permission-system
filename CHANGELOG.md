@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.3.1](https://github.com/gotgenes/pi-permission-system/compare/v5.3.0...v5.3.1) (2026-05-05)
+
+
+### Documentation
+
+* add permission frontmatter convention guide for subagent extensions ([c992959](https://github.com/gotgenes/pi-permission-system/commit/c99295960ad31e359fc1fbdea0ad45057d8366d8))
+* add upstream issue template for subagent extension outreach ([79eef27](https://github.com/gotgenes/pi-permission-system/commit/79eef27fbee6786b5ef8c830ed0fce575d067b92))
+* link permission frontmatter guide from README and target architecture ([df261fc](https://github.com/gotgenes/pi-permission-system/commit/df261fc36f9d9c527524b3301959a1be69bf8a51))
+* plan shared permission frontmatter convention for subagent extensions ([#98](https://github.com/gotgenes/pi-permission-system/issues/98)) ([eec5763](https://github.com/gotgenes/pi-permission-system/commit/eec57637810a04c923ddff6e5991a8fbd95f4030))
+* restructure README with inverted pyramid, extract reference docs ([db51142](https://github.com/gotgenes/pi-permission-system/commit/db51142e3bfc2283298c23a7a8517c72179f4611))
+* **retro:** add retro notes for issue [#29](https://github.com/gotgenes/pi-permission-system/issues/29) ([be0620b](https://github.com/gotgenes/pi-permission-system/commit/be0620bc417297d43d5e7c0d04efd14f2844f147))
+
 ## [5.3.0](https://github.com/gotgenes/pi-permission-system/compare/v5.2.1...v5.3.0) (2026-05-05)
 
 
