@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.0.0](https://github.com/gotgenes/pi-permission-system/compare/v4.9.0...v5.0.0) (2026-05-05)
+
+
+### ⚠ BREAKING CHANGES
+
+* Rule.origin and PermissionCheckResult.origin are now required fields. Code that constructs Rule or PermissionCheckResult literals must include an origin value.
+
+### Features
+
+* add RuleOrigin type and origin field to Rule ([b4452d1](https://github.com/gotgenes/pi-permission-system/commit/b4452d1cc9e87a8315edcd6f5f2b1425310bd0b6))
+* display rule origins in /permission-system show output ([af34c8e](https://github.com/gotgenes/pi-permission-system/commit/af34c8e808c7fa67bbe68635f776ec0fd8717bfa))
+* include rule origin in permission review log entries ([b19fdf6](https://github.com/gotgenes/pi-permission-system/commit/b19fdf69b48248430410643ee20bee58535b99d9))
+* make Rule.origin and PermissionCheckResult.origin required ([937a9f5](https://github.com/gotgenes/pi-permission-system/commit/937a9f5c4a9442611606fa3b27962555ed8c25a9))
+* propagate origin to synthesized default rule ([04f9130](https://github.com/gotgenes/pi-permission-system/commit/04f91304ec5ba975ac512989c90757528a30ef7b))
+* track and propagate rule origin through checkPermission ([327bc60](https://github.com/gotgenes/pi-permission-system/commit/327bc60e7f79aafd19995337f62244fd8b0c191f))
+
+
+### Documentation
+
+* plan rule origin provenance tracking ([#88](https://github.com/gotgenes/pi-permission-system/issues/88)) ([d8f8840](https://github.com/gotgenes/pi-permission-system/commit/d8f884028f03682a896dd0d6e8e5a335d8e669f5))
+* **retro:** add retro notes for issue [#48](https://github.com/gotgenes/pi-permission-system/issues/48) ([2187a53](https://github.com/gotgenes/pi-permission-system/commit/2187a53d2af30d6a68f664b1ce4af0dc30b39061))
+* update target architecture for required Rule.origin ([edf0620](https://github.com/gotgenes/pi-permission-system/commit/edf06209ce148b70131a5abf361070571db51e7b))
+* update target architecture for rule origin provenance ([c82435b](https://github.com/gotgenes/pi-permission-system/commit/c82435bb75dd7b22331986c6a23bfe5cf1849ca7))
+
 ## [4.9.0](https://github.com/gotgenes/pi-permission-system/compare/v4.8.0...v4.9.0) (2026-05-05)
 
 
