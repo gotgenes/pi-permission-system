@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.4.0](https://github.com/gotgenes/pi-permission-system/compare/v4.3.0...v4.4.0) (2026-05-05)
+
+
+### Features
+
+* wire PermissionPrompter and remove runtime promptPermission ([#80](https://github.com/gotgenes/pi-permission-system/issues/80)) ([8e0980a](https://github.com/gotgenes/pi-permission-system/commit/8e0980a207f9f665ad2af3ad635d73e28d313c91))
+
+
+### Documentation
+
+* add permission-prompter architecture note ([#80](https://github.com/gotgenes/pi-permission-system/issues/80)) ([6cc1b60](https://github.com/gotgenes/pi-permission-system/commit/6cc1b6089a332f262919d20ad27d5ca7a69b0b6d))
+* add permission-prompter to target architecture module map ([#80](https://github.com/gotgenes/pi-permission-system/issues/80)) ([c5cf101](https://github.com/gotgenes/pi-permission-system/commit/c5cf101af827dc108c66c5dffff94e05d4234e4c))
+* add permission-prompter to v3 architecture module map ([#80](https://github.com/gotgenes/pi-permission-system/issues/80)) ([94be5b5](https://github.com/gotgenes/pi-permission-system/commit/94be5b58b9018b1918102089bb2fff8401d8bad5))
+* plan extract PermissionPrompter class ([#80](https://github.com/gotgenes/pi-permission-system/issues/80)) ([50fcf34](https://github.com/gotgenes/pi-permission-system/commit/50fcf3400ed8574b036cacd2afc1b9e2161d41c6))
+* remove interim permission-prompter from target architecture map ([#80](https://github.com/gotgenes/pi-permission-system/issues/80)) ([f300f08](https://github.com/gotgenes/pi-permission-system/commit/f300f086b42d9d52ff0668b63a191addebe3140e))
+* **retro:** add retro notes for issue [#51](https://github.com/gotgenes/pi-permission-system/issues/51) ([79a564d](https://github.com/gotgenes/pi-permission-system/commit/79a564d24977da7cffa3d9d65391a75dd0d7e99c))
+* update target architecture for completed work and new issues ([#80](https://github.com/gotgenes/pi-permission-system/issues/80)) ([e661345](https://github.com/gotgenes/pi-permission-system/commit/e661345c8a699e702cbaa9adb7d61c80a25010d2))
+
 ## [4.3.0](https://github.com/gotgenes/pi-permission-system/compare/v4.2.0...v4.3.0) (2026-05-04)
 
 
