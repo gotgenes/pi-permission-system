@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.4.1](https://github.com/gotgenes/pi-permission-system/compare/v4.4.0...v4.4.1) (2026-05-05)
+
+
+### Documentation
+
+* plan delete deprecated defaults.ts stub ([#82](https://github.com/gotgenes/pi-permission-system/issues/82)) ([36fcace](https://github.com/gotgenes/pi-permission-system/commit/36fcaceab824b4334315767ba1cfd3fe24cff1b7))
+* **retro:** add retro notes for issue [#80](https://github.com/gotgenes/pi-permission-system/issues/80) ([bfa11d5](https://github.com/gotgenes/pi-permission-system/commit/bfa11d539920dc24efbcab33329595da4e93e152))
+
+
+### Miscellaneous Chores
+
+* delete deprecated defaults.ts stub ([#82](https://github.com/gotgenes/pi-permission-system/issues/82)) ([40ae42a](https://github.com/gotgenes/pi-permission-system/commit/40ae42ad710bc502f19d8a27e409cc22a6bca4f8))
+
 ## [4.4.0](https://github.com/gotgenes/pi-permission-system/compare/v4.3.0...v4.4.0) (2026-05-05)
 
 
