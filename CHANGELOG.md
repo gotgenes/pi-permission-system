@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.2.0](https://github.com/gotgenes/pi-permission-system/compare/v5.1.2...v5.2.0) (2026-05-05)
+
+
+### Features
+
+* add SUBAGENT_PARENT_SESSION_ENV_CANDIDATES, iterate in resolver ([#96](https://github.com/gotgenes/pi-permission-system/issues/96)) ([ac6831d](https://github.com/gotgenes/pi-permission-system/commit/ac6831d3418db0aee5d5ed4757d5833730a6e130))
+* broaden SUBAGENT_ENV_HINT_KEYS for nicobailon + HazAT extensions ([#96](https://github.com/gotgenes/pi-permission-system/issues/96)) ([8adafdb](https://github.com/gotgenes/pi-permission-system/commit/8adafdb45af66cf99b000b3ad011bee5a2c90476))
+
+
+### Documentation
+
+* plan broaden subagent env hint keys ([#96](https://github.com/gotgenes/pi-permission-system/issues/96)) ([9fa97b7](https://github.com/gotgenes/pi-permission-system/commit/9fa97b7385e5b9203a35c80d15f980ac4501f788))
+* update target-architecture subagent detection for [#96](https://github.com/gotgenes/pi-permission-system/issues/96) ([64cce35](https://github.com/gotgenes/pi-permission-system/commit/64cce3569c09cede690858af41d2f35611a8705f))
+
 ## [5.1.2](https://github.com/gotgenes/pi-permission-system/compare/v5.1.1...v5.1.2) (2026-05-05)
 
 
