@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.1.1](https://github.com/gotgenes/pi-permission-system/compare/v5.1.0...v5.1.1) (2026-05-05)
+
+
+### Bug Fixes
+
+* discover global node_modules root from dev checkout via npm root -g fallback ([93aac81](https://github.com/gotgenes/pi-permission-system/commit/93aac81bd830ec260d2156b34ca8074f6c533255))
+
+
+### Documentation
+
+* note npm root -g fallback for dev checkout infrastructure reads ([d06caf7](https://github.com/gotgenes/pi-permission-system/commit/d06caf73371c7ea73f1c56a5efb86b2023292dd3))
+* plan createRequire fallback for dev checkout infra read bypass ([#93](https://github.com/gotgenes/pi-permission-system/issues/93)) ([7750044](https://github.com/gotgenes/pi-permission-system/commit/775004477efff0d3cd2eb5ba7a0fcbdd98f3d122))
+* plan npm root -g fallback for dev checkout infra read bypass ([#93](https://github.com/gotgenes/pi-permission-system/issues/93)) ([85e697c](https://github.com/gotgenes/pi-permission-system/commit/85e697c5062a36fd150bd4d6b377ca906b3a1dbf))
+* **retro:** add retro notes for issue [#91](https://github.com/gotgenes/pi-permission-system/issues/91) ([d2d1263](https://github.com/gotgenes/pi-permission-system/commit/d2d1263955741053b2cf8718830d88043b9cdd8e))
+
 ## [5.1.0](https://github.com/gotgenes/pi-permission-system/compare/v5.0.0...v5.1.0) (2026-05-05)
 
 
