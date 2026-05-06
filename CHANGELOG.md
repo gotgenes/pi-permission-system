@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.3.4](https://github.com/gotgenes/pi-permission-system/compare/v5.3.3...v5.3.4) (2026-05-06)
+
+
+### Documentation
+
+* center logo with HTML align ([707f3e7](https://github.com/gotgenes/pi-permission-system/commit/707f3e7b6dead1d7f82942e4925ca137248e77ab))
+* convert logo to PNG for npm compatibility ([c81e094](https://github.com/gotgenes/pi-permission-system/commit/c81e0949bcb6bd7acd11950050fcd4eb678d6e51))
+* remove width constraint on logo ([d50930a](https://github.com/gotgenes/pi-permission-system/commit/d50930ac4e6dd7fe6e94f42338775b8e3a0093eb))
+
 ## [5.3.3](https://github.com/gotgenes/pi-permission-system/compare/v5.3.2...v5.3.3) (2026-05-06)
 
 
