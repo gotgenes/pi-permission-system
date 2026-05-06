@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.3.2](https://github.com/gotgenes/pi-permission-system/compare/v5.3.1...v5.3.2) (2026-05-06)
+
+
+### Documentation
+
+* fix ordered list continuation, use realistic quick-start config ([dd26166](https://github.com/gotgenes/pi-permission-system/commit/dd261666e497a280902790a5a50f7daf70a511a4))
+* **retro:** add retro notes for issue [#98](https://github.com/gotgenes/pi-permission-system/issues/98) ([bf2bbc6](https://github.com/gotgenes/pi-permission-system/commit/bf2bbc61c748222ff4bef8234ed8543d7a93ad27))
+
 ## [5.3.1](https://github.com/gotgenes/pi-permission-system/compare/v5.3.0...v5.3.1) (2026-05-05)
 
 
