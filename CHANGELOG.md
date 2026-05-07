@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.5.1](https://github.com/gotgenes/pi-permission-system/compare/v5.5.0...v5.5.1) (2026-05-07)
+
+
+### Documentation
+
+* plan narrow handler dependencies by splitting ExtensionRuntime ([#111](https://github.com/gotgenes/pi-permission-system/issues/111)) ([cb44dee](https://github.com/gotgenes/pi-permission-system/commit/cb44deea383fbcca8c8ba25bd4098f7dd8c35bfb))
+* **retro:** add retro notes for issue [#108](https://github.com/gotgenes/pi-permission-system/issues/108) ([e967fd9](https://github.com/gotgenes/pi-permission-system/commit/e967fd96c6ed0a9ac0a4f0037889f1d9c88ebd97))
+* update target architecture for gate interfaces and SessionState ([#111](https://github.com/gotgenes/pi-permission-system/issues/111)) ([85620c4](https://github.com/gotgenes/pi-permission-system/commit/85620c4486fdcf756c7039c15bdd8a295621ad37))
+
 ## [5.5.0](https://github.com/gotgenes/pi-permission-system/compare/v5.4.0...v5.5.0) (2026-05-07)
 
 
