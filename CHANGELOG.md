@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.6.2](https://github.com/gotgenes/pi-permission-system/compare/v5.6.1...v5.6.2) (2026-05-07)
+
+
+### Documentation
+
+* clarify bash arity table usage difference with OpenCode ([b387480](https://github.com/gotgenes/pi-permission-system/commit/b3874801a5084fa762cf521b743c21e3ed328d79))
+* clarify doom_loop is not a Pi surface, not just deprecated ([8c38ab2](https://github.com/gotgenes/pi-permission-system/commit/8c38ab24dbcc4ecb1da8baa1276facfdfa21e785))
+* detail superior bash path extraction vs OpenCode's allowlist approach ([b16767b](https://github.com/gotgenes/pi-permission-system/commit/b16767b5df0d9d8cf960a47f4bfbaa788ee21def))
+* merge doom_loop into OpenCode-only surfaces row ([85756a7](https://github.com/gotgenes/pi-permission-system/commit/85756a72917d43931c9026c0120d6f2731bfae5e))
+* move bash arity/tree-sitter to shared concepts (both at parity) ([6fd7cdc](https://github.com/gotgenes/pi-permission-system/commit/6fd7cdcad2917ab98fb80f80fe2abc8cc5c6bd36))
+* plan deduplicate shared helpers ([#109](https://github.com/gotgenes/pi-permission-system/issues/109)) ([52bff2e](https://github.com/gotgenes/pi-permission-system/commit/52bff2ef7cf0f5d64cf27f90381b558ed8427ac6))
+* plan split external-directory into focused modules ([#110](https://github.com/gotgenes/pi-permission-system/issues/110)) ([b2a4610](https://github.com/gotgenes/pi-permission-system/commit/b2a4610430e27f8ec9456c70e31ce54aa866ac30))
+* **retro:** add retro notes for issue [#106](https://github.com/gotgenes/pi-permission-system/issues/106) ([a945814](https://github.com/gotgenes/pi-permission-system/commit/a945814799264396fa8fc94249791fdbc22b58c1))
+* update target architecture for extracted helpers ([52693d6](https://github.com/gotgenes/pi-permission-system/commit/52693d6c0b0164d38b2746a40df9aab7031b47b2))
+
 ## [5.6.1](https://github.com/gotgenes/pi-permission-system/compare/v5.6.0...v5.6.1) (2026-05-07)
 
 
