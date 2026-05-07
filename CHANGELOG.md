@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.6.3](https://github.com/gotgenes/pi-permission-system/compare/v5.6.2...v5.6.3) (2026-05-07)
+
+
+### Documentation
+
+* **retro:** add retro notes for issue [#109](https://github.com/gotgenes/pi-permission-system/issues/109) ([7d46cf4](https://github.com/gotgenes/pi-permission-system/commit/7d46cf4576d13d1d348355de88fb3dda6297be5a))
+* update architecture for external-directory split ([#110](https://github.com/gotgenes/pi-permission-system/issues/110)) ([2e86fe7](https://github.com/gotgenes/pi-permission-system/commit/2e86fe79bc5de8076f775949824adadd4d366d7c))
+* update plan for [#110](https://github.com/gotgenes/pi-permission-system/issues/110) after [#109](https://github.com/gotgenes/pi-permission-system/issues/109) landed ([3541d57](https://github.com/gotgenes/pi-permission-system/commit/3541d5739385b77ea8b21752595efd5cb75a6789))
+
 ## [5.6.2](https://github.com/gotgenes/pi-permission-system/compare/v5.6.1...v5.6.2) (2026-05-07)
 
 
