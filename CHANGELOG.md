@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.4.0](https://github.com/gotgenes/pi-permission-system/compare/v5.3.4...v5.4.0) (2026-05-07)
+
+
+### Features
+
+* add npm shim to enforce pnpm usage via mise ([6a446b2](https://github.com/gotgenes/pi-permission-system/commit/6a446b2e94c125f36377a2388dba2adbd0305459))
+
+
+### Documentation
+
+* add redundant integration test cleanup step ([#107](https://github.com/gotgenes/pi-permission-system/issues/107)) ([236d812](https://github.com/gotgenes/pi-permission-system/commit/236d812f35821860fd5253fedb0e8b26386a34ac))
+* expand gate test surfaces in plan ([#107](https://github.com/gotgenes/pi-permission-system/issues/107)) ([d671556](https://github.com/gotgenes/pi-permission-system/commit/d671556054d35c4d542f9501600c546cb3574207))
+* plan extract per-gate functions from handleToolCall ([#107](https://github.com/gotgenes/pi-permission-system/issues/107)) ([c867d34](https://github.com/gotgenes/pi-permission-system/commit/c867d345e70aad0be953275e5712270e154f4f0a))
+* update architecture for gate extraction ([#107](https://github.com/gotgenes/pi-permission-system/issues/107)) ([fe4c967](https://github.com/gotgenes/pi-permission-system/commit/fe4c967d683be96031a7070390a8b8687dbb28ba))
+
 ## [5.3.4](https://github.com/gotgenes/pi-permission-system/compare/v5.3.3...v5.3.4) (2026-05-06)
 
 
