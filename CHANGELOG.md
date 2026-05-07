@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.6.1](https://github.com/gotgenes/pi-permission-system/compare/v5.6.0...v5.6.1) (2026-05-07)
+
+
+### Documentation
+
+* document OpenCode compatibility ([#106](https://github.com/gotgenes/pi-permission-system/issues/106)) ([be9b2ab](https://github.com/gotgenes/pi-permission-system/commit/be9b2ab70ffcb839b0400f86ad46bd8d79089f15))
+* plan document OpenCode compatibility ([#106](https://github.com/gotgenes/pi-permission-system/issues/106)) ([57aa584](https://github.com/gotgenes/pi-permission-system/commit/57aa5844a823779b4dfb3524c2bb4b696c56bd34))
+* **retro:** add retro notes for issue [#118](https://github.com/gotgenes/pi-permission-system/issues/118) ([cb89995](https://github.com/gotgenes/pi-permission-system/commit/cb8999511d7e2ae3ca5b6e0b4510bbb9b4a114f9))
+
 ## [5.6.0](https://github.com/gotgenes/pi-permission-system/compare/v5.5.1...v5.6.0) (2026-05-07)
 
 
