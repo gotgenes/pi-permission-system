@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.5.0](https://github.com/gotgenes/pi-permission-system/compare/v5.4.0...v5.5.0) (2026-05-07)
+
+
+### Features
+
+* extract FilePolicyLoader from PermissionManager ([705d800](https://github.com/gotgenes/pi-permission-system/commit/705d800ec326d99798be2abaeba83235adae55b2))
+
+
+### Bug Fixes
+
+* pass through npm calls targeting .pi/npm directory ([4104712](https://github.com/gotgenes/pi-permission-system/commit/4104712a17baa2b1eae5fd6388357b672798f8bb))
+
+
+### Documentation
+
+* add PolicyLoader to target architecture ([fbbb85f](https://github.com/gotgenes/pi-permission-system/commit/fbbb85f76830880c8b3906f3694c7a7f7bb7fab5))
+* plan extract PolicyLoader from PermissionManager ([#108](https://github.com/gotgenes/pi-permission-system/issues/108)) ([4d5f0df](https://github.com/gotgenes/pi-permission-system/commit/4d5f0df11af4bd87061ca38c19a14cc807dd6e84))
+* **retro:** add retro notes for issue [#107](https://github.com/gotgenes/pi-permission-system/issues/107) ([d979562](https://github.com/gotgenes/pi-permission-system/commit/d979562cee6e2aca0e1f2d232c8d18ddb7926dd4))
+
 ## [5.4.0](https://github.com/gotgenes/pi-permission-system/compare/v5.3.4...v5.4.0) (2026-05-07)
 
 
