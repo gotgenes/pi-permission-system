@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.6.0](https://github.com/gotgenes/pi-permission-system/compare/v5.5.1...v5.6.0) (2026-05-07)
+
+
+### Features
+
+* implement runGateCheck gate runner ([#118](https://github.com/gotgenes/pi-permission-system/issues/118)) ([46da4b6](https://github.com/gotgenes/pi-permission-system/commit/46da4b616cddef22d9e1d198a3aac9c640d62bac))
+
+
+### Documentation
+
+* plan gate runner extraction ([#118](https://github.com/gotgenes/pi-permission-system/issues/118)) ([8c0eb18](https://github.com/gotgenes/pi-permission-system/commit/8c0eb1881dabc19dba65f72ba5c30ae02e4070a0))
+* **retro:** add retro notes for issue [#111](https://github.com/gotgenes/pi-permission-system/issues/111) ([e327323](https://github.com/gotgenes/pi-permission-system/commit/e327323187822e779454eeafd7372c6256f869ba))
+* update target architecture for gate runner ([#118](https://github.com/gotgenes/pi-permission-system/issues/118)) ([40e1b1b](https://github.com/gotgenes/pi-permission-system/commit/40e1b1b016730e9be3da18fcb831001a2f498081))
+
 ## [5.5.1](https://github.com/gotgenes/pi-permission-system/compare/v5.5.0...v5.5.1) (2026-05-07)
 
 
