@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.11.1](https://github.com/gotgenes/pi-permission-system/compare/v5.11.0...v5.11.1) (2026-05-08)
+
+
+### Documentation
+
+* **retro:** add retro notes for issue [#130](https://github.com/gotgenes/pi-permission-system/issues/130) ([e2ed7cb](https://github.com/gotgenes/pi-permission-system/commit/e2ed7cbbabe2dabf5689704c14b59fc662c1e7d4))
+
+
+### Miscellaneous Chores
+
+* migrate @mariozechner/* deps to @earendil-works/* ([8908be1](https://github.com/gotgenes/pi-permission-system/commit/8908be17624a60ff3272b9e0e0a720a239de2de5))
+
 ## [5.11.0](https://github.com/gotgenes/pi-permission-system/compare/v5.10.0...v5.11.0) (2026-05-08)
 
 
