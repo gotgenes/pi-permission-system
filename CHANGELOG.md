@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.9.0](https://github.com/gotgenes/pi-permission-system/compare/v5.8.0...v5.9.0) (2026-05-08)
+
+
+### Features
+
+* add ForwardingManager class ([#128](https://github.com/gotgenes/pi-permission-system/issues/128)) ([7790380](https://github.com/gotgenes/pi-permission-system/commit/7790380eb0291f55724425a0bd6bd0b45cf15d91))
+
+
+### Documentation
+
+* plan ForwardingManager extraction ([#128](https://github.com/gotgenes/pi-permission-system/issues/128)) ([2f10450](https://github.com/gotgenes/pi-permission-system/commit/2f10450974adaedd7a43e8a7d986f8f61a0508db))
+* **retro:** add retro notes for issue [#127](https://github.com/gotgenes/pi-permission-system/issues/127) ([2dde534](https://github.com/gotgenes/pi-permission-system/commit/2dde53416c535331972367ca2a44ba302b25d2a0))
+
 ## [5.8.0](https://github.com/gotgenes/pi-permission-system/compare/v5.7.0...v5.8.0) (2026-05-08)
 
 
