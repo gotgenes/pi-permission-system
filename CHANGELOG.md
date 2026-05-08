@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.10.0](https://github.com/gotgenes/pi-permission-system/compare/v5.9.0...v5.10.0) (2026-05-08)
+
+
+### Features
+
+* PermissionSession class with delegation methods ([#129](https://github.com/gotgenes/pi-permission-system/issues/129)) ([a8486ce](https://github.com/gotgenes/pi-permission-system/commit/a8486ce1d0678a7617e3cc6d8131e5f3080a1bea))
+* PermissionSession lifecycle, cache, agent name, and infra methods ([#129](https://github.com/gotgenes/pi-permission-system/issues/129)) ([8f6edf7](https://github.com/gotgenes/pi-permission-system/commit/8f6edf727856a974dc8061c1ff6003838d916662))
+
+
+### Documentation
+
+* plan PermissionSession extraction ([#129](https://github.com/gotgenes/pi-permission-system/issues/129)) ([9dc21b4](https://github.com/gotgenes/pi-permission-system/commit/9dc21b457ff5ca5e95b920eed1e5b48511175cdf))
+* **retro:** add retro notes for issue [#128](https://github.com/gotgenes/pi-permission-system/issues/128) ([9794053](https://github.com/gotgenes/pi-permission-system/commit/979405305ee5ddeac97186ea949373aff947a210))
+* update architecture for PermissionSession ([#129](https://github.com/gotgenes/pi-permission-system/issues/129)) ([d452c50](https://github.com/gotgenes/pi-permission-system/commit/d452c50a7edb7ca1c2c7715836b007386814e1b3))
+
 ## [5.9.0](https://github.com/gotgenes/pi-permission-system/compare/v5.8.0...v5.9.0) (2026-05-08)
 
 
