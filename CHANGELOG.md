@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.12.0](https://github.com/gotgenes/pi-permission-system/compare/v5.11.2...v5.12.0) (2026-05-08)
+
+
+### Features
+
+* support trailing wildcard optionality ([#123](https://github.com/gotgenes/pi-permission-system/issues/123)) ([c25b0b5](https://github.com/gotgenes/pi-permission-system/commit/c25b0b5c59e5d5739a3b6c99de18444a4e7820ec))
+
+
+### Documentation
+
+* plan trailing wildcard optionality ([#123](https://github.com/gotgenes/pi-permission-system/issues/123)) ([a6a50d2](https://github.com/gotgenes/pi-permission-system/commit/a6a50d28284bb624a3695d361b5b9f2a9861f470))
+* **retro:** add retro notes for issue [#113](https://github.com/gotgenes/pi-permission-system/issues/113) ([7412740](https://github.com/gotgenes/pi-permission-system/commit/7412740c876c42cc1cd63f95ee4cb0ea0de72e68))
+* update wildcard optionality docs ([#123](https://github.com/gotgenes/pi-permission-system/issues/123)) ([562adaf](https://github.com/gotgenes/pi-permission-system/commit/562adaff9726096004dc4f5214550af2dc2fc118))
+
 ## [5.11.2](https://github.com/gotgenes/pi-permission-system/compare/v5.11.1...v5.11.2) (2026-05-08)
 
 
