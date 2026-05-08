@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.11.2](https://github.com/gotgenes/pi-permission-system/compare/v5.11.1...v5.11.2) (2026-05-08)
+
+
+### Documentation
+
+* plan removal of legacy path defaults from logging and extension-config ([#113](https://github.com/gotgenes/pi-permission-system/issues/113)) ([27ec0d8](https://github.com/gotgenes/pi-permission-system/commit/27ec0d8668c8c006f94c544e55d10c0eb272ddab))
+
+
+### Miscellaneous Chores
+
+* approve @google/genai build scripts in pnpm-workspace.yaml ([23b177f](https://github.com/gotgenes/pi-permission-system/commit/23b177f8c5e00d5bc9812fa826c34844cc665d7a))
+* upgrade pnpm to 11.0.8 and update deps ([31eb848](https://github.com/gotgenes/pi-permission-system/commit/31eb848539ff411cb7b6f422cd0244d6c9765ac7))
+
 ## [5.11.1](https://github.com/gotgenes/pi-permission-system/compare/v5.11.0...v5.11.1) (2026-05-08)
 
 
