@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.11.0](https://github.com/gotgenes/pi-permission-system/compare/v5.10.0...v5.11.0) (2026-05-08)
+
+
+### Features
+
+* add ToolRegistry interface ([#130](https://github.com/gotgenes/pi-permission-system/issues/130)) ([5e886fd](https://github.com/gotgenes/pi-permission-system/commit/5e886fd4bc67ddac56a7f2b7b445f6f172e60668))
+* PermissionSession absorbs prompting methods ([#130](https://github.com/gotgenes/pi-permission-system/issues/130)) ([4ae81e6](https://github.com/gotgenes/pi-permission-system/commit/4ae81e6e32164926202633ec7831a4f3db69fc70))
+
+
+### Documentation
+
+* plan handler classes to replace HandlerDeps ([#130](https://github.com/gotgenes/pi-permission-system/issues/130)) ([e8bc1a4](https://github.com/gotgenes/pi-permission-system/commit/e8bc1a40596aa6a032b367e642d19a03ca622394))
+* **retro:** add retro notes for issue [#129](https://github.com/gotgenes/pi-permission-system/issues/129) ([23c29a2](https://github.com/gotgenes/pi-permission-system/commit/23c29a2148f6647565e6997d9c56341b43e74118))
+* update architecture for handler classes ([#130](https://github.com/gotgenes/pi-permission-system/issues/130)) ([02d02b6](https://github.com/gotgenes/pi-permission-system/commit/02d02b647ec366eee3dc572afbaf436b1264b052))
+
 ## [5.10.0](https://github.com/gotgenes/pi-permission-system/compare/v5.9.0...v5.10.0) (2026-05-08)
 
 
