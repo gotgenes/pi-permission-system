@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.8.0](https://github.com/gotgenes/pi-permission-system/compare/v5.7.0...v5.8.0) (2026-05-08)
+
+
+### Features
+
+* add SessionLogger interface and createSessionLogger factory ([#127](https://github.com/gotgenes/pi-permission-system/issues/127)) ([8765ab8](https://github.com/gotgenes/pi-permission-system/commit/8765ab8cfe461324fc2a89c80486d3dde190d9d9))
+
+
+### Documentation
+
+* plan SessionLogger extraction ([#127](https://github.com/gotgenes/pi-permission-system/issues/127)) ([b13ac62](https://github.com/gotgenes/pi-permission-system/commit/b13ac62513d4b233ee4fc3f554324a54518f75ba))
+* **retro:** add retro notes for issue [#126](https://github.com/gotgenes/pi-permission-system/issues/126) ([3d8a38a](https://github.com/gotgenes/pi-permission-system/commit/3d8a38a09f9dfd2570178c856aec260ebdba89b1))
+* update architecture doc for SessionLogger ([#127](https://github.com/gotgenes/pi-permission-system/issues/127)) ([8fa4123](https://github.com/gotgenes/pi-permission-system/commit/8fa41237dc1b43cbe4487ba7d0acf75dc768ad9c))
+
 ## [5.7.0](https://github.com/gotgenes/pi-permission-system/compare/v5.6.3...v5.7.0) (2026-05-08)
 
 
