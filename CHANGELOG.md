@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.13.0](https://github.com/gotgenes/pi-permission-system/compare/v5.12.0...v5.13.0) (2026-05-08)
+
+
+### Features
+
+* warn that this is a pnpm project on global npm pass-throughs ([f643149](https://github.com/gotgenes/pi-permission-system/commit/f64314981126331ec96ec6a20418440eff1738e7))
+
+
+### Bug Fixes
+
+* pass through npm install/uninstall -g in PATH shim ([eaf4256](https://github.com/gotgenes/pi-permission-system/commit/eaf4256446b2c1ec3ecba98d11cc75b1406931af))
+* prevent double-loading extension in dev via project settings ([6c39f33](https://github.com/gotgenes/pi-permission-system/commit/6c39f33890e61b5e0fde41d178aad9df93592cc9))
+
+
+### Documentation
+
+* plan external_directory integration tests ([#1](https://github.com/gotgenes/pi-permission-system/issues/1)) ([695ffeb](https://github.com/gotgenes/pi-permission-system/commit/695ffeb6d7a648df3dd9e18a01c20ff22266857b))
+* **retro:** add retro notes for double-prompt investigation ([37734a5](https://github.com/gotgenes/pi-permission-system/commit/37734a57aee972aa4c732d92eeda424dd40443ee))
+* **retro:** add retro notes for issue [#123](https://github.com/gotgenes/pi-permission-system/issues/123) ([5dbea33](https://github.com/gotgenes/pi-permission-system/commit/5dbea3379963b6231a4a101c889a4594705b12b6))
+
+
+### Miscellaneous Chores
+
+* switch ask tool from pi-ask-user to @eko24ive/pi-ask ([0087458](https://github.com/gotgenes/pi-permission-system/commit/00874585724d79fbeda1fca84b998db3bcd1a043))
+
 ## [5.12.0](https://github.com/gotgenes/pi-permission-system/compare/v5.11.2...v5.12.0) (2026-05-08)
 
 
