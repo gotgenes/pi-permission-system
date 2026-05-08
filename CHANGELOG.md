@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.7.0](https://github.com/gotgenes/pi-permission-system/compare/v5.6.3...v5.7.0) (2026-05-08)
+
+
+### Features
+
+* extract ExtensionPaths value object ([#126](https://github.com/gotgenes/pi-permission-system/issues/126)) ([85bc347](https://github.com/gotgenes/pi-permission-system/commit/85bc347d3ed487210ffbed4c1c53616b5cf0d978))
+
+
+### Documentation
+
+* add handler decomposition plan ([#126](https://github.com/gotgenes/pi-permission-system/issues/126), [#127](https://github.com/gotgenes/pi-permission-system/issues/127), [#128](https://github.com/gotgenes/pi-permission-system/issues/128), [#129](https://github.com/gotgenes/pi-permission-system/issues/129), [#130](https://github.com/gotgenes/pi-permission-system/issues/130)) ([5a116a6](https://github.com/gotgenes/pi-permission-system/commit/5a116a6cf2f6ef29f5e6550821bb26b6e1c3a90f))
+* add structural design heuristics, design-review skill, and plan-issue hook ([d8e3233](https://github.com/gotgenes/pi-permission-system/commit/d8e32330baa25fa5a5abaf75f8e442ce650fe5a9))
+* extract code-style, testing, and markdown-conventions skills from AGENTS.md ([9d5ba7a](https://github.com/gotgenes/pi-permission-system/commit/9d5ba7a4a4a7a9e9fbdfe869fb42840238351b81))
+* plan ExtensionPaths value object extraction ([#126](https://github.com/gotgenes/pi-permission-system/issues/126)) ([d76e6cc](https://github.com/gotgenes/pi-permission-system/commit/d76e6cc255dc124a7a914e8d178113e5b7c8bddd))
+* rename target-architecture to architecture, strip progress indicators ([9776550](https://github.com/gotgenes/pi-permission-system/commit/9776550351f3b59f96bdad614cc5129a7be52a51))
+* **retro:** add retro notes for issue [#110](https://github.com/gotgenes/pi-permission-system/issues/110) ([5597de3](https://github.com/gotgenes/pi-permission-system/commit/5597de3c9c64c3d672a1fc77ba7910e952545824))
+
 ## [5.6.3](https://github.com/gotgenes/pi-permission-system/compare/v5.6.2...v5.6.3) (2026-05-07)
 
 
