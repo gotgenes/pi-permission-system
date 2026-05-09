@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.14.0](https://github.com/gotgenes/pi-permission-system/compare/v5.13.0...v5.14.0) (2026-05-09)
+
+
+### Features
+
+* support ? single-character wildcard in permission patterns ([#122](https://github.com/gotgenes/pi-permission-system/issues/122)) ([7b56f49](https://github.com/gotgenes/pi-permission-system/commit/7b56f4979a3479912dcc1d903f52a517587b95f6))
+
+
+### Documentation
+
+* document ? wildcard and update OpenCode compatibility ([#122](https://github.com/gotgenes/pi-permission-system/issues/122)) ([31ace5f](https://github.com/gotgenes/pi-permission-system/commit/31ace5f36a11299750994c2b9e6084dbecc240ba))
+* plan ? single-character wildcard support ([#122](https://github.com/gotgenes/pi-permission-system/issues/122)) ([a7a2963](https://github.com/gotgenes/pi-permission-system/commit/a7a296337809ee7c107f86b87b64bfeb3709467f))
+* **retro:** add retro notes for issue [#1](https://github.com/gotgenes/pi-permission-system/issues/1) ([b1c66f1](https://github.com/gotgenes/pi-permission-system/commit/b1c66f18d1aed5cc95a1fccb1a9c6c0f44f5cd11))
+
 ## [5.13.0](https://github.com/gotgenes/pi-permission-system/compare/v5.12.0...v5.13.0) (2026-05-08)
 
 
