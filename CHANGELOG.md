@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.14.1](https://github.com/gotgenes/pi-permission-system/compare/v5.14.0...v5.14.1) (2026-05-11)
+
+
+### Bug Fixes
+
+* show tool name instead of bare wildcard in session-approval label ([1a65c30](https://github.com/gotgenes/pi-permission-system/commit/1a65c3017f25012c3a7ced63f26d40fcecea81d3))
+* surface-prefixed session-approval labels for all permission surfaces ([759da03](https://github.com/gotgenes/pi-permission-system/commit/759da03be9c0d847ec6de58e161ef2e7cbbc70b8))
+
+
+### Documentation
+
+* **retro:** add retro notes for issue [#122](https://github.com/gotgenes/pi-permission-system/issues/122) ([7867db2](https://github.com/gotgenes/pi-permission-system/commit/7867db22054df00e13aa6c88347238dadaa63166))
+
 ## [5.14.0](https://github.com/gotgenes/pi-permission-system/compare/v5.13.0...v5.14.0) (2026-05-09)
 
 
