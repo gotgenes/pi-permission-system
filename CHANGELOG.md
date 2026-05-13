@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.16.0](https://github.com/gotgenes/pi-permission-system/compare/v5.15.0...v5.16.0) (2026-05-13)
+
+
+### Features
+
+* decision events include file path for path-bearing tools ([#147](https://github.com/gotgenes/pi-permission-system/issues/147)) ([eea226d](https://github.com/gotgenes/pi-permission-system/commit/eea226d990d4358983cc319d54b7544849b2b453))
+* normalizeInput returns file path for path-bearing tools ([#147](https://github.com/gotgenes/pi-permission-system/issues/147)) ([0b48995](https://github.com/gotgenes/pi-permission-system/commit/0b4899563ed3aaf2dd264650a98964168e7ecba1))
+* path-scoped session approvals for path-bearing tools ([#147](https://github.com/gotgenes/pi-permission-system/issues/147)) ([1feacc5](https://github.com/gotgenes/pi-permission-system/commit/1feacc53d4ac1653bf974886ce77e13aff014b68))
+
+
+### Documentation
+
+* document per-tool path patterns ([#147](https://github.com/gotgenes/pi-permission-system/issues/147)) ([81245f6](https://github.com/gotgenes/pi-permission-system/commit/81245f6ac98500e6c4d3c2191ceb2db032284f05))
+* plan per-tool path patterns for path-bearing tools ([#147](https://github.com/gotgenes/pi-permission-system/issues/147)) ([9458706](https://github.com/gotgenes/pi-permission-system/commit/9458706d85e4711b73677ee1abcc8f3ad7d18a2e))
+
 ## [5.15.0](https://github.com/gotgenes/pi-permission-system/compare/v5.14.1...v5.15.0) (2026-05-13)
 
 
