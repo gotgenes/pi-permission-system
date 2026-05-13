@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.15.0](https://github.com/gotgenes/pi-permission-system/compare/v5.14.1...v5.15.0) (2026-05-13)
+
+
+### Features
+
+* add PI_SUBAGENT_PARENT_SESSION convention for parent session resolution ([3829195](https://github.com/gotgenes/pi-permission-system/commit/3829195c7de1f755adf9aa35809de699434d9aae)), closes [#143](https://github.com/gotgenes/pi-permission-system/issues/143)
+
+
+### Documentation
+
+* add Cross-Extension Integration section to AGENTS.md ([#145](https://github.com/gotgenes/pi-permission-system/issues/145)) ([90209f7](https://github.com/gotgenes/pi-permission-system/commit/90209f75ecd0845b6ac13c6c4895da32a4c82909))
+
 ## [5.14.1](https://github.com/gotgenes/pi-permission-system/compare/v5.14.0...v5.14.1) (2026-05-11)
 
 
