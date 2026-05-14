@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.18.0](https://github.com/gotgenes/pi-permission-system/compare/v5.17.0...v5.18.0) (2026-05-14)
+
+
+### Features
+
+* add package.json exports field for cross-extension import ([#145](https://github.com/gotgenes/pi-permission-system/issues/145)) ([1091de5](https://github.com/gotgenes/pi-permission-system/commit/1091de5eb673050c3b83448ee69cffb876c407d9))
+* add Symbol.for()-backed service accessor module ([#145](https://github.com/gotgenes/pi-permission-system/issues/145)) ([6a7ddab](https://github.com/gotgenes/pi-permission-system/commit/6a7ddab6e3e58ca0f93807255e9e48716d96ca24))
+* publish permissions service on startup, clear on shutdown ([#145](https://github.com/gotgenes/pi-permission-system/issues/145)) ([97bea7b](https://github.com/gotgenes/pi-permission-system/commit/97bea7bec043de4f6abb823846cef5c04a069517))
+
+
+### Documentation
+
+* deprecate permissions:rpc:check types in favor of service accessor ([#145](https://github.com/gotgenes/pi-permission-system/issues/145)) ([a64b1b9](https://github.com/gotgenes/pi-permission-system/commit/a64b1b91f141e1a98b576433280ad09d95ec3011))
+* document service accessor and deprecate RPC check ([#145](https://github.com/gotgenes/pi-permission-system/issues/145)) ([931a14e](https://github.com/gotgenes/pi-permission-system/commit/931a14efec1ef9bc53075f8974bfd1eeff7e0749))
+* plan Symbol.for()-backed service accessor ([#145](https://github.com/gotgenes/pi-permission-system/issues/145)) ([d9448bc](https://github.com/gotgenes/pi-permission-system/commit/d9448bc8c9ee71714599a18f03cf516a5ffca2cb))
+* **retro:** add retro notes for issue [#148](https://github.com/gotgenes/pi-permission-system/issues/148) ([84e0262](https://github.com/gotgenes/pi-permission-system/commit/84e026264e292357c18c0333b1d1bd561f70149b))
+
 ## [5.17.0](https://github.com/gotgenes/pi-permission-system/compare/v5.16.0...v5.17.0) (2026-05-14)
 
 
