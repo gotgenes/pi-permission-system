@@ -62,6 +62,17 @@ export function getSessionId(ctx: ExtensionContext): string {
   return "unknown";
 }
 
+function getSessionDir(ctx: ExtensionContext): string | null {
+  try {
+    const sessionDir = ctx.sessionManager.getSessionDir();
+    return typeof sessionDir === "string" && sessionDir.trim()
+      ? sessionDir
+      : null;
+  } catch {
+    return null;
+  }
+}
+
 function getContextSystemPrompt(ctx: ExtensionContext): string | undefined {
   const getSystemPrompt = toRecord(ctx).getSystemPrompt;
   if (typeof getSystemPrompt !== "function") {
@@ -101,20 +112,23 @@ export async function waitForForwardedPermissionApproval(
   deps: PermissionForwardingDeps,
 ): Promise<PermissionPromptDecision> {
   const requesterSessionId = getSessionId(ctx);
+  const requesterSessionDir = getSessionDir(ctx);
   const targetSessionId = resolvePermissionForwardingTargetSessionId({
     hasUI: ctx.hasUI,
     isSubagent: isSubagentExecutionContext(ctx, deps.subagentSessionsDir),
     currentSessionId: requesterSessionId,
     env: process.env,
+    sessionDir: requesterSessionDir,
   });
 
   if (!targetSessionId) {
     logPermissionForwardingError(
       deps.logger,
       `Permission forwarding target session could not be resolved. ` +
-        `Checked env vars: ${SUBAGENT_PARENT_SESSION_ENV_CANDIDATES.join(", ")}. ` +
-        `If you are using a subagent extension (nicobailon/pi-subagents, HazAT/pi-interactive-subagents, etc.), ` +
-        `ask its maintainer to set PI_SUBAGENT_PARENT_SESSION in the child process environment ` +
+        `Checked env vars: ${SUBAGENT_PARENT_SESSION_ENV_CANDIDATES.join(", ")}; ` +
+        `the session-directory walk-up from '${requesterSessionDir ?? "<unknown>"}' also found no parent session log. ` +
+        `If you are using a subagent extension (nicobailon/pi-subagents, HazAT/pi-interactive-subagents, etc.) ` +
+        `outside Pi's normal session-directory layout, ask its maintainer to set PI_SUBAGENT_PARENT_SESSION in the child process environment ` +
         `(see https://github.com/gotgenes/pi-permission-system/issues/143).`,
     );
     return { approved: false, state: "denied" };

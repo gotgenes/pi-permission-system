@@ -1,5 +1,6 @@
 import { join } from "node:path";
 
+import { resolveParentSessionIdFromSessionDir } from "./parent-session-discovery";
 import type { PermissionDecisionState } from "./permission-dialog";
 
 export const PERMISSION_FORWARDING_POLL_INTERVAL_MS = 250;
@@ -118,6 +119,13 @@ export function resolvePermissionForwardingTargetSessionId(options: {
   isSubagent: boolean;
   currentSessionId?: string | null;
   env?: NodeJS.ProcessEnv;
+  /**
+   * Current process's session directory (e.g. `ctx.sessionManager.getSessionDir()`).
+   * When the env-candidate loop misses, the resolver walks ancestors of this
+   * directory looking for a sibling `<name>.jsonl` whose JSONL header carries
+   * the parent session ID.
+   */
+  sessionDir?: string | null;
 }): string | null {
   if (options.hasUI) {
     return normalizePermissionForwardingSessionId(options.currentSessionId);
@@ -132,7 +140,8 @@ export function resolvePermissionForwardingTargetSessionId(options: {
     const resolved = normalizePermissionForwardingSessionId(env[key]);
     if (resolved) return resolved;
   }
-  return null;
+
+  return resolveParentSessionIdFromSessionDir(options.sessionDir);
 }
 
 export function isForwardedPermissionRequestForSession(
