@@ -407,9 +407,30 @@ A session-directory path-based fallback (child session dir is nested under `suba
 ### Parent-session resolution (`SUBAGENT_PARENT_SESSION_ENV_CANDIDATES`)
 
 `resolvePermissionForwardingTargetSessionId()` iterates `SUBAGENT_PARENT_SESSION_ENV_CANDIDATES` and returns the first non-empty, non-`"unknown"` value.
-Currently only `PI_AGENT_ROUTER_PARENT_SESSION_ID` is in the list.
-Neither nicobailon nor HazAT sets a parent-session env var today, so forwarding still fails for those extensions with an explicit log message pointing to #98.
+The list contains `PI_AGENT_ROUTER_PARENT_SESSION_ID` (original `pi-agent-router`) and `PI_SUBAGENT_PARENT_SESSION` (shared convention for CLI-based subagent extensions).
 Adding a new env var candidate when an extension adopts the convention is a one-line change to the array.
+
+### Parent-session resolution (session-directory fallback)
+
+When every env candidate is empty or `"unknown"`, `resolvePermissionForwardingTargetSessionId()` falls back to `resolveParentSessionIdFromSessionDir()` in `src/parent-session-discovery.ts`.
+This covers CLI-based subagent extensions (`nicobailon/pi-subagents`, `HazAT/pi-interactive-subagents`) that do not yet set `PI_SUBAGENT_PARENT_SESSION` in spawned children — no upstream coordination is required.
+
+The helper relies on Pi's session-directory layout:
+
+```text
+<sessionsDir>/
+  <parentBaseName>.jsonl              ← parent session log; first line is { type: "session", id: <parentId> }
+  <parentBaseName>/
+    <runId>/run-<n>/                  ← child session directory (returned by ctx.sessionManager.getSessionDir())
+      session.jsonl                   ← child session log
+```
+
+This nesting is enforced by `nicobailon/pi-subagents` (`getSubagentSessionRoot()`) and is the same shape Pi's own `SessionManager` creates.
+The helper climbs at most `MAX_WALK_DEPTH` levels (currently 8), and at each level checks whether `<currentDir>.jsonl` exists as a sibling file.
+The first such file whose first JSONL line is a valid `{ type: "session", id: <string> }` record wins — its `id` is returned.
+All filesystem and parse errors are silently skipped so the helper never throws.
+
+The directory-name is *not* used to derive the session ID — only the JSONL header's `id` field is, because directory naming is not part of Pi's SDK contract while the `SessionHeader` shape is.
 
 ### Deferred: tintinweb in-process case
 
