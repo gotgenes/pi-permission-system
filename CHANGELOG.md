@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.17.0](https://github.com/gotgenes/pi-permission-system/compare/v5.16.0...v5.17.0) (2026-05-14)
+
+
+### Features
+
+* bash path gate with broader token extraction ([#148](https://github.com/gotgenes/pi-permission-system/issues/148)) ([affe202](https://github.com/gotgenes/pi-permission-system/commit/affe20284c7b579facc46ba489a1b6b0e2acc949))
+* broader token extraction for path rules ([#148](https://github.com/gotgenes/pi-permission-system/issues/148)) ([6303641](https://github.com/gotgenes/pi-permission-system/commit/6303641a6efc3265e209799b93d4c8bcbc17c6a0))
+* evaluateMostRestrictive helper for cross-cutting path evaluation ([#148](https://github.com/gotgenes/pi-permission-system/issues/148)) ([5260f21](https://github.com/gotgenes/pi-permission-system/commit/5260f21f149f8cd9b3331c4e418bc9091db2acdb))
+* integrate path gates into permission pipeline ([#148](https://github.com/gotgenes/pi-permission-system/issues/148)) ([36fb30e](https://github.com/gotgenes/pi-permission-system/commit/36fb30e2564a8707b8e6eb8b798b90d536623c53))
+* path gate for tool path restrictions ([#148](https://github.com/gotgenes/pi-permission-system/issues/148)) ([cc53681](https://github.com/gotgenes/pi-permission-system/commit/cc5368103686eee0849644cffce463c2851dff3c))
+* register path as a special permission surface ([#148](https://github.com/gotgenes/pi-permission-system/issues/148)) ([356bcf7](https://github.com/gotgenes/pi-permission-system/commit/356bcf74b3028894319ea3c63b5d4b014b7bfe48))
+
+
+### Documentation
+
+* document cross-cutting path permission surface ([#148](https://github.com/gotgenes/pi-permission-system/issues/148)) ([3bd4478](https://github.com/gotgenes/pi-permission-system/commit/3bd4478c95197550485910c4364d35203ff53ada))
+* include edit alongside write in config examples ([#147](https://github.com/gotgenes/pi-permission-system/issues/147)) ([f083ccc](https://github.com/gotgenes/pi-permission-system/commit/f083ccc0316e0689390e5ecc16e14ab40baca1d9))
+* plan path-aware bash permission rules ([#148](https://github.com/gotgenes/pi-permission-system/issues/148)) ([71ff973](https://github.com/gotgenes/pi-permission-system/commit/71ff973edd57d75801b75044e238139e90a8490f))
+* **retro:** add retro notes for issue [#147](https://github.com/gotgenes/pi-permission-system/issues/147) ([e40402b](https://github.com/gotgenes/pi-permission-system/commit/e40402b018703c37c8af436dc4e15665216f59c7))
+
 ## [5.16.0](https://github.com/gotgenes/pi-permission-system/compare/v5.15.0...v5.16.0) (2026-05-13)
 
 
