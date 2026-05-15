@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.18.1](https://github.com/gotgenes/pi-permission-system/compare/v5.18.0...v5.18.1) (2026-05-15)
+
+
+### Documentation
+
+* plan Pi GitHub Tools extension ([#153](https://github.com/gotgenes/pi-permission-system/issues/153)) ([6f8566f](https://github.com/gotgenes/pi-permission-system/commit/6f8566feba22981e3f726aae8544bab53dce8a8a))
+* **retro:** add retro notes for issue [#145](https://github.com/gotgenes/pi-permission-system/issues/145) ([70ff363](https://github.com/gotgenes/pi-permission-system/commit/70ff36369a902f82d78e277ba9fa7948bb62d82c))
+* update /ship-issue to use pi-github-tools ([#153](https://github.com/gotgenes/pi-permission-system/issues/153)) ([7a4de21](https://github.com/gotgenes/pi-permission-system/commit/7a4de21ee16f7a1fff3ef8cf6e2b3a0516183ab5))
+* update docs and pattern-suggest for path surface ([6defcdb](https://github.com/gotgenes/pi-permission-system/commit/6defcdb5430296c82da6eefc1980ab109dedc202))
+
 ## [5.18.0](https://github.com/gotgenes/pi-permission-system/compare/v5.17.0...v5.18.0) (2026-05-14)
 
 
