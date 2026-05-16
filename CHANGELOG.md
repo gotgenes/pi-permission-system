@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.18.2](https://github.com/gotgenes/pi-permission-system/compare/v5.18.1...v5.18.2) (2026-05-15)
+
+
+### Documentation
+
+* link to Agent Sandboxes from not-a-sandbox limitation ([cbfed78](https://github.com/gotgenes/pi-permission-system/commit/cbfed787800a1d8e47bb20ee5b22e30a2a0cb9e7))
+
+
+### Miscellaneous Chores
+
+* add pi-github-tools to local project ([e5a3eca](https://github.com/gotgenes/pi-permission-system/commit/e5a3eca5cc7f44c41b477738f6cc8c73198259b9))
+* fix pi-autoformat commands to use pnpm ([87f82fb](https://github.com/gotgenes/pi-permission-system/commit/87f82fb9b468815c7a4da472fecee293fe608941))
+
 ## [5.18.1](https://github.com/gotgenes/pi-permission-system/compare/v5.18.0...v5.18.1) (2026-05-15)
 
 
